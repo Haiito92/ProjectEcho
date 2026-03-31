@@ -6,6 +6,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "EchoDebug.generated.h"
 
+class UEchoDebugDataAsset;
 enum EEchoSystem : uint8;
 /**
  * 
@@ -25,6 +26,6 @@ class PROJECTECHO_API UEchoDebug : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, Category="EchoDebug")
-	static void AddOnScreenDebugMessage(EEchoSystem SystemKey, EMessageType MessageType, const FString& Message, float TimeToDisplay);	
+	UFUNCTION(BlueprintCallable, Category="Echo Debug")
+	static void AddOnScreenDebugMessage(EEchoSystem SystemKey, EMessageType MessageType, const FString& Message, float TimeToDisplay);
 };

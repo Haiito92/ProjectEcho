@@ -16,9 +16,9 @@ struct PROJECTECHO_API FEchoSystemDebugInfo
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadWrite, Category="EchoDebug/SystemDebugInfo")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Echo Debug/System Debug Info")
 	FString DebugTag;
 	
-	UPROPERTY(BlueprintReadWrite, Category="EchoDebug/SystemDebugInfo")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Echo Debug/System Debug Info")
 	FColor DebugColor;
 };
