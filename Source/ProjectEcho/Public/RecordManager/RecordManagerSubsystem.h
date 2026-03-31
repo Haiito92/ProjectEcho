@@ -63,7 +63,7 @@ struct FEchoTimeline
 	 * This function will : 
 	 * - Calculate the Transform of the Actor based on last and next TransformKey
 	 */
-	void PlayReplay(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind) -> void;
+	void PlayReplay(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind);
 	
 	void ActivateTimeline(bool bInIsActive);
 };

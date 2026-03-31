@@ -1,8 +1,5 @@
 ﻿#include <RecordManager/RecordManagerSubsystem.h>
 
-#include "Developer/AITestSuite/Public/AITestsCommon.h"
-#include "Engine/World.h"
-
 #pragma region Timeline
 
 const FRecordTransformKey* FEchoTimeline::GetNextTransformKey(const float& TimeKey) const
@@ -95,7 +92,7 @@ void FGlobalTimeline::Play(const float& PreviousTimeKey, const float& CurrentTim
 	for (FEchoTimeline& Timeline : Timelines)
 	{
 		// Activate or deactivate Timeline
-		float LocalTimeKey = CurrentTimeKey - Timeline.StartTimeKey();
+		float LocalTimeKey = CurrentTimeKey - Timeline.StartTimeKey;
 		if (Timeline.bIsActive)
 		{
 			if (Timeline.GetLastTimeKey() < LocalTimeKey)
