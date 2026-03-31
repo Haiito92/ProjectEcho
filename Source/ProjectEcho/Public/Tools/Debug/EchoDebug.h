@@ -28,4 +28,9 @@ class PROJECTECHO_API UEchoDebug : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintCallable, Category="Echo Debug")
 	static void AddOnScreenDebugMessage(EEchoSystem SystemKey, EMessageType MessageType, const FString& Message, float TimeToDisplay);
+
+private:
+	static const UEchoDebugDataAsset* LazyGetDebugDataAsset();
+	
+	static TObjectPtr<UEchoDebugDataAsset> DebugDataAsset;
 };

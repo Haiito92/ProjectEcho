@@ -8,19 +8,37 @@
 
 void UEchoDebug::AddOnScreenDebugMessage(EEchoSystem SystemKey, EMessageType MessageType, const FString& Message, float TimeToDisplay)
 {
-	const UEchoDebugDeveloperSettings* Settings = GetDefault<UEchoDebugDeveloperSettings>();
-
-	UEchoDebugDataAsset* DebugData = Settings->DebugDataAsset.LoadSynchronous();
+	const UEchoDebugDataAsset* DebugData = LazyGetDebugDataAsset();
 
 	if (!DebugData) return;
 
-	FEchoSystemDebugInfo* SystemDebugInfo = DebugData->EchoSystemDebugInfos.Find(SystemKey);
+	const FEchoSystemDebugInfo* SystemDebugInfo = DebugData->EchoSystemDebugInfos.Find(SystemKey);
 	if (!SystemDebugInfo) return;
 
+	FString DebugMessage = "[" + SystemDebugInfo->DebugTag + "] " + Message;
+	
 	GEngine->AddOnScreenDebugMessage(
 		-1,
 		TimeToDisplay,
 		SystemDebugInfo->DebugColor,
-		Message
+		DebugMessage
 		);
 }
+
+const UEchoDebugDataAsset* UEchoDebug::LazyGetDebugDataAsset()
+{
+	if (DebugDataAsset == nullptr)
+	{
+		const UEchoDebugDeveloperSettings* Settings = GetDefault<UEchoDebugDeveloperSettings>();
+
+		if (Settings != nullptr)
+		{
+			DebugDataAsset = Settings->DebugDataAsset.LoadSynchronous();
+		}
+	}
+
+	return DebugDataAsset;
+}
+
+TObjectPtr<UEchoDebugDataAsset> UEchoDebug::DebugDataAsset = nullptr;
+
