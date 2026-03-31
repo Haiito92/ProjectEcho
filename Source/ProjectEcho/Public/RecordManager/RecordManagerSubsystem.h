@@ -94,9 +94,32 @@ class PROJECTECHO_API URecordManagerSubsystem : public UTickableWorldSubsystem
 {
 	GENERATED_BODY()
 	
+	UFUNCTION(BlueprintCallable)
+	void StartRecord(AActor* InRecordedActor);
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStartRecording, float, CurrentTimeKey);
+	FOnStartRecording OnStartRecording;
+	
+	UFUNCTION(BlueprintCallable)
+	void StopRecord();
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopRecording);
+	FOnStopRecording OnStopRecording;
+	
 	virtual void Tick(float DeltaTime) override;
 protected:
 	FGlobalTimeline GlobalTimeline;
+
+	//Current Recording Timeline;
+	FEchoTimeline RecordingTimeline;
+	
+	TObjectPtr<AActor> RecordedActor = nullptr;
+	
+	//Current TimeKey, used for Recording and Replays;
+	float CurrentTimeKey = 0.0f;
+	
+	//Is Recording
+	bool bIsRecording = false;
 	
 private:
 };

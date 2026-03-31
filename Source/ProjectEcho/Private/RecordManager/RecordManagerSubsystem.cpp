@@ -1,5 +1,8 @@
 ﻿#include <RecordManager/RecordManagerSubsystem.h>
 
+#include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
+
 #pragma region Timeline
 
 const FRecordTransformKey* FEchoTimeline::GetNextTransformKey(const float& TimeKey) const
@@ -83,6 +86,10 @@ void FEchoTimeline::ActivateTimeline(bool bInIsActive)
 	}
 }
 
+#pragma endregion
+
+#pragma region GlobalTimeline
+
 void FGlobalTimeline::Play(const float& PreviousTimeKey, const float& CurrentTimeKey, bool bIsInRewind, bool& bOutHasReachedEnd)
 {
 	//TODO: Add Rewind behavior
@@ -129,10 +136,36 @@ void FGlobalTimeline::RegisterTimeline(const FEchoTimeline& Timeline)
 	Timelines.Add(Timeline);
 }
 
+#pragma endregion
+
+void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor)
+{
+	if (bIsRecording || !GlobalTimeline.HasAvailableTimelineSlot()) return;
+	if (!IsValid(InRecordedActor)) return;
+	RecordedActor = InRecordedActor;
+	bIsRecording = true;
+	RecordingTimeline = FEchoTimeline();
+	RecordingTimeline.StartTimeKey = CurrentTimeKey;
+	RecordingTimeline.RecordTransformKey(RecordedActor, 0);
+	OnStartRecording.Broadcast(CurrentTimeKey);
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.9f);
+}
+
+void URecordManagerSubsystem::StopRecord()
+{
+	if (bIsRecording)
+	{
+		bIsRecording = false;
+		RecordingTimeline.RecordTransformKey(RecordedActor, CurrentTimeKey);
+		RecordedActor = nullptr;
+		GlobalTimeline.RegisterTimeline(RecordingTimeline);
+		OnStopRecording.Broadcast();
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
+	}
+}
+
 // Fill out your copyright notice in the Description page of Project Settings.
 void URecordManagerSubsystem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
-
-#pragma endregion
