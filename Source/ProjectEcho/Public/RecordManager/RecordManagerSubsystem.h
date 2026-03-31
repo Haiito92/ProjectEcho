@@ -27,7 +27,7 @@ struct FRecordTransformKey
 
 #pragma region Timeline Struct
 USTRUCT(Blueprintable)
-struct FTimeline
+struct FEchoTimeline
 {
 	GENERATED_BODY()
 	
@@ -44,22 +44,18 @@ struct FTimeline
 	bool bIsActive = false;
 
 	//Get Closest Next Key
-	UFUNCTION(BlueprintCallable)
 	const FRecordTransformKey* GetNextTransformKey(const float& TimeKey) const;
 	
 	//Get Closest Previous Key
-	UFUNCTION(BlueprintCallable)
 	const FRecordTransformKey* GetPreviousTransformKey(const float& TimeKey) const;
 	
 	//Get Last Key of Timeline (End of Timeline, in Local Time)
 	const float& GetLastTimeKey();
 	
 	//Save Echo Actor for Replays
-	UFUNCTION(BlueprintCallable)
 	void RegisterEchoActor(AActor* InEchoActor);
 	
 	//Record current Transform into TransformKey in Timeline List
-	UFUNCTION(BlueprintCallable)
 	void RecordTransformKey(AActor* RecordedActor, const float& CurrentTimeKey);
 	
 	/* Replay Function
@@ -67,10 +63,8 @@ struct FTimeline
 	 * This function will : 
 	 * - Calculate the Transform of the Actor based on last and next TransformKey
 	 */
-	UFUNCTION(BlueprintCallable)
 	void PlayReplay(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind) -> void;
 	
-	UFUNCTION(BlueprintCallable)
 	void ActivateTimeline(bool bInIsActive);
 };
 
@@ -79,7 +73,7 @@ struct FGlobalTimeline
 {
 	GENERATED_BODY()
 	
-	TArray<FTimeline> Timelines;
+	TArray<FEchoTimeline> Timelines;
 	
 	int MaxSlots = 5;
 	
@@ -87,7 +81,10 @@ struct FGlobalTimeline
 	void Play(const float& PreviousTimeKey, const float& CurrentTimeKey, bool bIsInRewind, bool& bOutHasReachedEnd);
 	
 	//Whether GlobalTimeline has an available slot to start recording in it
-	bool HasAvailableTimelineSlot();
+	bool HasAvailableTimelineSlot() const;
+	
+	//Add Timeline to Global Timeline
+	void RegisterTimeline(const FEchoTimeline& Timeline);
 };
 
 #pragma endregion

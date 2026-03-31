@@ -5,7 +5,7 @@
 
 #pragma region Timeline
 
-const FRecordTransformKey* FTimeline::GetNextTransformKey(const float& TimeKey) const
+const FRecordTransformKey* FEchoTimeline::GetNextTransformKey(const float& TimeKey) const
 {
 	for (const FRecordTransformKey& TransformKey : TransformKeys)
 	{
@@ -17,7 +17,7 @@ const FRecordTransformKey* FTimeline::GetNextTransformKey(const float& TimeKey) 
 	return nullptr;
 }
 
-const FRecordTransformKey* FTimeline::GetPreviousTransformKey(const float& TimeKey) const
+const FRecordTransformKey* FEchoTimeline::GetPreviousTransformKey(const float& TimeKey) const
 {
 	const FRecordTransformKey* key = nullptr;
 	for (const FRecordTransformKey& TransformKey : TransformKeys)
@@ -34,17 +34,17 @@ const FRecordTransformKey* FTimeline::GetPreviousTransformKey(const float& TimeK
 	return key;
 }
 
-const float& FTimeline::GetLastTimeKey()
+const float& FEchoTimeline::GetLastTimeKey()
 {
 	return TransformKeys[TransformKeys.Num() - 1].TimeKey;
 }
 
-void FTimeline::RegisterEchoActor(AActor* InEchoActor)
+void FEchoTimeline::RegisterEchoActor(AActor* InEchoActor)
 {
 	EchoActor = InEchoActor;
 }
 
-void FTimeline::RecordTransformKey(AActor* RecordedActor, const float& CurrentTimeKey)
+void FEchoTimeline::RecordTransformKey(AActor* RecordedActor, const float& CurrentTimeKey)
 {
 	//Create and Init values of TransformKey
 	FRecordTransformKey TransformKey;
@@ -61,7 +61,7 @@ void FTimeline::RecordTransformKey(AActor* RecordedActor, const float& CurrentTi
 	});
 }
 
-void FTimeline::PlayReplay(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind)
+void FEchoTimeline::PlayReplay(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind)
 {
 	if (!IsValid(EchoActor)) return;
 	if (GetLastTimeKey() < CurrentTimeKey) return;
@@ -77,7 +77,7 @@ void FTimeline::PlayReplay(const float& PreviousKey,const float& CurrentTimeKey,
 	EchoActor->SetActorScale3D(FMath::Lerp(PreviousTransformKey->Scale, NextTransformKey->Scale, lerpValue));
 }
 
-void FTimeline::ActivateTimeline(bool bInIsActive)
+void FEchoTimeline::ActivateTimeline(bool bInIsActive)
 {
 	if (IsValid(EchoActor))
 	{
@@ -92,7 +92,7 @@ void FGlobalTimeline::Play(const float& PreviousTimeKey, const float& CurrentTim
 	
 	bool bHasActiveTimeline = false;
 	
-	for (FTimeline& Timeline : Timelines)
+	for (FEchoTimeline& Timeline : Timelines)
 	{
 		// Activate or deactivate Timeline
 		float LocalTimeKey = CurrentTimeKey - Timeline.StartTimeKey();
@@ -121,9 +121,15 @@ void FGlobalTimeline::Play(const float& PreviousTimeKey, const float& CurrentTim
 	bOutHasReachedEnd = !bHasActiveTimeline;
 }
 
-bool FGlobalTimeline::HasAvailableTimelineSlot()
+bool FGlobalTimeline::HasAvailableTimelineSlot() const
 {
 	return Timelines.Num() < MaxSlots;
+}
+
+void FGlobalTimeline::RegisterTimeline(const FEchoTimeline& Timeline)
+{
+	if (!HasAvailableTimelineSlot()) return;
+	Timelines.Add(Timeline);
 }
 
 // Fill out your copyright notice in the Description page of Project Settings.
