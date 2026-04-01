@@ -19,8 +19,8 @@ class PROJECTECHO_API UEchoDebug : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, Category="Echo Debug", meta=(DisplayName="Echo Print"))
-	static void AddOnScreenDebugMessage(EEchoSystem SystemKey, EMessageType MessageType, const FString& Message, FLinearColor Color, float TimeToDisplay);
+	UFUNCTION(BlueprintCallable, Category="Echo Debug", meta=(DisplayName="Echo Print", AutoCreateRefTerm="SystemKey,MessageType,Color"))
+	static void AddOnScreenDebugMessage(const EEchoSystem& SystemKey, const EMessageType& MessageType, const FString& Message, const FLinearColor& Color, float TimeToDisplay);
 
 private:
 	static FString FormatMessage(const FString& Tag, const EMessageType& MessageType, const FString& Message);

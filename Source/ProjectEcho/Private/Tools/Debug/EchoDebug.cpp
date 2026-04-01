@@ -3,7 +3,7 @@
 #include "Tools/Debug/EchoDebug.h"
 #include "Tools/Debug/EchoDebugDeveloperSettings.h"
 
-void UEchoDebug::AddOnScreenDebugMessage(EEchoSystem SystemKey, EMessageType MessageType, const FString& Message, FLinearColor Color, float TimeToDisplay)
+void UEchoDebug::AddOnScreenDebugMessage(const EEchoSystem& SystemKey, const EMessageType& MessageType, const FString& Message, const FLinearColor& Color, float TimeToDisplay)
 {
 	const UEchoDebugDeveloperSettings* Settings = LazyGetDebugSettings();
 
