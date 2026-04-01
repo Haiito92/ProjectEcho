@@ -50,7 +50,7 @@ struct FEchoTimeline
 	const FRecordTransformKey* GetPreviousTransformKey(const float& TimeKey) const;
 	
 	//Get Last Key of Timeline (End of Timeline, in Local Time)
-	const float& GetLastTimeKey();
+	const float& GetLastTimeKey() const;
 	
 	//Save Echo Actor for Replays
 	void RegisterEchoActor(AActor* InEchoActor);
@@ -67,6 +67,9 @@ struct FEchoTimeline
 	
 	void ActivateTimeline(bool bInIsActive);
 };
+#pragma endregion
+
+#pragma region GlobalTimelineStruct
 
 USTRUCT(Blueprintable)
 struct FGlobalTimeline
@@ -83,6 +86,8 @@ struct FGlobalTimeline
 	//Whether GlobalTimeline has an available slot to start recording in it
 	bool HasAvailableTimelineSlot() const;
 	
+	float GetLastTimeKey() const;
+	
 	//Add Timeline to Global Timeline
 	void RegisterTimeline(const FEchoTimeline& Timeline);
 };
@@ -93,6 +98,8 @@ UCLASS()
 class PROJECTECHO_API URecordManagerSubsystem : public UTickableWorldSubsystem
 {
 	GENERATED_BODY()
+	
+	virtual TStatId GetStatId() const override;
 	
 	UFUNCTION(BlueprintCallable)
 	void StartRecord(AActor* InRecordedActor);
@@ -107,6 +114,10 @@ class PROJECTECHO_API URecordManagerSubsystem : public UTickableWorldSubsystem
 	FOnStopRecording OnStopRecording;
 	
 	virtual void Tick(float DeltaTime) override;
+	
+	//For Testing Purposes
+	UFUNCTION(BlueprintCallable)
+	void AssociateEchoToRecordingTimeline(AActor* Echo);
 protected:
 	FGlobalTimeline GlobalTimeline;
 

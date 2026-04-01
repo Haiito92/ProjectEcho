@@ -1,5 +1,7 @@
-﻿#include <RecordManager/RecordManagerSubsystem.h>
+﻿#include <string>
+#include <RecordManager/RecordManagerSubsystem.h>
 
+#include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -34,7 +36,7 @@ const FRecordTransformKey* FEchoTimeline::GetPreviousTransformKey(const float& T
 	return key;
 }
 
-const float& FEchoTimeline::GetLastTimeKey()
+const float& FEchoTimeline::GetLastTimeKey() const
 {
 	return TransformKeys[TransformKeys.Num() - 1].TimeKey;
 }
@@ -82,7 +84,7 @@ void FEchoTimeline::ActivateTimeline(bool bInIsActive)
 	if (IsValid(EchoActor))
 	{
 		bIsActive = bInIsActive;
-		EchoActor->SetActorHiddenInGame(bInIsActive);
+		EchoActor->SetActorHiddenInGame(!bInIsActive);
 	}
 }
 
@@ -119,7 +121,7 @@ void FGlobalTimeline::Play(const float& PreviousTimeKey, const float& CurrentTim
 		
 		// Play Timeline
 		bHasActiveTimeline = true;
-		Timeline.PlayReplay(PreviousTimeKey, CurrentTimeKey, bIsInRewind);
+		Timeline.PlayReplay(PreviousTimeKey - Timeline.StartTimeKey, LocalTimeKey, bIsInRewind);
 	}
 	
 	bOutHasReachedEnd = !bHasActiveTimeline;
@@ -130,6 +132,17 @@ bool FGlobalTimeline::HasAvailableTimelineSlot() const
 	return Timelines.Num() < MaxSlots;
 }
 
+float FGlobalTimeline::GetLastTimeKey() const
+{
+	float globalLastTimeKey = 0;
+	for (const FEchoTimeline& EchoTimeline : Timelines)
+	{
+		float lastTimeKey = EchoTimeline.GetLastTimeKey() + EchoTimeline.StartTimeKey;
+		if (lastTimeKey > globalLastTimeKey) globalLastTimeKey = lastTimeKey;
+	}
+	return globalLastTimeKey;
+}
+
 void FGlobalTimeline::RegisterTimeline(const FEchoTimeline& Timeline)
 {
 	if (!HasAvailableTimelineSlot()) return;
@@ -137,6 +150,11 @@ void FGlobalTimeline::RegisterTimeline(const FEchoTimeline& Timeline)
 }
 
 #pragma endregion
+
+TStatId URecordManagerSubsystem::GetStatId() const
+{
+	RETURN_QUICK_DECLARE_CYCLE_STAT(URecordManagerSubsystem, STATGROUP_Tickables);
+}
 
 void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor)
 {
@@ -149,6 +167,7 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor)
 	RecordingTimeline.RecordTransformKey(RecordedActor, 0);
 	OnStartRecording.Broadcast(CurrentTimeKey);
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.9f);
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, "Start Recording");
 }
 
 void URecordManagerSubsystem::StopRecord()
@@ -156,11 +175,12 @@ void URecordManagerSubsystem::StopRecord()
 	if (bIsRecording)
 	{
 		bIsRecording = false;
-		RecordingTimeline.RecordTransformKey(RecordedActor, CurrentTimeKey);
+		RecordingTimeline.RecordTransformKey(RecordedActor, CurrentTimeKey - RecordingTimeline.StartTimeKey);
 		RecordedActor = nullptr;
 		GlobalTimeline.RegisterTimeline(RecordingTimeline);
 		OnStopRecording.Broadcast();
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, "Stop Recording");
 	}
 }
 
@@ -168,4 +188,41 @@ void URecordManagerSubsystem::StopRecord()
 void URecordManagerSubsystem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	if (GlobalTimeline.Timelines.IsEmpty() && !bIsRecording) return;
+	
+	float previousTimeKey = CurrentTimeKey;
+	CurrentTimeKey+= DeltaTime;
+	GEngine->AddOnScreenDebugMessage(-1, DeltaTime, FColor::Cyan, "Ticking : " + FString::SanitizeFloat(CurrentTimeKey));
+	
+	//--- Handle Replay ---
+	if (!GlobalTimeline.Timelines.IsEmpty())
+	{
+		bool bHasReachedEnd = false;
+		GlobalTimeline.Play(previousTimeKey, CurrentTimeKey, false, bHasReachedEnd);
+		GEngine->AddOnScreenDebugMessage(-1, DeltaTime, FColor::Cyan, "Playing Replay");
+		
+		if (bHasReachedEnd && !bIsRecording)
+		{
+			//TODO: Implement Rewind
+			//Reset to start of Timeline
+			CurrentTimeKey = 0.f;
+		}
+	}
+	
+	// --- Handle Recording ---
+	if (bIsRecording)
+	{
+		RecordingTimeline.RecordTransformKey(RecordedActor, CurrentTimeKey - RecordingTimeline.StartTimeKey);
+		GEngine->AddOnScreenDebugMessage(-1, DeltaTime, FColor::Cyan, "Recording a TransformKey at Key : " + FString::SanitizeFloat(CurrentTimeKey - RecordingTimeline.StartTimeKey));
+		
+		//TODO: Implement Action Keys
+	}
+	
+}
+
+void URecordManagerSubsystem::AssociateEchoToRecordingTimeline(AActor* Echo)
+{
+	if (!bIsRecording || !IsValid(Echo)) return;
+	RecordingTimeline.EchoActor = Echo;
 }
