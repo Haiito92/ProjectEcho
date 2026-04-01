@@ -18,7 +18,4 @@ struct PROJECTECHO_API FEchoSystemDebugInfo
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Echo Debug/System Debug Info")
 	FString DebugTag;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Echo Debug/System Debug Info")
-	FColor DebugColor;
 };

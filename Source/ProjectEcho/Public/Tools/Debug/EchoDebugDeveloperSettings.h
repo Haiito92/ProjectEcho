@@ -3,10 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EchoSystemDebugInfo.h"
+#include "MessageType.h"
 #include "Engine/DeveloperSettings.h"
 #include "EchoDebugDeveloperSettings.generated.h"
 
-class UEchoDebugDataAsset;
 /**
  * 
  */
@@ -16,6 +17,9 @@ class PROJECTECHO_API UEchoDebugDeveloperSettings : public UDeveloperSettings
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "Echo Debug Settings")
-	TSoftObjectPtr<UEchoDebugDataAsset> DebugDataAsset;
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Echo Debug Settings")
+	TMap<TEnumAsByte<EMessageType>, FString> MessageTypeTags;
+	
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Echo Debug Settings")
+	TMap<TEnumAsByte<EEchoSystem>, FEchoSystemDebugInfo> SystemDebugInfos;
 };

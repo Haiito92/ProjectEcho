@@ -6,19 +6,12 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "EchoDebug.generated.h"
 
-class UEchoDebugDataAsset;
+class UEchoDebugDeveloperSettings;
 enum EEchoSystem : uint8;
-/**
+enum EMessageType : uint8;
+/** 
  * 
  */
-
-UENUM()
-enum EMessageType : uint8
-{
-	Log,
-	Warning,
-	Error
-};
 
 UCLASS()
 class PROJECTECHO_API UEchoDebug : public UBlueprintFunctionLibrary
@@ -26,11 +19,13 @@ class PROJECTECHO_API UEchoDebug : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, Category="Echo Debug")
-	static void AddOnScreenDebugMessage(EEchoSystem SystemKey, EMessageType MessageType, const FString& Message, float TimeToDisplay);
+	UFUNCTION(BlueprintCallable, Category="Echo Debug", meta=(DisplayName="Echo Print"))
+	static void AddOnScreenDebugMessage(EEchoSystem SystemKey, EMessageType MessageType, const FString& Message, FLinearColor Color, float TimeToDisplay);
 
 private:
-	static const UEchoDebugDataAsset* LazyGetDebugDataAsset();
+	static FString FormatMessage(const FString& Tag, const EMessageType& MessageType, const FString& Message);
 	
-	static TObjectPtr<UEchoDebugDataAsset> DebugDataAsset;
+	static const UEchoDebugDeveloperSettings* LazyGetDebugSettings();
+	
+	static const UEchoDebugDeveloperSettings* DebugSettings;
 };
