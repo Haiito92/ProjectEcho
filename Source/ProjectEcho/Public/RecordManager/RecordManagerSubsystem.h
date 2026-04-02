@@ -65,7 +65,11 @@ struct FEchoTimeline
 	 */
 	void PlayReplay(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind);
 	
+	//Turns
 	void ActivateTimeline(bool bInIsActive);
+	
+	//Called when Timeline is being Destroyed
+	void OnDestroy();
 };
 #pragma endregion
 
@@ -76,9 +80,11 @@ struct FGlobalTimeline
 {
 	GENERATED_BODY()
 	
-	TArray<FEchoTimeline> Timelines;
+	TMap<int, FEchoTimeline> Timelines;
 	
-	int MaxSlots = 5;
+	void Initiate(int InNbSlots);
+	
+	int NbSlots = 5;
 	
 	//Play CurrentFrame for all Active Timelines, activate timelines that have not yet been activated
 	void Play(const float& PreviousTimeKey, const float& CurrentTimeKey, bool bIsInRewind, bool& bOutHasReachedEnd);
@@ -86,10 +92,13 @@ struct FGlobalTimeline
 	//Whether GlobalTimeline has an available slot to start recording in it
 	bool HasAvailableTimelineSlot() const;
 	
+	//Find Last Time Key of the Global Timeline (Last Key of Last Timeline played)
 	float GetLastTimeKey() const;
 	
 	//Add Timeline to Global Timeline
 	void RegisterTimeline(const FEchoTimeline& Timeline);
+	
+	void DestroyTimeline(int TimelineIndex);
 };
 
 #pragma endregion
@@ -118,6 +127,18 @@ class PROJECTECHO_API URecordManagerSubsystem : public UTickableWorldSubsystem
 	//For Testing Purposes
 	UFUNCTION(BlueprintCallable)
 	void AssociateEchoToRecordingTimeline(AActor* Echo);
+	
+	//Destroys the Timeline at the Slot currently selected (if there is one) 
+	UFUNCTION(BlueprintCallable)
+	void DestroySelectedTimeline();
+	
+	// Increment the Selected Slot Value, if reaches end, goes back to first Slot
+	UFUNCTION(BlueprintCallable)
+	void IncrementSelectedSlot();
+	
+	// Decrement the Selected Slot Value, if reaches beginning, goes back to last Slot
+	UFUNCTION(BlueprintCallable)
+	void DecrementSelectedSlot();
 protected:
 	FGlobalTimeline GlobalTimeline;
 
@@ -131,6 +152,8 @@ protected:
 	
 	//Is Recording
 	bool bIsRecording = false;
+	
+	int SelectedSlot = 0;
 	
 private:
 };

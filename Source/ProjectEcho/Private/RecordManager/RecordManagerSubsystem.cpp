@@ -1,5 +1,5 @@
-﻿#include <string>
-#include <RecordManager/RecordManagerSubsystem.h>
+﻿#include <RecordManager/RecordManagerSubsystem.h>
+#include <string>
 
 #include "Engine/Engine.h"
 #include "Engine/World.h"
@@ -88,31 +88,56 @@ void FEchoTimeline::ActivateTimeline(bool bInIsActive)
 	}
 }
 
+void FEchoTimeline::OnDestroy()
+{
+	ActivateTimeline(false);
+	EchoActor->Destroy();
+}
+
 #pragma endregion
 
 #pragma region GlobalTimeline
+
+void FGlobalTimeline::Initiate(const int InNbSlots)
+{
+	if (!Timelines.IsEmpty()) Timelines.Empty();
+	NbSlots = InNbSlots;
+}
 
 void FGlobalTimeline::Play(const float& PreviousTimeKey, const float& CurrentTimeKey, bool bIsInRewind, bool& bOutHasReachedEnd)
 {
 	//TODO: Add Rewind behavior
 	
-	bool bHasActiveTimeline = false;
-	
-	for (FEchoTimeline& Timeline : Timelines)
+	bool bHasNotReachedEnd = false;
+
+	for (int i = 0; i < NbSlots; ++i)
 	{
+		if (!Timelines.Contains(i)) continue;
+		
 		// Activate or deactivate Timeline
-		float LocalTimeKey = CurrentTimeKey - Timeline.StartTimeKey;
-		if (Timeline.bIsActive)
+		float LocalTimeKey = CurrentTimeKey - Timelines[i].StartTimeKey;
+		if (Timelines[i].bIsActive)
 		{
-			if (Timeline.GetLastTimeKey() < LocalTimeKey)
+			if (Timelines[i].GetLastTimeKey() < LocalTimeKey)
 			{
-				Timeline.ActivateTimeline(false);
+				//Timeline Desactivation (Reached End of Last Key)
+				Timelines[i].ActivateTimeline(false);
 				continue;
 			}
 		}
-		else if (LocalTimeKey > 0 && LocalTimeKey < Timeline.GetLastTimeKey())
+		else if (LocalTimeKey < Timelines[i].GetLastTimeKey())
 		{
-			Timeline.ActivateTimeline(true);
+			if (LocalTimeKey > 0)
+			{
+				//Timeline Activation (Reached FirstKey)
+				Timelines[i].ActivateTimeline(true);
+			}
+			else
+			{
+				//Has not reached first Key (GlobalTimeline has not reached end)
+				bHasNotReachedEnd = true;
+				continue;
+			}
 		}
 		else
 		{
@@ -120,24 +145,29 @@ void FGlobalTimeline::Play(const float& PreviousTimeKey, const float& CurrentTim
 		}
 		
 		// Play Timeline
-		bHasActiveTimeline = true;
-		Timeline.PlayReplay(PreviousTimeKey - Timeline.StartTimeKey, LocalTimeKey, bIsInRewind);
+		bHasNotReachedEnd = true;
+		Timelines[i].PlayReplay(PreviousTimeKey - Timelines[i].StartTimeKey, LocalTimeKey, bIsInRewind);
 	}
 	
-	bOutHasReachedEnd = !bHasActiveTimeline;
+	bOutHasReachedEnd = !bHasNotReachedEnd;
 }
 
 bool FGlobalTimeline::HasAvailableTimelineSlot() const
 {
-	return Timelines.Num() < MaxSlots;
+	for (int i = 0; i < NbSlots; ++i)
+	{
+		if (!Timelines.Contains(i)) return true;
+	}
+	return false;
 }
 
 float FGlobalTimeline::GetLastTimeKey() const
 {
 	float globalLastTimeKey = 0;
-	for (const FEchoTimeline& EchoTimeline : Timelines)
+	for (int i = 0; i < NbSlots; ++i)
 	{
-		float lastTimeKey = EchoTimeline.GetLastTimeKey() + EchoTimeline.StartTimeKey;
+		if (!Timelines.Contains(i)) continue;
+		float lastTimeKey = Timelines[i].GetLastTimeKey() + Timelines[i].StartTimeKey;
 		if (lastTimeKey > globalLastTimeKey) globalLastTimeKey = lastTimeKey;
 	}
 	return globalLastTimeKey;
@@ -146,7 +176,44 @@ float FGlobalTimeline::GetLastTimeKey() const
 void FGlobalTimeline::RegisterTimeline(const FEchoTimeline& Timeline)
 {
 	if (!HasAvailableTimelineSlot()) return;
-	Timelines.Add(Timeline);
+	for (int i = 0; i < NbSlots; ++i)
+	{
+		if (!Timelines.Contains(i))
+		{
+			Timelines.Add(i, Timeline);
+			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Blue, "Registered Timeline at Slot : " + FString::FromInt(i));
+			return;
+		}
+	}
+}
+
+void FGlobalTimeline::DestroyTimeline(int SelectedSlot)
+{
+	if (Timelines.Contains(SelectedSlot))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Blue, "Deleting Selected Timeline : " + FString::FromInt(SelectedSlot));
+		float StartTimeKey = Timelines[SelectedSlot].StartTimeKey;
+		Timelines[SelectedSlot].OnDestroy();
+		Timelines.Remove(SelectedSlot);
+		if (StartTimeKey == 0.0f && !Timelines.IsEmpty())
+		{
+			float ClosestStartKey = -1;
+			for (int i = 0; i < NbSlots; ++i)
+			{
+				if (Timelines.Contains(i) && (ClosestStartKey < 0 || Timelines[i].StartTimeKey < ClosestStartKey))
+				{
+					ClosestStartKey = Timelines[i].StartTimeKey;
+				}
+			}
+			for (int i = 0; i < NbSlots; ++i)
+			{
+				if (Timelines.Contains(i))
+				{
+					Timelines[i].StartTimeKey -= ClosestStartKey;
+				}
+			}
+		}
+	}
 }
 
 #pragma endregion
@@ -167,7 +234,7 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor)
 	RecordingTimeline.RecordTransformKey(RecordedActor, 0);
 	OnStartRecording.Broadcast(CurrentTimeKey);
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.9f);
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, "Start Recording");
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Blue, "Start Recording");
 }
 
 void URecordManagerSubsystem::StopRecord()
@@ -180,11 +247,10 @@ void URecordManagerSubsystem::StopRecord()
 		GlobalTimeline.RegisterTimeline(RecordingTimeline);
 		OnStopRecording.Broadcast();
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, "Stop Recording");
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Blue, "Stop Recording");
 	}
 }
 
-// Fill out your copyright notice in the Description page of Project Settings.
 void URecordManagerSubsystem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -194,6 +260,7 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 	float previousTimeKey = CurrentTimeKey;
 	CurrentTimeKey+= DeltaTime;
 	GEngine->AddOnScreenDebugMessage(-1, DeltaTime, FColor::Cyan, "Ticking : " + FString::SanitizeFloat(CurrentTimeKey));
+	GEngine->AddOnScreenDebugMessage(-1, DeltaTime, FColor::Cyan, "Current Selected Timeline : " + FString::FromInt(SelectedSlot));
 	
 	//--- Handle Replay ---
 	if (!GlobalTimeline.Timelines.IsEmpty())
@@ -225,4 +292,21 @@ void URecordManagerSubsystem::AssociateEchoToRecordingTimeline(AActor* Echo)
 {
 	if (!bIsRecording || !IsValid(Echo)) return;
 	RecordingTimeline.EchoActor = Echo;
+}
+
+void URecordManagerSubsystem::DestroySelectedTimeline()
+{
+	GlobalTimeline.DestroyTimeline(SelectedSlot);
+}
+
+void URecordManagerSubsystem::IncrementSelectedSlot()
+{
+	SelectedSlot++;
+	if (SelectedSlot >= GlobalTimeline.NbSlots) SelectedSlot = 0;
+}
+
+void URecordManagerSubsystem::DecrementSelectedSlot()
+{
+	SelectedSlot--;
+	if (SelectedSlot < 0) SelectedSlot = GlobalTimeline.NbSlots - 1;
 }
