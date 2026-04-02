@@ -63,7 +63,7 @@ bool UEchoDebug::IsSystemDebugActivated(const EEchoSystem& SystemKey)
 	bool* SystemDebugActivated =  SystemToggles.Find(SystemKey);
 	if (SystemDebugActivated == nullptr) return false;
 
-	return SystemDebugActivated;
+	return *SystemDebugActivated;
 }
 
 FString UEchoDebug::FormatMessage(const FString& Tag, const EMessageType& MessageType, const FString& Message)
