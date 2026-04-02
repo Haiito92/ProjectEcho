@@ -7,14 +7,9 @@
 
 void UEchoDebug::AddOnScreenDebugMessage(const EEchoSystem& SystemKey, const EMessageType& MessageType, const FString& Message, const FLinearColor& Color, float TimeToDisplay)
 {
-	auto& SystemToggles = LazyGetToggles();
-	bool* SystemDebugActivated =  SystemToggles.Find(SystemKey);
-	if (SystemDebugActivated == nullptr || *SystemDebugActivated == false) return;
+	if(!IsSystemDebugActivated(SystemKey)) return;
 	
-	const UEchoDebugDeveloperSettings* Settings = LazyGetDebugSettings();
-	if (!Settings) return;
-
-	const FEchoSystemDebugInfo* SystemDebugInfo = Settings->SystemDebugInfos.Find(SystemKey);
+	const FEchoSystemDebugInfo* SystemDebugInfo = GetSystemDebugInfo(SystemKey);
 	if (!SystemDebugInfo) return;
 
 	GEngine->AddOnScreenDebugMessage(
@@ -27,14 +22,9 @@ void UEchoDebug::AddOnScreenDebugMessage(const EEchoSystem& SystemKey, const EMe
 
 void UEchoDebug::Log(const EEchoSystem& SystemKey, const EMessageType& MessageType, const FString& Message)
 {
-	auto& SystemToggles = LazyGetToggles();
-	bool* SystemDebugActivated =  SystemToggles.Find(SystemKey);
-	if (SystemDebugActivated == nullptr || *SystemDebugActivated == false) return;
+	if(!IsSystemDebugActivated(SystemKey)) return;
 
-	const UEchoDebugDeveloperSettings* Settings = LazyGetDebugSettings();
-	if (!Settings) return;
-
-	const FEchoSystemDebugInfo* SystemDebugInfo = Settings->SystemDebugInfos.Find(SystemKey);
+	const FEchoSystemDebugInfo* SystemDebugInfo = GetSystemDebugInfo(SystemKey);
 	if (!SystemDebugInfo) return;
 
 	FString FinalMessage = FormatMessage(SystemDebugInfo->DebugTag, MessageType,  Message);
@@ -67,6 +57,15 @@ void UEchoDebug::ToggleSystemDebug(const EEchoSystem& SystemKey, bool Activated)
 	if (SystemDebugActivated != nullptr) *SystemDebugActivated = Activated;
 }
 
+bool UEchoDebug::IsSystemDebugActivated(const EEchoSystem& SystemKey)
+{
+	auto& SystemToggles = LazyGetToggles();
+	bool* SystemDebugActivated =  SystemToggles.Find(SystemKey);
+	if (SystemDebugActivated == nullptr) return false;
+
+	return SystemDebugActivated;
+}
+
 FString UEchoDebug::FormatMessage(const FString& Tag, const EMessageType& MessageType, const FString& Message)
 {
 	TArray<FStringFormatArg> Args;
@@ -86,6 +85,14 @@ FString UEchoDebug::FormatMessage(const FString& Tag, const EMessageType& Messag
 	Args.Add(FStringFormatArg(*MessageTypeTag));
 	
 	return FString::Format(TEXT("[{0}][{2}]: {1}"), Args);
+}
+
+const FEchoSystemDebugInfo* UEchoDebug::GetSystemDebugInfo(const EEchoSystem& SystemKey)
+{
+	const UEchoDebugDeveloperSettings* Settings = LazyGetDebugSettings();
+	if (!Settings) return nullptr;
+
+	return Settings->SystemDebugInfos.Find(SystemKey);
 }
 
 const UEchoDebugDeveloperSettings* UEchoDebug::LazyGetDebugSettings()

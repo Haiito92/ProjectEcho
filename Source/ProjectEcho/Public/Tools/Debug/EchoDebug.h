@@ -6,6 +6,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "EchoDebug.generated.h"
 
+struct FEchoSystemDebugInfo;
 class UEchoDebugDeveloperSettings;
 enum EEchoSystem : uint8;
 enum EMessageType : uint8;
@@ -28,8 +29,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Echo Debug", meta=(DisplayName="Toggle System Debug", AutoCreateRefTerm="SystemKey,Activated"))
 	static void ToggleSystemDebug(const EEchoSystem& SystemKey, bool Activated);
 private:
+	static bool IsSystemDebugActivated(const EEchoSystem& SystemKey);
 	static FString FormatMessage(const FString& Tag, const EMessageType& MessageType, const FString& Message);
-	
+
+	static const FEchoSystemDebugInfo* GetSystemDebugInfo(const EEchoSystem& SystemKey);
 	static const UEchoDebugDeveloperSettings* LazyGetDebugSettings();
 	static TMap<EEchoSystem, bool>& LazyGetToggles();
 	
