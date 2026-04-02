@@ -12,5 +12,8 @@ UENUM()
 enum EEchoSystem : uint8
 {
 	PlayerStateMachine,
-	Record
+	Record,
+	Count UMETA(Hidden)
 };
+
+ENUM_RANGE_BY_COUNT(EEchoSystem, EEchoSystem::Count)

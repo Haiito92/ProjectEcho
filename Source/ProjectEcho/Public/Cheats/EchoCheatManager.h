@@ -6,6 +6,7 @@
 #include "GameFramework/CheatManager.h"
 #include "EchoCheatManager.generated.h"
 
+enum EEchoSystem : uint8;
 /**
  * 
  */
@@ -16,5 +17,5 @@ class PROJECTECHO_API UEchoCheatManager : public UCheatManager
 
 public:
 	UFUNCTION(Exec)
-	void ToggleSystemDebug();
+	void ToggleSystemDebug(EEchoSystem SystemKey, bool Activated);
 };

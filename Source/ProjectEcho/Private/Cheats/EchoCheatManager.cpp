@@ -4,15 +4,11 @@
 #include "Cheats/EchoCheatManager.h"
 
 #include "EchoSystem.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Tools/Debug/EchoDebug.h"
 #include "Tools/Debug/MessageType.h"
 
-void UEchoCheatManager::ToggleSystemDebug()
+void UEchoCheatManager::ToggleSystemDebug(EEchoSystem SystemKey, bool Activated)
 {
-	UEchoDebug::AddOnScreenDebugMessage(
-		EEchoSystem::Record,
-		EMessageType::Log,
-		"Toggle Record Debug",
-		FColor::Magenta,
-		5.0f);
+	UEchoDebug::ToggleSystemDebug(SystemKey, Activated);
 }
