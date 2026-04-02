@@ -2,6 +2,7 @@
 
 #include "Tools/Debug/EchoDebug.h"
 #include "EchoSystem.h"
+#include "ProjectEcho.h"
 #include "Tools/Debug/EchoDebugDeveloperSettings.h"
 
 void UEchoDebug::AddOnScreenDebugMessage(const EEchoSystem& SystemKey, const EMessageType& MessageType, const FString& Message, const FLinearColor& Color, float TimeToDisplay)
@@ -24,10 +25,42 @@ void UEchoDebug::AddOnScreenDebugMessage(const EEchoSystem& SystemKey, const EMe
 		);
 }
 
+void UEchoDebug::Log(const EEchoSystem& SystemKey, const EMessageType& MessageType, const FString& Message)
+{
+	auto& SystemToggles = LazyGetToggles();
+	bool* SystemDebugActivated =  SystemToggles.Find(SystemKey);
+	if (SystemDebugActivated == nullptr || *SystemDebugActivated == false) return;
+
+	const UEchoDebugDeveloperSettings* Settings = LazyGetDebugSettings();
+	if (!Settings) return;
+
+	const FEchoSystemDebugInfo* SystemDebugInfo = Settings->SystemDebugInfos.Find(SystemKey);
+	if (!SystemDebugInfo) return;
+
+	FString FinalMessage = FormatMessage(SystemDebugInfo->DebugTag, MessageType,  Message);
+	
+	switch (MessageType)
+	{
+		case EMessageType::Log:
+		{
+			UE_LOGFMT(LogProjectEcho, Log, "{0}", FinalMessage);
+			break;
+		}	
+		case EMessageType::Warning:
+		{
+			UE_LOGFMT(LogProjectEcho, Warning, "{0}", FinalMessage);
+			break;
+		}	
+		case EMessageType::Error:
+		{
+			UE_LOGFMT(LogProjectEcho, Error, "{0}", FinalMessage);
+			break;
+		}
+	}
+}
+
 void UEchoDebug::ToggleSystemDebug(const EEchoSystem& SystemKey, bool Activated)
 {
-	UE_LOGFMT(LogTemp, Display, "Key: {0}, Value: {1}", SystemKey, Activated);
-	
 	auto& SystemToggles = LazyGetToggles();
 	bool* SystemDebugActivated =  SystemToggles.Find(SystemKey);
 	

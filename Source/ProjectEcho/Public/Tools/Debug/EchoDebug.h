@@ -22,7 +22,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Echo Debug", meta=(DisplayName="Print", AutoCreateRefTerm="SystemKey,MessageType,Color"))
 	static void AddOnScreenDebugMessage(const EEchoSystem& SystemKey, const EMessageType& MessageType, const FString& Message, const FLinearColor& Color, float TimeToDisplay);
 
-	UFUNCTION(BlueprintCallable, Category="Echo Debug", meta=(DisplayName="ToggleSystemDebug", AutoCreateRefTerm="SystemKey,Activated"))
+	UFUNCTION(BlueprintCallable, Category="Echo Debug", meta=(DisplayName="Log", AutoCreateRefTerm="SystemKey,MessageType"))
+	static void Log(const EEchoSystem& SystemKey, const EMessageType& MessageType, const FString& Message);
+	
+	UFUNCTION(BlueprintCallable, Category="Echo Debug", meta=(DisplayName="Toggle System Debug", AutoCreateRefTerm="SystemKey,Activated"))
 	static void ToggleSystemDebug(const EEchoSystem& SystemKey, bool Activated);
 private:
 	static FString FormatMessage(const FString& Tag, const EMessageType& MessageType, const FString& Message);
