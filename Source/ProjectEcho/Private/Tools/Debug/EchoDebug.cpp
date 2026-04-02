@@ -1,9 +1,10 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Tools/Debug/EchoDebug.h"
-#include "EchoSystem.h"
+#include "DataAssetDeveloperSettings.h"
 #include "ProjectEcho.h"
-#include "Tools/Debug/EchoDebugDeveloperSettings.h"
+#include "Tools/Debug/DebugDataAsset.h"
+#include "Tools/Debug/EchoSystemDebugInfo.h"
 
 void UEchoDebug::AddOnScreenDebugMessage(const EEchoSystem& SystemKey, const EMessageType& MessageType, const FString& Message, const FLinearColor& Color, float TimeToDisplay)
 {
@@ -72,10 +73,10 @@ FString UEchoDebug::FormatMessage(const FString& Tag, const EMessageType& Messag
 	Args.Add(FStringFormatArg(Tag));
 	Args.Add(FStringFormatArg(Message));
 	
-	const UEchoDebugDeveloperSettings* Settings = LazyGetDebugSettings();
+	const UDebugDataAsset* DebugDA = LazyGetDebugDataAsset();
 
 	const FString* MessageTypeTag = nullptr;
-	if (Settings) MessageTypeTag = Settings->MessageTypeTags.Find(MessageType);
+	if (DebugDA) MessageTypeTag = DebugDA->MessageTypeTags.Find(MessageType);
 	
 	if (!MessageTypeTag || MessageTypeTag->IsEmpty())
 	{
@@ -89,20 +90,21 @@ FString UEchoDebug::FormatMessage(const FString& Tag, const EMessageType& Messag
 
 const FEchoSystemDebugInfo* UEchoDebug::GetSystemDebugInfo(const EEchoSystem& SystemKey)
 {
-	const UEchoDebugDeveloperSettings* Settings = LazyGetDebugSettings();
-	if (!Settings) return nullptr;
+	const UDebugDataAsset* DebugDA = LazyGetDebugDataAsset();
+	if (!DebugDA) return nullptr;
 
-	return Settings->SystemDebugInfos.Find(SystemKey);
+	return DebugDA->SystemDebugInfos.Find(SystemKey);
 }
 
-const UEchoDebugDeveloperSettings* UEchoDebug::LazyGetDebugSettings()
+const UDebugDataAsset* UEchoDebug::LazyGetDebugDataAsset()
 {
-	if (DebugSettings == nullptr)
+	if (DebugDataAsset == nullptr)
 	{
-		DebugSettings = GetDefault<UEchoDebugDeveloperSettings>();
+		const UDataAssetDeveloperSettings* DebugSettings = GetDefault<UDataAssetDeveloperSettings>();
+		DebugDataAsset = DebugSettings->DebutDataAsset.LoadSynchronous();
 	}
 
-	return DebugSettings;
+	return DebugDataAsset;
 }
 
 TMap<EEchoSystem, bool>& UEchoDebug::LazyGetToggles()
@@ -118,6 +120,6 @@ TMap<EEchoSystem, bool>& UEchoDebug::LazyGetToggles()
 	return Toggles;
 }
 
-const UEchoDebugDeveloperSettings* UEchoDebug::DebugSettings = nullptr;
+TObjectPtr<UDebugDataAsset> UEchoDebug::DebugDataAsset = nullptr;
 TMap<EEchoSystem, bool> UEchoDebug::Toggles = {};
 

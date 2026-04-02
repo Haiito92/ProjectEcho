@@ -6,6 +6,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "EchoDebug.generated.h"
 
+class UDebugDataAsset;
 struct FEchoSystemDebugInfo;
 class UEchoDebugDeveloperSettings;
 enum EEchoSystem : uint8;
@@ -33,9 +34,9 @@ private:
 	static FString FormatMessage(const FString& Tag, const EMessageType& MessageType, const FString& Message);
 
 	static const FEchoSystemDebugInfo* GetSystemDebugInfo(const EEchoSystem& SystemKey);
-	static const UEchoDebugDeveloperSettings* LazyGetDebugSettings();
+	static const UDebugDataAsset* LazyGetDebugDataAsset();
 	static TMap<EEchoSystem, bool>& LazyGetToggles();
 	
-	static const UEchoDebugDeveloperSettings* DebugSettings;
+	static TObjectPtr<UDebugDataAsset> DebugDataAsset;
 	static TMap<EEchoSystem, bool> Toggles;
 };
