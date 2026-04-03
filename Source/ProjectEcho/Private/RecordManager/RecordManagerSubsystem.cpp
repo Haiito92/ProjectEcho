@@ -313,6 +313,13 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 		RecordingTimeline.RecordTransformKey(RecordedActor, CurrentTimeKey - RecordingTimeline.StartTimeKey);
 		
 		//TODO: Implement Action Keys
+		
+		if (CurrentTimeKey - RecordingTimeline.StartTimeKey >= RecordManagerSettings->MaxRecordTime)
+		{
+			//Reached MaxRecordTime, Stop Record
+			StopRecord();
+			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Reached Max Record Time", FColor::Turquoise, 3.f);
+		}
 	}
 	
 }

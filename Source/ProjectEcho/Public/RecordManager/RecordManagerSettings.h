@@ -22,4 +22,8 @@ public:
 	//Factor at which Time Dilatation will be multiplied when in Record
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Record")
 	float TimeDilatationFactor = 0.7f;
+	
+	//Max Time to Record (After which Record will be stopped) in Seconds
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Record")
+	float MaxRecordTime = 5.0f;
 };
