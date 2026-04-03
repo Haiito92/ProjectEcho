@@ -51,6 +51,43 @@ void UEchoDebug::Log(const EEchoSystem& SystemKey, const EEchoMessageType& Messa
 	}
 }
 
+void UEchoDebug::LogAndAddOnScreenDebugMessage(const EEchoSystem& SystemKey, const EEchoMessageType& MessageType,
+	const FString& Message, const FLinearColor& Color, float TimeToDisplay)
+{
+	if(!IsSystemDebugActivated(SystemKey)) return;
+
+	const FEchoSystemDebugInfo* SystemDebugInfo = GetSystemDebugInfo(SystemKey);
+	if (!SystemDebugInfo) return;
+
+	FString FinalMessage = FormatMessage(SystemDebugInfo->DebugTag, MessageType,  Message);
+
+	GEngine->AddOnScreenDebugMessage(
+		-1,
+		TimeToDisplay,
+		Color.ToFColor(false),
+		FinalMessage
+		);
+
+	switch (MessageType)
+	{
+		case EEchoMessageType::Log:
+		{
+			UE_LOGFMT(LogProjectEcho, Log, "{0}", FinalMessage);
+			break;
+		}	
+		case EEchoMessageType::Warning:
+		{
+			UE_LOGFMT(LogProjectEcho, Warning, "{0}", FinalMessage);
+			break;
+		}	
+		case EEchoMessageType::Error:
+		{
+			UE_LOGFMT(LogProjectEcho, Error, "{0}", FinalMessage);
+			break;
+		}
+	}
+}
+
 void UEchoDebug::DrawSphere(const UObject* WorldContextObject, const EEchoSystem& SystemKey, const FVector& Center, float Radius, int32 Segments, const FLinearColor& Color, float LifeTime, float Thickness, const EDrawDebugSceneDepthPriorityGroup& DepthPriority)
 {
 	if(!IsSystemDebugActivated(SystemKey)) return;
