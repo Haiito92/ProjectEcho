@@ -6,7 +6,7 @@
 #include "EchoSystem.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Tools/Debug/EchoDebug.h"
-#include "Tools/Debug/MessageType.h"
+#include "Tools/Debug/EchoMessageType.h"
 
 void UEchoCheatManager::ToggleSystemDebug(EEchoSystem SystemKey, bool Activated)
 {

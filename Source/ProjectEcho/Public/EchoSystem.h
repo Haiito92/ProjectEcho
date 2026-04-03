@@ -9,7 +9,7 @@
  * 
  */
 UENUM()
-enum EEchoSystem : uint8
+enum class EEchoSystem : uint8
 {
 	PlayerStateMachine,
 	Record,

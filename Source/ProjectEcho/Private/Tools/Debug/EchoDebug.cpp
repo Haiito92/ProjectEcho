@@ -3,10 +3,11 @@
 #include "Tools/Debug/EchoDebug.h"
 #include "DataAssetDeveloperSettings.h"
 #include "ProjectEcho.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Tools/Debug/DebugDataAsset.h"
 #include "Tools/Debug/EchoSystemDebugInfo.h"
 
-void UEchoDebug::AddOnScreenDebugMessage(const EEchoSystem& SystemKey, const EMessageType& MessageType, const FString& Message, const FLinearColor& Color, float TimeToDisplay)
+void UEchoDebug::AddOnScreenDebugMessage(const EEchoSystem& SystemKey, const EEchoMessageType& MessageType, const FString& Message, const FLinearColor& Color, float TimeToDisplay)
 {
 	if(!IsSystemDebugActivated(SystemKey)) return;
 	
@@ -21,7 +22,7 @@ void UEchoDebug::AddOnScreenDebugMessage(const EEchoSystem& SystemKey, const EMe
 		);
 }
 
-void UEchoDebug::Log(const EEchoSystem& SystemKey, const EMessageType& MessageType, const FString& Message)
+void UEchoDebug::Log(const EEchoSystem& SystemKey, const EEchoMessageType& MessageType, const FString& Message)
 {
 	if(!IsSystemDebugActivated(SystemKey)) return;
 
@@ -32,22 +33,29 @@ void UEchoDebug::Log(const EEchoSystem& SystemKey, const EMessageType& MessageTy
 	
 	switch (MessageType)
 	{
-		case EMessageType::Log:
+		case EEchoMessageType::Log:
 		{
 			UE_LOGFMT(LogProjectEcho, Log, "{0}", FinalMessage);
 			break;
 		}	
-		case EMessageType::Warning:
+		case EEchoMessageType::Warning:
 		{
 			UE_LOGFMT(LogProjectEcho, Warning, "{0}", FinalMessage);
 			break;
 		}	
-		case EMessageType::Error:
+		case EEchoMessageType::Error:
 		{
 			UE_LOGFMT(LogProjectEcho, Error, "{0}", FinalMessage);
 			break;
 		}
 	}
+}
+
+void UEchoDebug::DrawSphere(const UObject* WorldContextObject, const EEchoSystem& SystemKey, const FVector& Center, float Radius, int32 Segments, const FLinearColor& Color, float LifeTime, float Thickness, const EDrawDebugSceneDepthPriorityGroup& DepthPriority)
+{
+	if(!IsSystemDebugActivated(SystemKey)) return;
+	
+	UKismetSystemLibrary::DrawDebugSphere(WorldContextObject, Center, Radius, Segments, Color, LifeTime, Thickness, DepthPriority);
 }
 
 void UEchoDebug::ToggleSystemDebug(const EEchoSystem& SystemKey, bool Activated)
@@ -67,7 +75,7 @@ bool UEchoDebug::IsSystemDebugActivated(const EEchoSystem& SystemKey)
 	return *SystemDebugActivated;
 }
 
-FString UEchoDebug::FormatMessage(const FString& Tag, const EMessageType& MessageType, const FString& Message)
+FString UEchoDebug::FormatMessage(const FString& Tag, const EEchoMessageType& MessageType, const FString& Message)
 {
 	TArray<FStringFormatArg> Args;
 	Args.Add(FStringFormatArg(Tag));

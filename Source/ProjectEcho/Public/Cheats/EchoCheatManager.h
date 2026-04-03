@@ -6,7 +6,7 @@
 #include "GameFramework/CheatManager.h"
 #include "EchoCheatManager.generated.h"
 
-enum EEchoSystem : uint8;
+enum class EEchoSystem : uint8;
 /**
  * 
  */

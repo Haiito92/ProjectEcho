@@ -6,7 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "EchoSystemDebugInfo.h"
 #include "EchoSystem.h"
-#include "MessageType.h"
+#include "EchoMessageType.h"
 #include "DebugDataAsset.generated.h"
 
 
@@ -20,8 +20,8 @@ class PROJECTECHO_API UDebugDataAsset : public UDataAsset
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Debug Data")
-	TMap<TEnumAsByte<EMessageType>, FString> MessageTypeTags;
+	TMap<EEchoMessageType, FString> MessageTypeTags;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Debug Data")
-	TMap<TEnumAsByte<EEchoSystem>, FEchoSystemDebugInfo> SystemDebugInfos;
+	TMap<EEchoSystem, FEchoSystemDebugInfo> SystemDebugInfos;
 };
