@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RecordManagerSettings.h"
 #include "GameFramework/Actor.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "UObject/ObjectPtr.h"
@@ -13,6 +14,7 @@
  * 
  */
 
+class URecordManagerSettings;
 //Key used to save the position of an element at a set timekey 
 USTRUCT(Blueprintable)
 struct FRecordTransformKey
@@ -98,7 +100,7 @@ struct FGlobalTimeline
 	//Add Timeline to Global Timeline
 	void RegisterTimeline(const FEchoTimeline& Timeline);
 	
-	void DestroyTimeline(int TimelineIndex);
+	void DestroyTimeline(int TimelineIndex, TArray<TObjectPtr<AActor>>& OutEchoActorPool);
 };
 
 #pragma endregion
@@ -109,6 +111,9 @@ class PROJECTECHO_API URecordManagerSubsystem : public UTickableWorldSubsystem
 	GENERATED_BODY()
 	
 	virtual TStatId GetStatId() const override;
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void InitRecordManager(const int& NbTimelineSlot);
 	
 	UFUNCTION(BlueprintCallable)
 	void StartRecord(AActor* InRecordedActor);
@@ -123,10 +128,6 @@ class PROJECTECHO_API URecordManagerSubsystem : public UTickableWorldSubsystem
 	FOnStopRecording OnStopRecording;
 	
 	virtual void Tick(float DeltaTime) override;
-	
-	//For Testing Purposes
-	UFUNCTION(BlueprintCallable)
-	void AssociateEchoToRecordingTimeline(AActor* Echo);
 	
 	//Destroys the Timeline at the Slot currently selected (if there is one) 
 	UFUNCTION(BlueprintCallable)
@@ -156,5 +157,9 @@ protected:
 	int SelectedSlot = 0;
 	
 private:
+	TObjectPtr<URecordManagerSettings> RecordManagerSettings = nullptr;
+	
+	//Pool of EchoActor to display Timelines (avoid runtime Spawning)
+	TArray<TObjectPtr<AActor>> EchoActorsPool;
 };
 
