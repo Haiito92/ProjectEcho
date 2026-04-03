@@ -4,12 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "EchoDebug.generated.h"
 
+class UDebugDataAsset;
 struct FEchoSystemDebugInfo;
 class UEchoDebugDeveloperSettings;
-enum EEchoSystem : uint8;
-enum EMessageType : uint8;
+enum class EEchoSystem : uint8;
+enum class EEchoMessageType : uint8;
 /** 
  * 
  */
@@ -20,22 +22,35 @@ class PROJECTECHO_API UEchoDebug : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, Category="Echo Debug", meta=(DisplayName="Print", AutoCreateRefTerm="SystemKey,MessageType,Color"))
-	static void AddOnScreenDebugMessage(const EEchoSystem& SystemKey, const EMessageType& MessageType, const FString& Message, const FLinearColor& Color, float TimeToDisplay);
+	UFUNCTION(BlueprintCallable, Category="Echo Debug", meta=(DisplayName="Print", AutoCreateRefTerm="SystemKey,MessageType,Color", DevelopmentOnly))
+	static void AddOnScreenDebugMessage(const EEchoSystem& SystemKey, const EEchoMessageType& MessageType, const FString& Message, const FLinearColor& Color = FLinearColor::White, float TimeToDisplay = 0);
 
-	UFUNCTION(BlueprintCallable, Category="Echo Debug", meta=(DisplayName="Log", AutoCreateRefTerm="SystemKey,MessageType"))
-	static void Log(const EEchoSystem& SystemKey, const EMessageType& MessageType, const FString& Message);
+	UFUNCTION(BlueprintCallable, Category="Echo Debug", meta=(DisplayName="Log", AutoCreateRefTerm="SystemKey,MessageType", DevelopmentOnly))
+	static void Log(const EEchoSystem& SystemKey, const EEchoMessageType& MessageType, const FString& Message);
 	
-	UFUNCTION(BlueprintCallable, Category="Echo Debug", meta=(DisplayName="Toggle System Debug", AutoCreateRefTerm="SystemKey,Activated"))
+	UFUNCTION(BlueprintCallable, Category="Echo Debug", meta=(DisplayName="Log & Print", AutoCreateRefTerm="SystemKey,MessageType,Color", DevelopmentOnly))
+	static void LogAndAddOnScreenDebugMessage(const EEchoSystem& SystemKey, const EEchoMessageType& MessageType, const FString& Message, const FLinearColor& Color = FLinearColor::White, float TimeToDisplay = 0);
+
+	UFUNCTION(BlueprintCallable, Category="Echo Debug", meta=(DisplayName="Draw Sphere", WorldContext="WorldContextObject", AutoCreateRefTerm="SystemKey,Center,Color,DepthPriority", DevelopmentOnly))
+	static void DrawSphere(const UObject* WorldContextObject, const EEchoSystem& SystemKey, const FVector& Center, float Radius = 100.f, int32 Segments = 12, const FLinearColor& Color = FLinearColor::White, float LifeTime = 0.f, float Thickness = 0.f, const EDrawDebugSceneDepthPriorityGroup& DepthPriority = EDrawDebugSceneDepthPriorityGroup::World);
+	
+	UFUNCTION(BlueprintCallable, Category="Echo Debug", meta=(DisplayName="Toggle System Debug", AutoCreateRefTerm="SystemKey,Activated", DevelopmentOnly))
 	static void ToggleSystemDebug(const EEchoSystem& SystemKey, bool Activated);
 private:
+	UFUNCTION(meta=(DevelopmentOnly))
 	static bool IsSystemDebugActivated(const EEchoSystem& SystemKey);
-	static FString FormatMessage(const FString& Tag, const EMessageType& MessageType, const FString& Message);
+	
+	UFUNCTION(meta=(DevelopmentOnly))
+	static FString FormatMessage(const FString& Tag, const EEchoMessageType& MessageType, const FString& Message);
 
 	static const FEchoSystemDebugInfo* GetSystemDebugInfo(const EEchoSystem& SystemKey);
-	static const UEchoDebugDeveloperSettings* LazyGetDebugSettings();
+	
+	UFUNCTION(meta=(DevelopmentOnly))
+	static const UDebugDataAsset* LazyGetDebugDataAsset();
+	
+	UFUNCTION(meta=(DevelopmentOnly))
 	static TMap<EEchoSystem, bool>& LazyGetToggles();
 	
-	static const UEchoDebugDeveloperSettings* DebugSettings;
+	static TObjectPtr<UDebugDataAsset> DebugDataAsset;
 	static TMap<EEchoSystem, bool> Toggles;
 };

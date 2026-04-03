@@ -9,11 +9,10 @@
  * 
  */
 UENUM()
-enum EEchoSystem : uint8
+enum class EEchoSystem : uint8
 {
 	PlayerStateMachine,
 	Record,
 	Count UMETA(Hidden)
 };
-
 ENUM_RANGE_BY_COUNT(EEchoSystem, EEchoSystem::Count)

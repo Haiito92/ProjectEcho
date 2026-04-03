@@ -7,7 +7,6 @@
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "Tools/Debug/EchoDebug.h"
-#include "Tools/Debug/MessageType.h"
 
 #pragma region Timeline
 
@@ -184,8 +183,7 @@ void FGlobalTimeline::RegisterTimeline(const FEchoTimeline& Timeline)
 		if (!Timelines.Contains(i))
 		{
 			Timelines.Add(i, Timeline);
-			UEchoDebug::AddOnScreenDebugMessage(Record, Log, "Registered Timeline at Slot : " + FString::FromInt(i), FColor::Turquoise, 3.f);
-			UEchoDebug::Log(Record, Log, "Registered Timeline at Slot : " + FString::FromInt(i));
+			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Registered Timeline at Slot : " + FString::FromInt(i), FColor::Turquoise, 3.f);
 			return;
 		}
 	}
@@ -195,8 +193,7 @@ void FGlobalTimeline::DestroyTimeline(int SelectedSlot, TArray<TObjectPtr<AActor
 {
 	if (Timelines.Contains(SelectedSlot))
 	{
-		UEchoDebug::AddOnScreenDebugMessage(Record, Log, "Deleted Timeline at Slot : " + FString::FromInt(SelectedSlot), FColor::Turquoise, 3.f);
-		UEchoDebug::Log(Record, Log, "Deleted Timeline at Slot : " + FString::FromInt(SelectedSlot));
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Deleted Timeline at Slot : " + FString::FromInt(SelectedSlot), FColor::Turquoise, 3.f);
 		
 		float StartTimeKey = Timelines[SelectedSlot].StartTimeKey;
 		
@@ -241,7 +238,7 @@ void URecordManagerSubsystem::InitRecordManager(const int& NbTimelineSlot)
 	RecordManagerSettings = GetDefault<UDataAssetDeveloperSettings>()->RecordManagerSettings.LoadSynchronous();
 	if (!IsValid(RecordManagerSettings))
 	{
-		UEchoDebug::Log(Record, Error, "Missing RecordManagerSettings");
+		UEchoDebug::Log(EEchoSystem::Record, EEchoMessageType::Error, "Missing RecordManagerSettings");
 		return;
 	}
 	TSubclassOf<AActor> EchoActorClass = RecordManagerSettings->EchoActorClass;
@@ -268,8 +265,7 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor)
 	RecordingTimeline.RecordTransformKey(RecordedActor, 0);
 	OnStartRecording.Broadcast(CurrentTimeKey);
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), RecordManagerSettings->TimeDilatationFactor);
-	UEchoDebug::AddOnScreenDebugMessage(Record, Log, "Start Recording", FColor::Turquoise, 3.f);
-	UEchoDebug::Log(Record, Log, "Start Recording");
+	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Start Recording", FColor::Turquoise, 3.f);
 }
 
 void URecordManagerSubsystem::StopRecord()
@@ -282,9 +278,7 @@ void URecordManagerSubsystem::StopRecord()
 		GlobalTimeline.RegisterTimeline(RecordingTimeline);
 		OnStopRecording.Broadcast();
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
-		UEchoDebug::AddOnScreenDebugMessage(Record, Log, "Stop Recording", FColor::Turquoise, 3.f);
-		UEchoDebug::Log(Record, Log, "Stop Recording");
-		
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Stop Recording", FColor::Turquoise, 3.f);
 	}
 }
 
@@ -296,8 +290,8 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 	
 	float previousTimeKey = CurrentTimeKey;
 	CurrentTimeKey+= DeltaTime;
-	UEchoDebug::AddOnScreenDebugMessage(Record, Log, "Current Time Key  " + FString::SanitizeFloat(CurrentTimeKey), FColor::Cyan, DeltaTime);
-	UEchoDebug::AddOnScreenDebugMessage(Record, Log, "Current Selected Timeline : " + FString::FromInt(SelectedSlot), FColor::Cyan, DeltaTime);
+	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Current Time Key  " + FString::SanitizeFloat(CurrentTimeKey), FColor::Cyan, DeltaTime);
+	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Current Selected Timeline : " + FString::FromInt(SelectedSlot), FColor::Cyan, DeltaTime);
 	
 	//--- Handle Replay ---
 	if (!GlobalTimeline.Timelines.IsEmpty())

@@ -6,7 +6,6 @@
 #include "UObject/Class.h"
 #include "EchoSystemDebugInfo.generated.h"
 
-enum EEchoSystem : uint8;
 /**
  * 
  */

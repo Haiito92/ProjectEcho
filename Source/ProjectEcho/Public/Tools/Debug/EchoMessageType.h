@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
-#include "MessageType.generated.h"
+#include "EchoMessageType.generated.h"
 
 /**
  * 
  */
 
 UENUM()
-enum EMessageType : uint8
+enum class EEchoMessageType : uint8
 {
 	Log,
 	Warning,
