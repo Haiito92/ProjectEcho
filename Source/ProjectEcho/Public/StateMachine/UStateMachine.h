@@ -27,5 +27,5 @@ protected:
 	TMap<FString,UState*> StateMap;
 	
 	UPROPERTY()
-	ACharacter* Owner;
+	ACharacter* Character;
 };

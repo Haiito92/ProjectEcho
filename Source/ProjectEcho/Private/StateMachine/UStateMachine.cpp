@@ -10,7 +10,7 @@ void UStateMachine::BeginPlay()
 
 UStateMachine::UStateMachine()
 {
-	Owner = Cast<ACharacter>(GetOwner());
+	Character = Cast<ACharacter>(GetOwner());
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = true;
 }

@@ -8,8 +8,9 @@
 #include "StateMachine/States/UWalk.h"
 #include "UPlayerStateMachine.generated.h"
 
+class UInputDataConfig;
 class UInputMappingContext;
-class UInputAction;
+class APlayerController;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class UPlayerStateMachine : public UStateMachine
@@ -18,7 +19,18 @@ class UPlayerStateMachine : public UStateMachine
 public:
 	virtual void InitStates() override;
 	
-	void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent);
+	
+	//UFUNCTION(BlueprintCallable)
+	//void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent);
+	
+	UFUNCTION()
+	void AIdle(const FInputActionValue& Value);
+	UFUNCTION()
+	void AMove(const FInputActionValue& Value);
+	UFUNCTION()
+	void ASprint(const FInputActionValue& Value);
+	UFUNCTION()
+	void AJump(const FInputActionValue& Value);
 	
 	UPROPERTY()
 	UIdle* Idle;
@@ -33,20 +45,11 @@ public:
 	UPROPERTY()
 	UWallRun* WallRun;
 	
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* AJump;
 	
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* AWalk;
 	
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* ALook;
+	UPROPERTY()
+	APlayerController* PlayerController;
 	
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* ARun;
-	
-	UPROPERTY(EditDefaultsOnly,  Category = "State Machine")
-	UInputMappingContext* InputMapping;
 	UPROPERTY(EditDefaultsOnly,  Category = "State Machine")
 	float MinimumSpeedToRun;
 	UPROPERTY(EditDefaultsOnly,  Category = "State Machine")

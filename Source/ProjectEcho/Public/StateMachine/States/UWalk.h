@@ -7,7 +7,5 @@ class UWalk : public UState
 {
 public:
 	GENERATED_BODY()
-	virtual void Tick(float DeltaTime) override;
-
-	
+	virtual void Tick(float DeltaTime) override;	
 };

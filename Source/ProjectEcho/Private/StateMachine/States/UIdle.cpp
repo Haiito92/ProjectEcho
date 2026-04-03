@@ -5,8 +5,4 @@
 void UIdle::Tick(float DeltaTime)
 {
 	UState::Tick(DeltaTime);
-	//if (StateMachine->CurrentSpeed > 0)
-	//{
-	//	StateMachine->ChangeState("Walk");
-	//}
 }

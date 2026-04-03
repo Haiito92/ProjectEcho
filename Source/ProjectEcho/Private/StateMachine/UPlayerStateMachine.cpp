@@ -1,6 +1,4 @@
 #include "StateMachine/UPlayerStateMachine.h"
-
-#include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/Character.h"
 #include "StateMachine/UStateMachine.h"
@@ -31,11 +29,44 @@ void UPlayerStateMachine::InitStates()
 	StartState("Idle");
 }
 
-void UPlayerStateMachine::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void UPlayerStateMachine::AIdle(const FInputActionValue& Value)
 {
-	APlayerController* PlayerController = Cast<APlayerController>(GetOwner());
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
-	    
-	Subsystem->ClearAllMappings();
-	Subsystem->AddMappingContext(InputMapping, 0);
+	if(GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("en Idle"));
+	if (CurrentState != Idle) ChangeState("Idle");
 }
+
+void UPlayerStateMachine::AMove(const FInputActionValue& Value)
+{
+	if(GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("en Walk"));
+	if (CurrentState != Walk) ChangeState("Walk");
+	const FVector2D MovementValue = Value.Get<FVector2D>();
+	
+	if (PlayerController)
+	{
+		const FVector Right = Character->GetActorRightVector();
+		Character->AddMovementInput(Right, MovementValue.X);
+		
+		const FVector Forward = Character->GetActorForwardVector();
+		Character->AddMovementInput(Forward, MovementValue.Y);
+	}
+}
+
+void UPlayerStateMachine::ASprint(const FInputActionValue& Value)
+{
+	if(GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("en Sprint"));
+	if (CurrentState != Run) ChangeState("Sprint");
+}
+
+
+void UPlayerStateMachine::AJump(const FInputActionValue& Value)
+{
+	if(GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("en Jump"));
+	if (CurrentState != Jump) ChangeState("Jump");
+}
+
+
+
