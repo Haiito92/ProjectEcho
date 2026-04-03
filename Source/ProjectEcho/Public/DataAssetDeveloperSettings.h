@@ -7,6 +7,7 @@
 #include "Tools/Debug/DebugDataAsset.h"
 #include "DataAssetDeveloperSettings.generated.h"
 
+class URecordManagerSettings;
 /**
  * 
  */
@@ -18,4 +19,8 @@ class PROJECTECHO_API UDataAssetDeveloperSettings : public UDeveloperSettings
 public:
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Echo Debug Settings")
 	TSoftObjectPtr<UDebugDataAsset> DebutDataAsset;
+	
+	//Data Asset of Record Mechanics Settings
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Record Settings")
+	TSoftObjectPtr<URecordManagerSettings> RecordManagerSettings;
 };
