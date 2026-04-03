@@ -88,11 +88,38 @@ void UEchoDebug::LogAndAddOnScreenDebugMessage(const EEchoSystem& SystemKey, con
 	}
 }
 
-void UEchoDebug::DrawSphere(const UObject* WorldContextObject, const EEchoSystem& SystemKey, const FVector& Center, float Radius, int32 Segments, const FLinearColor& Color, float LifeTime, float Thickness, const EDrawDebugSceneDepthPriorityGroup& DepthPriority)
+void UEchoDebug::DrawBox(const UObject* WorldContextObject, const EEchoSystem& SystemKey, const FVector& Center,
+	const FVector& Extent, const FRotator& Rotation, const FLinearColor& LineColor, float Duration, float Thickness,
+	const EDrawDebugSceneDepthPriorityGroup& DepthPriority)
 {
 	if(!IsSystemDebugActivated(SystemKey)) return;
 	
-	UKismetSystemLibrary::DrawDebugSphere(WorldContextObject, Center, Radius, Segments, Color, LifeTime, Thickness, DepthPriority);
+	UKismetSystemLibrary::DrawDebugBox(WorldContextObject, Center, Extent, LineColor, Rotation, Duration, Thickness, DepthPriority);
+}
+
+void UEchoDebug::DrawCapsule(const UObject* WorldContextObject, const EEchoSystem& SystemKey, const FVector& Center,
+	float HalfHeight, float Radius, const FRotator& Rotation, const FLinearColor& LineColor, float Duration, float Thickness,
+	const EDrawDebugSceneDepthPriorityGroup& DepthPriority)
+{
+	if(!IsSystemDebugActivated(SystemKey)) return;
+	
+	UKismetSystemLibrary::DrawDebugCapsule(WorldContextObject, Center, HalfHeight, Radius, Rotation, LineColor, Duration, Thickness, DepthPriority);
+}
+
+void UEchoDebug::DrawLine(const UObject* WorldContextObject, const EEchoSystem& SystemKey, const FVector& LineStart,
+	const FVector& LineEnd, const FLinearColor& LineColor, float Duration, float Thickness,
+	const EDrawDebugSceneDepthPriorityGroup& DepthPriority)
+{
+	if(!IsSystemDebugActivated(SystemKey)) return;
+	
+	UKismetSystemLibrary::DrawDebugLine(WorldContextObject, LineStart, LineEnd, LineColor, Duration, Thickness, DepthPriority);
+}
+
+void UEchoDebug::DrawSphere(const UObject* WorldContextObject, const EEchoSystem& SystemKey, const FVector& Center, float Radius, int32 Segments, const FLinearColor& LineColor, float Duration, float Thickness, const EDrawDebugSceneDepthPriorityGroup& DepthPriority)
+{
+	if(!IsSystemDebugActivated(SystemKey)) return;
+	
+	UKismetSystemLibrary::DrawDebugSphere(WorldContextObject, Center, Radius, Segments, LineColor, Duration, Thickness, DepthPriority);
 }
 
 void UEchoDebug::ToggleSystemDebug(const EEchoSystem& SystemKey, bool Activated)
