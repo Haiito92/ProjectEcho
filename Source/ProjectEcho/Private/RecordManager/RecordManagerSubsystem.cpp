@@ -6,6 +6,8 @@
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
+#include "RecordManager/EchoActor.h"
+#include "RecordManager/RecordableInterface.h"
 #include "Tools/Debug/EchoDebug.h"
 
 #pragma region Timeline
@@ -44,7 +46,21 @@ const float& FEchoTimeline::GetLastTimeKey() const
 	return TransformKeys[TransformKeys.Num() - 1].TimeKey;
 }
 
-void FEchoTimeline::RegisterEchoActor(AActor* InEchoActor)
+bool FEchoTimeline::GetActionKeys(const float& PreviousKey,const float& CurrentTimeKey, TArray<const FRecordActionKey*>& OutActionKeys) const
+{
+	bool bHasAddedActionKeys = false;
+	for (const FRecordActionKey& ActionKey: ActionKeys)
+	{
+		if (ActionKey.TimeKey > PreviousKey && ActionKey.TimeKey <= CurrentTimeKey)
+		{
+			OutActionKeys.Add(&ActionKey);
+			bHasAddedActionKeys = true;
+		}
+	}
+	return bHasAddedActionKeys;
+}
+
+void FEchoTimeline::RegisterEchoActor(AEchoActor* InEchoActor)
 {
 	EchoActor = InEchoActor;
 }
@@ -66,6 +82,20 @@ void FEchoTimeline::RecordTransformKey(AActor* RecordedActor, const float& Curre
 	});
 }
 
+void FEchoTimeline::RecordActionKey(AActor* RecordedActor, const float& CurrentTimeKey)
+{
+	if (!RecordedActor->GetClass()->ImplementsInterface(URecordableInterface::StaticClass())) return;
+	TArray<ERecordedAction> ToRecordActions = IRecordableInterface::Execute_GetToRecordActions(RecordedActor);
+	for (const ERecordedAction& ToRecordAction : ToRecordActions)
+	{
+		FRecordActionKey RecordActionKey;
+		RecordActionKey.TimeKey = CurrentTimeKey;
+		RecordActionKey.Action = ToRecordAction;
+		ActionKeys.Add(RecordActionKey);
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Recording Action : " + UEnum::GetDisplayValueAsText(ToRecordAction).ToString());
+	}
+}
+
 void FEchoTimeline::PlayReplay(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind)
 {
 	if (!IsValid(EchoActor)) return;
@@ -80,6 +110,18 @@ void FEchoTimeline::PlayReplay(const float& PreviousKey,const float& CurrentTime
 	EchoActor->SetActorLocation(FMath::Lerp(PreviousTransformKey->Position, NextTransformKey->Position, lerpValue));
 	EchoActor->SetActorRotation(FMath::Lerp(PreviousTransformKey->Rotation, NextTransformKey->Rotation, lerpValue));
 	EchoActor->SetActorScale3D(FMath::Lerp(PreviousTransformKey->Scale, NextTransformKey->Scale, lerpValue));
+	
+	//Play Action Keys
+	TArray<const FRecordActionKey*> CurrentActionKeys;
+	if (GetActionKeys(PreviousKey, CurrentTimeKey, CurrentActionKeys))
+	{
+		for (const FRecordActionKey* ActionKey : CurrentActionKeys)
+		{
+			if (!ActionKey) continue;
+			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Replaying Action : " + UEnum::GetDisplayValueAsText(ActionKey->Action).ToString());
+			EchoActor->HandleActionKey(ActionKey->Action);
+		}
+	}
 }
 
 void FEchoTimeline::ActivateTimeline(bool bInIsActive)
@@ -189,7 +231,7 @@ void FGlobalTimeline::RegisterTimeline(const FEchoTimeline& Timeline)
 	}
 }
 
-void FGlobalTimeline::DestroyTimeline(int SelectedSlot, TArray<TObjectPtr<AActor>>& OutEchoActorPool)
+void FGlobalTimeline::DestroyTimeline(int SelectedSlot, TArray<TObjectPtr<AEchoActor>>& OutEchoActorPool)
 {
 	if (Timelines.Contains(SelectedSlot))
 	{
@@ -245,7 +287,7 @@ void URecordManagerSubsystem::InitRecordManager(const int& NbTimelineSlot)
 	FTransform SpawnTransform;
 	for (int i = 0; i < NbTimelineSlot; ++i)
 	{
-		AActor* SpawnedEchoActor = GetWorld()->SpawnActorDeferred<AActor>(EchoActorClass, SpawnTransform);
+		AEchoActor* SpawnedEchoActor = GetWorld()->SpawnActorDeferred<AEchoActor>(EchoActorClass, SpawnTransform);
 		SpawnedEchoActor->SetActorHiddenInGame(true);
 		SpawnedEchoActor->FinishSpawning(SpawnTransform);
 		EchoActorsPool.Add(SpawnedEchoActor);
@@ -259,6 +301,10 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor)
 	if (EchoActorsPool.IsEmpty()) return;
 	RecordedActor = InRecordedActor;
 	bIsRecording = true;
+	if (RecordedActor->GetClass()->ImplementsInterface(URecordableInterface::StaticClass()))
+	{
+		IRecordableInterface::Execute_StartRecording(RecordedActor);
+	}
 	RecordingTimeline = FEchoTimeline();
 	RecordingTimeline.StartTimeKey = CurrentTimeKey;
 	RecordingTimeline.EchoActor = EchoActorsPool.Pop();
@@ -273,6 +319,10 @@ void URecordManagerSubsystem::StopRecord()
 	if (bIsRecording)
 	{
 		bIsRecording = false;
+		if (RecordedActor->GetClass()->ImplementsInterface(URecordableInterface::StaticClass()))
+		{
+			IRecordableInterface::Execute_StartRecording(RecordedActor);
+		}
 		RecordingTimeline.RecordTransformKey(RecordedActor, CurrentTimeKey - RecordingTimeline.StartTimeKey);
 		RecordedActor = nullptr;
 		GlobalTimeline.RegisterTimeline(RecordingTimeline);
@@ -310,11 +360,13 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 	// --- Handle Recording ---
 	if (bIsRecording)
 	{
-		RecordingTimeline.RecordTransformKey(RecordedActor, CurrentTimeKey - RecordingTimeline.StartTimeKey);
+		float LocalTimeKey = CurrentTimeKey - RecordingTimeline.StartTimeKey;
+		RecordingTimeline.RecordTransformKey(RecordedActor, LocalTimeKey);
+		RecordingTimeline.RecordActionKey(RecordedActor, LocalTimeKey);
 		
 		//TODO: Implement Action Keys
 		
-		if (CurrentTimeKey - RecordingTimeline.StartTimeKey >= RecordManagerSettings->MaxRecordTime)
+		if (LocalTimeKey >= RecordManagerSettings->MaxRecordTime)
 		{
 			//Reached MaxRecordTime, Stop Record
 			StopRecord();

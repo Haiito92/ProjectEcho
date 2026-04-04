@@ -14,6 +14,8 @@
  * 
  */
 
+enum class ERecordedAction : uint8;
+
 class URecordManagerSettings;
 //Key used to save the position of an element at a set timekey 
 USTRUCT(Blueprintable)
@@ -27,6 +29,16 @@ struct FRecordTransformKey
 	FVector Scale;
 };
 
+USTRUCT()
+struct FRecordActionKey
+{
+	GENERATED_BODY()
+	
+	float TimeKey;
+	ERecordedAction Action;
+};
+
+
 #pragma region Timeline Struct
 USTRUCT(Blueprintable)
 struct FEchoTimeline
@@ -34,10 +46,12 @@ struct FEchoTimeline
 	GENERATED_BODY()
 	
 	//Actor used to show Replay of Timeline (Echo)
-	TObjectPtr<AActor> EchoActor = nullptr;
+	TObjectPtr<AEchoActor> EchoActor = nullptr;
 	
 	//List of TransformKeys
 	TArray<FRecordTransformKey> TransformKeys;
+	//List of TransformKeys
+	TArray<FRecordActionKey> ActionKeys;
 	
 	//TimeKey of Start of Timeline (from Global Timeline)
 	float StartTimeKey;
@@ -54,11 +68,17 @@ struct FEchoTimeline
 	//Get Last Key of Timeline (End of Timeline, in Local Time)
 	const float& GetLastTimeKey() const;
 	
-	//Save Echo Actor for Replays
-	void RegisterEchoActor(AActor* InEchoActor);
+	//Get All Action Keys between two Keys in given Array, returns true if has found ActionKeys
+	bool GetActionKeys(const float& PreviousKey,const float& CurrentTimeKey, TArray<const FRecordActionKey*>& OutActionKeys) const;
 	
-	//Record current Transform into TransformKey in Timeline List
+	//Save Echo Actor for Replays
+	void RegisterEchoActor(AEchoActor* InEchoActor);
+	
+	//Record current Transform into aTransformKey in Timeline List
 	void RecordTransformKey(AActor* RecordedActor, const float& CurrentTimeKey);
+	
+	//Record All Actions executed between last record and now into an ActionKey in Timeline List
+	void RecordActionKey(AActor* RecordedActor, const float& CurrentTimeKey);
 	
 	/* Replay Function
 	 * Play Current Frame of the Replay with given PreviousKey Played and CurrentTimeKey 
@@ -100,7 +120,7 @@ struct FGlobalTimeline
 	//Add Timeline to Global Timeline
 	void RegisterTimeline(const FEchoTimeline& Timeline);
 	
-	void DestroyTimeline(int TimelineIndex, TArray<TObjectPtr<AActor>>& OutEchoActorPool);
+	void DestroyTimeline(int TimelineIndex, TArray<TObjectPtr<AEchoActor>>& OutEchoActorPool);
 };
 
 #pragma endregion
@@ -160,6 +180,6 @@ private:
 	TObjectPtr<URecordManagerSettings> RecordManagerSettings = nullptr;
 	
 	//Pool of EchoActor to display Timelines (avoid runtime Spawning)
-	TArray<TObjectPtr<AActor>> EchoActorsPool;
+	TArray<TObjectPtr<AEchoActor>> EchoActorsPool;
 };
 

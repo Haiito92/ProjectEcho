@@ -6,6 +6,8 @@
 
 #include "RecordManagerSettings.generated.h"
 
+class AEchoActor;
+
 /**
  * 
  */
@@ -17,7 +19,7 @@ class PROJECTECHO_API URecordManagerSettings : public UDataAsset
 public:
 	//Actor of Echo Character that will be instantiated and used to display Character's Actions in Replays
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Echo Actors")
-	TSubclassOf<AActor> EchoActorClass;
+	TSubclassOf<AEchoActor> EchoActorClass;
 	
 	//Factor at which Time Dilatation will be multiplied when in Record
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Record")
