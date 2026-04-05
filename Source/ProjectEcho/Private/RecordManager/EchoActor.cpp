@@ -16,3 +16,9 @@ void AEchoActor::HandleActionKey(ERecordedAction Action)
 	ReceiveHandleActionKey(Action);
 }
 
+void AEchoActor::SetControlRotation(const FRotator& ControlRotation)
+{
+	//Call BP Function
+	ReceiveSetControlRotation(ControlRotation);
+}
+

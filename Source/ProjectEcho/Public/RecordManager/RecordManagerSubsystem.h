@@ -27,6 +27,7 @@ struct FRecordTransformKey
 	FVector Position;
 	FRotator Rotation;
 	FVector Scale;
+	FRotator ControlRotation;
 };
 
 USTRUCT()

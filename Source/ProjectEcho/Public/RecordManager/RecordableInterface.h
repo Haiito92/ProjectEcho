@@ -44,4 +44,8 @@ public:
 	//Called to get RecordedAction List
 	UFUNCTION(BlueprintNativeEvent)
 	TArray<ERecordedAction> GetToRecordActions();
+	
+	//Called to Get Control Rotation
+	UFUNCTION(BlueprintNativeEvent)
+	FRotator GetToRecordControlRotation();
 };

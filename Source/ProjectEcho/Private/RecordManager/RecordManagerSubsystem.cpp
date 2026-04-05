@@ -73,6 +73,10 @@ void FEchoTimeline::RecordTransformKey(AActor* RecordedActor, const float& Curre
 	TransformKey.Position = RecordedActor->GetActorLocation();
 	TransformKey.Rotation = RecordedActor->GetActorRotation();
 	TransformKey.Scale = RecordedActor->GetActorScale();
+	if (RecordedActor->GetClass()->ImplementsInterface(URecordableInterface::StaticClass()))
+	{
+		TransformKey.ControlRotation = IRecordableInterface::Execute_GetToRecordControlRotation(RecordedActor);
+	};
 	
 	//Add it to the list and Sort the list (list has to be in order)
 	TransformKeys.Add(TransformKey);
@@ -110,6 +114,7 @@ void FEchoTimeline::PlayReplay(const float& PreviousKey,const float& CurrentTime
 	EchoActor->SetActorLocation(FMath::Lerp(PreviousTransformKey->Position, NextTransformKey->Position, lerpValue));
 	EchoActor->SetActorRotation(FMath::Lerp(PreviousTransformKey->Rotation, NextTransformKey->Rotation, lerpValue));
 	EchoActor->SetActorScale3D(FMath::Lerp(PreviousTransformKey->Scale, NextTransformKey->Scale, lerpValue));
+	EchoActor->SetControlRotation(FMath::Lerp(PreviousTransformKey->ControlRotation, NextTransformKey->ControlRotation, lerpValue));
 	
 	//Play Action Keys
 	TArray<const FRecordActionKey*> CurrentActionKeys;

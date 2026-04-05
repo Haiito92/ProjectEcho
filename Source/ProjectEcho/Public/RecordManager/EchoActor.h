@@ -22,6 +22,14 @@ public:
 	UFUNCTION()
 	void HandleActionKey(ERecordedAction Action);
 	
+	UFUNCTION()
+	void SetControlRotation(const FRotator& ControlRotation);
+	
+protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveHandleActionKey(ERecordedAction Action);
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveSetControlRotation(const FRotator& ControlRotation);
+	
 };
