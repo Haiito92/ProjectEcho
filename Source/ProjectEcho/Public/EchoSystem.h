@@ -13,6 +13,7 @@ enum class EEchoSystem : uint8
 {
 	PlayerStateMachine,
 	Record,
+	Grab,
 	Count UMETA(Hidden)
 };
 ENUM_RANGE_BY_COUNT(EEchoSystem, EEchoSystem::Count)

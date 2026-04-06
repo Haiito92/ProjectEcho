@@ -7,6 +7,7 @@
 #include "Tools/Debug/DebugDataAsset.h"
 #include "DataAssetDeveloperSettings.generated.h"
 
+class UGrabMechanicSettings;
 class URecordManagerSettings;
 /**
  * 
@@ -23,4 +24,8 @@ public:
 	//Data Asset of Record Mechanics Settings
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Record Settings")
 	TSoftObjectPtr<URecordManagerSettings> RecordManagerSettings;
+	
+	//Data Asset of Grab Mechanic Settings
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Grab Settings")
+	TSoftObjectPtr<UGrabMechanicSettings> GrabMechanicSettings;
 };
