@@ -26,4 +26,8 @@ public:
 	//SphereTrace Radius
 	UPROPERTY(EditDefaultsOnly, Category="Sphere Trace")
 	float SphereTraceRadius = 50.f;
+	
+	//Strength of the Throw Force added to the Object
+	UPROPERTY(EditDefaultsOnly, Category="Throw")
+	float ThrowStrength = 5.0f;
 };

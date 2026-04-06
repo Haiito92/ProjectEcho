@@ -59,10 +59,37 @@ bool UGrabbingComponent::TryGrab(const FRotator& ControlRotation)
 		if (HitResult.GetActor()->GetClass()->ImplementsInterface(UGrabbableInterface::StaticClass()) && IGrabbableInterface::Execute_CanBeGrabbed(HitResult.GetActor()))
 		{
 			GrabbedActor = HitResult.GetActor();
+			IGrabbableInterface::Execute_OnBeforeGrabbed(GrabbedActor);
 			FAttachmentTransformRules AttachmentTransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
 			GrabbedActor->AttachToComponent(this, AttachmentTransformRules);
 			IGrabbableInterface::Execute_OnGrabbed(GrabbedActor);
 		}
+	}
+	return false;
+}
+
+bool UGrabbingComponent::TryRelease()
+{
+	if (IsGrabbing())
+	{
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Grab, EEchoMessageType::Log,"Releasing Grabbed Actor : " + GrabbedActor->GetName(), FColor::White, 3.f);
+		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		IGrabbableInterface::Execute_OnObjectReleased(GrabbedActor);
+		GrabbedActor = nullptr;
+		return true;
+	}
+	return false;
+}
+
+bool UGrabbingComponent::TryThrow(const FRotator& ControlRotation)
+{
+	if (IsGrabbing())
+	{
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Grab, EEchoMessageType::Log,"Throwing Grabbed Actor : " + GrabbedActor->GetName(), FColor::White, 3.f);
+		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		IGrabbableInterface::Execute_OnThrown(GrabbedActor, ControlRotation.Vector(), GrabMechanicSettings->ThrowStrength);
+		GrabbedActor = nullptr;
+		return true;
 	}
 	return false;
 }

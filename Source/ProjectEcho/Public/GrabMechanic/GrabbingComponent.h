@@ -18,18 +18,26 @@ public:
 	// Sets default values for this component's properties
 	UGrabbingComponent();
 
-	//Try to Grab Object in front of Player (According to Settings configurations
+	//Try to Grab Object in front of Player (According to Settings configurations)
 	UFUNCTION(BlueprintCallable)
 	virtual bool TryGrab(const FRotator& ControlRotation);
 	
-	//Has Object Currently Grabbed
+	//Try to Release Held Object
 	UFUNCTION(BlueprintCallable)
+	virtual bool TryRelease();
+	
+	//Try to Throw Held Object
+	UFUNCTION(BlueprintCallable)
+	virtual bool TryThrow(const FRotator& ControlRotation);
+	
+	//Has Object Currently Grabbed
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	virtual bool IsGrabbing();
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 	
-	//Grabbed Actor;
+	//Grabbed Object;
 	TObjectPtr<AActor> GrabbedActor = nullptr;
 
 private:

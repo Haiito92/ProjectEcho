@@ -25,7 +25,19 @@ public:
 	UFUNCTION(BLueprintNativeEvent)
 	bool CanBeGrabbed();
 	
+	//Called Before Being Grabbed 
+	UFUNCTION(BlueprintNativeEvent)
+	void OnBeforeGrabbed();
+	
 	//Called when Grabbed
 	UFUNCTION(BlueprintNativeEvent)
 	void OnGrabbed();
+	
+	//Called when Released
+	UFUNCTION(BlueprintNativeEvent)
+	void OnObjectReleased();
+	
+	//Called when Thrown
+	UFUNCTION(BlueprintNativeEvent)
+	void OnThrown(const FVector& ThrowDirection,const float& ThrowForce);
 };
