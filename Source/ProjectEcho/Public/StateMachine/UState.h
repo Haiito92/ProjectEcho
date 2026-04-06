@@ -1,7 +1,8 @@
 #pragma once
 #include "UState.generated.h"
 
-class UPlayerStateMachine;
+class ACharacterST;
+class UStateMachine;
 
 UCLASS()
 class UState : public UObject
@@ -10,11 +11,13 @@ public:
 	GENERATED_BODY()
 	UState();
 	
-	void InitStateMachine(UPlayerStateMachine *sm);
+	void InitStateMachine(UStateMachine *InStateMachine,ACharacterST* InCharacter);
 	virtual void Enter();
 	virtual void Tick(float DeltaTime);
 	virtual void Exit();
 protected:
 	UPROPERTY()
-	UPlayerStateMachine* StateMachine;
+	UStateMachine* StateMachine;
+	UPROPERTY()
+	TObjectPtr<ACharacterST> Character;
 };

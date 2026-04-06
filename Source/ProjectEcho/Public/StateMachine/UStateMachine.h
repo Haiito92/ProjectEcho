@@ -1,20 +1,62 @@
 #pragma once
-#include "Public/StateMachine/UState.h"
 #include "UStateMachine.generated.h"
 
+class UIdle;
+class UMove;
+class URun;
+class UJump;
+class UFall;
+class UWallRun;
+
+
+class UInputDataConfig;
+class UInputMappingContext;
+
+UENUM(BlueprintType)
+enum class EState : uint8
+{
+	Idle,
+	Move,
+	Sprint,
+	Jump,
+	Fall,
+	WallRun
+};
+
 UCLASS()
-class UStateMachine : public UActorComponent
+class UStateMachine : public UObject
 {
 	GENERATED_BODY()
 public:
-	UStateMachine();
-	virtual void InitStates();
-	void StartState(const FString& newState);
-	void AddState(UState* newState,const FString& nameState);
-	void ChangeState(const FString& newState);
+	UFUNCTION()
+	void InitStates(ACharacterST* InCharacter);
+	UFUNCTION()
+	void StartState(const EState& newState);
+	UFUNCTION()
+	void AddState(UState* newState,const EState& nameState);
+	UFUNCTION()
+	void ChangeState(const EState& newState);
 	
-	virtual void BeginPlay() override;
-	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	void Tick(float DeltaTime);
+	
+	UPROPERTY()
+	UIdle* Idle;
+	UPROPERTY()
+	UMove* Move;
+	UPROPERTY()
+	URun* Run ;
+	UPROPERTY()
+	UJump* Jump;
+	UPROPERTY()
+	UFall* Fall;
+	UPROPERTY()
+	UWallRun* WallRun;
+	
+	
+	UPROPERTY(EditDefaultsOnly,  Category = "State Machine")
+	float MinimumSpeedToRun;
+	UPROPERTY(EditDefaultsOnly,  Category = "State Machine")
+	float MinimumSpeedToWalk;
 	
 protected:
 
@@ -24,8 +66,5 @@ protected:
 	UState* PreviousState;
 
 	UPROPERTY()
-	TMap<FString,UState*> StateMap;
-	
-	UPROPERTY()
-	ACharacter* Character;
+	TMap<EState,UState*> StateMap;
 };

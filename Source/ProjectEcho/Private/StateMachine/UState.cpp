@@ -1,19 +1,20 @@
 #include "Public/StateMachine/UState.h"
-#include "StateMachine/UPlayerStateMachine.h"
 
-class UPlayerStateMachine;
+class UStateMachine;
 
 UState::UState()
 {
 }
 
-void UState::InitStateMachine(UPlayerStateMachine* sm)
+void UState::InitStateMachine(UStateMachine* InStateMachine,ACharacterST* InCharacter)
 {
-	StateMachine = sm;
+	StateMachine = InStateMachine;
+	Character = InCharacter;
 }
 
 void UState::Enter()
 {
+
 }
 
 void UState::Tick(float DeltaTime)
