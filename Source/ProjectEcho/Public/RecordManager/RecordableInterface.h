@@ -15,6 +15,7 @@ enum class ERecordedAction : uint8
 	Jump,
 	Interact,
 	TryGrab,
+	TryRelease,
 	TryThrow,
 };
 
