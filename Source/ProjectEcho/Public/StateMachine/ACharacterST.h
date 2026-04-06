@@ -29,8 +29,11 @@ public:
 	
 	UFUNCTION()
 	void AMove(const FInputActionValue& Value);
+	
 	UFUNCTION()
-	void ASprint(const FInputActionValue& Value);
+	void AMoveReleased(const FInputActionValue& Value);
+	UFUNCTION()
+	void ARun(const FInputActionValue& Value);
 	UFUNCTION()
 	void AJump(const FInputActionValue& Value);
 	UFUNCTION()
@@ -42,8 +45,8 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveInput, FVector2D, MoveInputVector);
 	FMoveInput OnMoveInput;
 	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FLookInput, FVector2D, LookInputVector);
-	FLookInput OnLookInput;
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveReleased, bool, isReleased);
+	FMoveReleased OnMoveReleased;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FJumpInput, bool, isJumping);
 	FJumpInput OnJumping;
@@ -55,6 +58,11 @@ public:
 	UInputDataConfig* InputActions;
 	UPROPERTY(EditDefaultsOnly,  Category = "Input")
 	UInputMappingContext* InputMapping;
+	
+	UPROPERTY(EditAnywhere)
+	float WalkSpeed = 600.f;
+	UPROPERTY(EditAnywhere)
+	float RunSpeed = 900.f;
 	
 	
 	UPROPERTY(BlueprintReadOnly,VisibleAnywhere)

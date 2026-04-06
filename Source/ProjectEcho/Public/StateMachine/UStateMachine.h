@@ -2,7 +2,7 @@
 #include "UStateMachine.generated.h"
 
 class UIdle;
-class UMove;
+class UWalk;
 class URun;
 class UJump;
 class UFall;
@@ -16,8 +16,8 @@ UENUM(BlueprintType)
 enum class EState : uint8
 {
 	Idle,
-	Move,
-	Sprint,
+	Walk,
+	Run,
 	Jump,
 	Fall,
 	WallRun
@@ -42,7 +42,7 @@ public:
 	UPROPERTY()
 	UIdle* Idle;
 	UPROPERTY()
-	UMove* Move;
+	UWalk* Move;
 	UPROPERTY()
 	URun* Run ;
 	UPROPERTY()
@@ -60,7 +60,7 @@ public:
 	
 protected:
 
-	UPROPERTY(BlueprintReadOnly,VisibleAnywhere)
+	UPROPERTY()
 	UState* CurrentState;
 	UPROPERTY()
 	UState* PreviousState;

@@ -1,9 +1,9 @@
 #pragma once
 #include "StateMachine/UState.h"
-#include "UMove.generated.h"
+#include "UWalk.generated.h"
 
 UCLASS()
-class UMove : public UState
+class UWalk : public UState
 {
 public:
 	GENERATED_BODY()
@@ -11,6 +11,9 @@ public:
 	virtual void Enter() override;
 	virtual void Exit() override;
 private:
+	UFUNCTION()
+	void OnMoveReleased(bool IsReleased);
+	
 	UFUNCTION()
 	void OnMove(FVector2D InMoveInput);
 };

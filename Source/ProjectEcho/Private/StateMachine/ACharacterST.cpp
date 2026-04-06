@@ -48,7 +48,6 @@ ACharacterST::ACharacterST()
 void ACharacterST::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void ACharacterST::Tick(float DeltaTime)
@@ -62,7 +61,7 @@ void ACharacterST::Tick(float DeltaTime)
 void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	APlayerController* PlayerController = Cast<APlayerController>(GetController());	
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
 	if (Subsystem == nullptr) return;
 	
@@ -83,8 +82,9 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	InitStateMachine();
 	
 	Input->BindAction(InputActions->AMove, ETriggerEvent::Triggered, this, &ACharacterST::AMove);
-	Input->BindAction(InputActions->ASprint, ETriggerEvent::Triggered, this, &ACharacterST::ASprint);
+	Input->BindAction(InputActions->ASprint, ETriggerEvent::Triggered, this, &ACharacterST::ARun);
 	Input->BindAction(InputActions->AJump, ETriggerEvent::Triggered, this, &ACharacterST::AJump);
+	Input->BindAction(InputActions->AMove, ETriggerEvent::Completed, this, &ACharacterST::AMoveReleased);
 	Input->BindAction(InputActions->ALook, ETriggerEvent::Triggered, this, &ACharacterST::ALook);
 }
 
@@ -94,7 +94,13 @@ void ACharacterST::AMove(const FInputActionValue& Value)
 	OnMoveInput.Broadcast(Input);
 }
 
-void ACharacterST::ASprint(const FInputActionValue& Value)
+void ACharacterST::AMoveReleased(const FInputActionValue& Value)
+{
+	bool bReleased = Value.Get<bool>();
+	OnMoveReleased.Broadcast(bReleased);
+}
+
+void ACharacterST::ARun(const FInputActionValue& Value)
 {
 	bool bRunning = Value.Get<bool>();
 	OnRunning.Broadcast(bRunning);
@@ -109,8 +115,6 @@ void ACharacterST::AJump(const FInputActionValue& Value)
 void ACharacterST::ALook(const FInputActionValue& Value)
 {
 	FVector2D Input = Value.Get<FVector2D>();
-	OnLookInput.Broadcast(Input);
-	
 	AddControllerYawInput(Input.X);
 	AddControllerPitchInput(-Input.Y);
 }

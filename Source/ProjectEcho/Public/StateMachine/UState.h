@@ -1,4 +1,5 @@
 #pragma once
+#include "StateMachine/UStateMachine.h"
 #include "UState.generated.h"
 
 class ACharacterST;
@@ -15,9 +16,14 @@ public:
 	virtual void Enter();
 	virtual void Tick(float DeltaTime);
 	virtual void Exit();
+	
+	UPROPERTY()
+	EState EnumState;
+	
 protected:
 	UPROPERTY()
 	UStateMachine* StateMachine;
+	
 	UPROPERTY()
 	TObjectPtr<ACharacterST> Character;
 };

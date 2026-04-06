@@ -14,5 +14,6 @@ private:
 	UFUNCTION()
 	void OnMove(FVector2D InMoveInput);
 	
-	
+	UPROPERTY()
+	FVector2D MoveInput;
 };
