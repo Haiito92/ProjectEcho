@@ -42,6 +42,8 @@ ACharacterST::ACharacterST()
 	
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 	GetCharacterMovement()->AirControl = 0.5f;
+	
+	
 }
 
 
@@ -82,16 +84,27 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	InitStateMachine();
 	
 	Input->BindAction(InputActions->AMove, ETriggerEvent::Triggered, this, &ACharacterST::AMove);
-	Input->BindAction(InputActions->ASprint, ETriggerEvent::Triggered, this, &ACharacterST::ARun);
-	Input->BindAction(InputActions->AJump, ETriggerEvent::Triggered, this, &ACharacterST::AJump);
+	Input->BindAction(InputActions->AMove, ETriggerEvent::Started, this, &ACharacterST::AMoveStarted);
 	Input->BindAction(InputActions->AMove, ETriggerEvent::Completed, this, &ACharacterST::AMoveReleased);
+	
+	Input->BindAction(InputActions->ARun, ETriggerEvent::Triggered, this, &ACharacterST::ARun);
+	Input->BindAction(InputActions->ARun, ETriggerEvent::Started, this, &ACharacterST::ARunStarted);
+	Input->BindAction(InputActions->ARun, ETriggerEvent::Completed, this, &ACharacterST::ARunReleased);
+	
+	Input->BindAction(InputActions->AJump, ETriggerEvent::Triggered, this, &ACharacterST::AJump);
+	
 	Input->BindAction(InputActions->ALook, ETriggerEvent::Triggered, this, &ACharacterST::ALook);
 }
 
 void ACharacterST::AMove(const FInputActionValue& Value)
 {
 	FVector2D Input = Value.Get<FVector2D>();
-	OnMoveInput.Broadcast(Input);
+	OnMovePressed.Broadcast(Input);
+}
+
+void ACharacterST::AMoveStarted(const FInputActionValue& Value)
+{
+	OnMoveStarted.Broadcast(true);
 }
 
 void ACharacterST::AMoveReleased(const FInputActionValue& Value)
@@ -104,6 +117,16 @@ void ACharacterST::ARun(const FInputActionValue& Value)
 {
 	bool bRunning = Value.Get<bool>();
 	OnRunning.Broadcast(bRunning);
+}
+
+void ACharacterST::ARunStarted(const FInputActionValue& Value)
+{
+	OnRunningStarted.Broadcast(true);
+}
+
+void ACharacterST::ARunReleased(const FInputActionValue& Value)
+{
+	OnRunningReleased.Broadcast(true);
 }
 
 void ACharacterST::AJump(const FInputActionValue& Value)

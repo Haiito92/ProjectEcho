@@ -29,11 +29,18 @@ public:
 	
 	UFUNCTION()
 	void AMove(const FInputActionValue& Value);
-	
+	UFUNCTION()
+	void AMoveStarted(const FInputActionValue& Value);
 	UFUNCTION()
 	void AMoveReleased(const FInputActionValue& Value);
+	
 	UFUNCTION()
 	void ARun(const FInputActionValue& Value);
+	UFUNCTION()
+	void ARunStarted(const FInputActionValue& Value);
+	UFUNCTION()
+	void ARunReleased(const FInputActionValue& Value);
+	
 	UFUNCTION()
 	void AJump(const FInputActionValue& Value);
 	UFUNCTION()
@@ -42,17 +49,22 @@ public:
 	UFUNCTION()
 	void InitStateMachine();
 	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveInput, FVector2D, MoveInputVector);
-	FMoveInput OnMoveInput;
-	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
+	FMovePressed OnMovePressed;
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveStarted, bool, isPress);
+	FMoveStarted OnMoveStarted;
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveReleased, bool, isReleased);
 	FMoveReleased OnMoveReleased;
 	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FJumpInput, bool, isJumping);
-	FJumpInput OnJumping;
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FJumpPressed, bool, isJumping);
+	FJumpPressed OnJumping;
 	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRunInput, bool, isRunning);
-	FRunInput OnRunning;
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRunPressed, bool, isRunning);
+	FRunPressed OnRunning;
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRunStarted, bool, isRunning);
+	FRunStarted OnRunningStarted;
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRunReleased, bool, isRunning);
+	FRunReleased OnRunningReleased;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputDataConfig* InputActions;

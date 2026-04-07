@@ -12,7 +12,12 @@ public:
 	virtual void Exit() override;
 	
 	UFUNCTION()
-	void OnRunning(bool InRunning);
+	void OnMoving(FVector2D MoveInput);
+	
+	UFUNCTION()
+	void OnRunningReleased(bool InRunning);
+	UFUNCTION()
+	void OnMovingReleased(bool InRunning);
 	
 private:
 	bool IsRunning;

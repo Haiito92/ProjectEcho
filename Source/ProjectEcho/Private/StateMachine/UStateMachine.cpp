@@ -15,12 +15,12 @@ void UStateMachine::InitStates(ACharacterST* InCharacter)
 	Fall = NewObject<UFall>(this);
 	WallRun = NewObject<UWallRun>(this);
 	
-	Idle->InitStateMachine(this,InCharacter);
-	Run->InitStateMachine(this,InCharacter);
-	Jump->InitStateMachine(this,InCharacter);
-	Fall->InitStateMachine(this,InCharacter);
-	WallRun->InitStateMachine(this,InCharacter);
-	Move->InitStateMachine(this,InCharacter);
+	Idle->InitState(this,InCharacter);
+	Run->InitState(this,InCharacter);
+	Jump->InitState(this,InCharacter);
+	Fall->InitState(this,InCharacter);
+	WallRun->InitState(this,InCharacter);
+	Move->InitState(this,InCharacter);
 	
 	AddState(Idle,EState::Idle);
 	AddState(Move,EState::Walk);
@@ -58,11 +58,16 @@ void UStateMachine::AddState(UState* newState, const EState& nameState)
 
 void UStateMachine::ChangeState(const EState& newState)
 {
+	if (CurrentState->EnumState == newState) return;
+	
+	//TODO : Check state exist
+	
 	if (CurrentState == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Current State is null can't change state"));
 		return;
 	}
+	
 	
 	if(GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, UEnum::GetValueAsString(newState));

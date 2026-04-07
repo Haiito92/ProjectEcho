@@ -15,5 +15,8 @@ private:
 	void OnMoveReleased(bool IsReleased);
 	
 	UFUNCTION()
-	void OnMove(FVector2D InMoveInput);
+	void OnRunningStarted(bool InRunningStarted);
+	
+	UFUNCTION()
+	void OnMovePressed(FVector2D InMoveInput);
 };

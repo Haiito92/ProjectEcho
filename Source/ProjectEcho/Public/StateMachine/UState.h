@@ -12,7 +12,7 @@ public:
 	GENERATED_BODY()
 	UState();
 	
-	void InitStateMachine(UStateMachine *InStateMachine,ACharacterST* InCharacter);
+	void InitState(UStateMachine *InStateMachine,ACharacterST* InCharacter);
 	virtual void Enter();
 	virtual void Tick(float DeltaTime);
 	virtual void Exit();

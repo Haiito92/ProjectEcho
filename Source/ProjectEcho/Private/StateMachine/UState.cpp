@@ -6,7 +6,7 @@ UState::UState()
 {
 }
 
-void UState::InitStateMachine(UStateMachine* InStateMachine,ACharacterST* InCharacter)
+void UState::InitState(UStateMachine* InStateMachine,ACharacterST* InCharacter)
 {
 	StateMachine = InStateMachine;
 	Character = InCharacter;

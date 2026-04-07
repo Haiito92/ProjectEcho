@@ -44,7 +44,7 @@ public:
 	UPROPERTY()
 	UWalk* Move;
 	UPROPERTY()
-	URun* Run ;
+	URun* Run;
 	UPROPERTY()
 	UJump* Jump;
 	UPROPERTY()

@@ -11,16 +11,18 @@ void UWalk::Tick(float DeltaTime)
 void UWalk::Enter()
 {
 	Super::Enter();
-	Character->OnMoveInput.AddDynamic(this,&UWalk::OnMove);
+	Character->OnMovePressed.AddDynamic(this,&UWalk::OnMovePressed);
 	Character->OnMoveReleased.AddDynamic(this,&UWalk::OnMoveReleased);
+	Character->OnRunningStarted.AddDynamic(this,&UWalk::OnRunningStarted);
 	Character->GetCharacterMovement()->MaxWalkSpeed = Character->WalkSpeed;
 }
 
 void UWalk::Exit()
 {
 	Super::Exit();
-	Character->OnMoveInput.RemoveDynamic(this,&UWalk::OnMove);
+	Character->OnMovePressed.RemoveDynamic(this,&UWalk::OnMovePressed);
 	Character->OnMoveReleased.RemoveDynamic(this,&UWalk::OnMoveReleased);
+	Character->OnRunningStarted.RemoveDynamic(this,&UWalk::OnRunningStarted);
 }
 
 void UWalk::OnMoveReleased(bool IsReleased)
@@ -28,7 +30,12 @@ void UWalk::OnMoveReleased(bool IsReleased)
 	StateMachine->ChangeState(EState::Idle);
 }
 
-void UWalk::OnMove(FVector2D InMoveInput)
+void UWalk::OnRunningStarted(bool InRunningStarted)
+{
+	StateMachine->ChangeState(EState::Run);
+}
+
+void UWalk::OnMovePressed(FVector2D InMoveInput)
 {
 	FVector Dir = Character->GetActorForwardVector() * InMoveInput.Y + Character->GetActorRightVector() * InMoveInput.X;
 	Dir.Normalize();

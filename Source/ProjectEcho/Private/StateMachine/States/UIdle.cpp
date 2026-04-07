@@ -6,24 +6,22 @@
 void UIdle::Tick(float DeltaTime)
 {
 	UState::Tick(DeltaTime);
-	if (MoveInput == FVector2D::ZeroVector) return;
-	StateMachine->ChangeState(EState::Walk);
 }
 
 void UIdle::Enter()
 {
 	Super::Enter();
-	Character->OnMoveInput.AddDynamic(this,&UIdle::OnMove);
+	Character->OnMoveStarted.AddDynamic(this,&UIdle::OnMoveStarted);
 }
 
 void UIdle::Exit()
 {
 	Super::Exit();
-	Character->OnMoveInput.RemoveDynamic(this,&UIdle::OnMove);
+	Character->OnMoveStarted.RemoveDynamic(this,&UIdle::OnMoveStarted);
 }
 
-void UIdle::OnMove(FVector2D InMoveInput)
+void UIdle::OnMoveStarted(bool IsPressed)
 {
-	MoveInput = InMoveInput;
+	StateMachine->ChangeState(EState::Walk);
 }
 

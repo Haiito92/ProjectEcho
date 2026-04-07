@@ -15,7 +15,7 @@ public:
 	UInputAction* AMove;
 	 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UInputAction* ASprint;
+	UInputAction* ARun;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UInputAction* AJump;

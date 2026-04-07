@@ -7,24 +7,39 @@
 void URun::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (!IsRunning) StateMachine->ChangeState(EState::Walk);
 }
 
 void URun::Enter()
 {
 	Super::Enter();
-	Character->OnRunning.AddDynamic(this,&URun::OnRunning);
+	Character->OnMovePressed.AddDynamic(this,&URun::OnMoving);
+	Character->OnMoveReleased.AddDynamic(this,&URun::OnMovingReleased);
+	Character->OnRunningReleased.AddDynamic(this,&URun::OnRunningReleased);
 	Character->GetCharacterMovement()->MaxWalkSpeed = Character->RunSpeed;
 }
 
 void URun::Exit()
 {
-	Character->OnRunning.RemoveDynamic(this,&URun::OnRunning);
 	Super::Exit();
+	Character->OnMovePressed.RemoveDynamic(this,&URun::OnMoving);
+	Character->OnMoveReleased.RemoveDynamic(this,&URun::OnMovingReleased);
+	Character->OnRunningReleased.RemoveDynamic(this,&URun::OnRunningReleased);
 }
 
-void URun::OnRunning(bool InRunning)
+void URun::OnMoving(FVector2D MoveInput)
 {
-	IsRunning = InRunning;
+	FVector Dir = Character->GetActorForwardVector() * MoveInput.Y + Character->GetActorRightVector() * MoveInput.X;
+	Dir.Normalize();
+	Character->AddMovementInput(Dir);
+}
+
+void URun::OnRunningReleased(bool InRunning)
+{
+	StateMachine->ChangeState(EState::Walk);
+}
+
+void URun::OnMovingReleased(bool InRunning)
+{
+	StateMachine->ChangeState(EState::Idle);
 }
 
