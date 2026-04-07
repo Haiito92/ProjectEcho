@@ -33,6 +33,10 @@ public:
 	//Has Object Currently Grabbed
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	virtual bool IsGrabbing();
+	
+	//Returns currently Grabbed Actor, return nullptr if isn't grabbing
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	virtual AActor* GetGrabbedActor();
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

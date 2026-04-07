@@ -29,12 +29,13 @@ void UGrabbingComponent::BeginPlay()
 
 bool UGrabbingComponent::TryGrab(const FRotator& ControlRotation)
 {
-	FHitResult HitResult;
+	if (IsGrabbing()) return false;
 	if (!IsValid(GrabMechanicSettings))
 	{
 		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Grab, EEchoMessageType::Error,"GrabSettings not found, Can't Grab !", FColor::White, 3.f);
 		return false;
 	}
+	FHitResult HitResult;
 	FVector CastLocation = GetOwner()->GetActorLocation() + GrabMechanicSettings->SphereTraceBaseLocationOffset + (ControlRotation.RotateVector(FVector(GrabMechanicSettings->SphereTraceDistance, 0.f, 0.f)));
 	FCollisionQueryParams TraceParams = FCollisionQueryParams::DefaultQueryParam;
 	TraceParams.bTraceComplex = true;
@@ -97,5 +98,10 @@ bool UGrabbingComponent::TryThrow(const FRotator& ControlRotation)
 bool UGrabbingComponent::IsGrabbing()
 {
 	return IsValid(GrabbedActor);
+}
+
+AActor* UGrabbingComponent::GetGrabbedActor()
+{
+	return GrabbedActor;
 }
 

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RecordableInterface.h"
+#include "RecordHandlerInterface.h"
 
 #include "EchoActor.generated.h"
 

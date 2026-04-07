@@ -7,7 +7,7 @@
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "RecordManager/EchoActor.h"
-#include "RecordManager/RecordableInterface.h"
+#include "RecordManager/RecordHandlerInterface.h"
 #include "Tools/Debug/EchoDebug.h"
 
 #pragma region Timeline
@@ -73,9 +73,9 @@ void FEchoTimeline::RecordTransformKey(AActor* RecordedActor, const float& Curre
 	TransformKey.Position = RecordedActor->GetActorLocation();
 	TransformKey.Rotation = RecordedActor->GetActorRotation();
 	TransformKey.Scale = RecordedActor->GetActorScale();
-	if (RecordedActor->GetClass()->ImplementsInterface(URecordableInterface::StaticClass()))
+	if (RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass()))
 	{
-		TransformKey.ControlRotation = IRecordableInterface::Execute_GetToRecordControlRotation(RecordedActor);
+		TransformKey.ControlRotation = IRecordHandlerInterface::Execute_GetToRecordControlRotation(RecordedActor);
 	};
 	
 	//Add it to the list and Sort the list (list has to be in order)
@@ -88,8 +88,8 @@ void FEchoTimeline::RecordTransformKey(AActor* RecordedActor, const float& Curre
 
 void FEchoTimeline::RecordActionKey(AActor* RecordedActor, const float& CurrentTimeKey)
 {
-	if (!RecordedActor->GetClass()->ImplementsInterface(URecordableInterface::StaticClass())) return;
-	TArray<ERecordedAction> ToRecordActions = IRecordableInterface::Execute_GetToRecordActions(RecordedActor);
+	if (!RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass())) return;
+	TArray<ERecordedAction> ToRecordActions = IRecordHandlerInterface::Execute_GetToRecordActions(RecordedActor);
 	for (const ERecordedAction& ToRecordAction : ToRecordActions)
 	{
 		FRecordActionKey RecordActionKey;
@@ -306,9 +306,9 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor)
 	if (EchoActorsPool.IsEmpty()) return;
 	RecordedActor = InRecordedActor;
 	bIsRecording = true;
-	if (RecordedActor->GetClass()->ImplementsInterface(URecordableInterface::StaticClass()))
+	if (RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass()))
 	{
-		IRecordableInterface::Execute_StartRecording(RecordedActor);
+		IRecordHandlerInterface::Execute_StartRecording(RecordedActor);
 	}
 	RecordingTimeline = FEchoTimeline();
 	RecordingTimeline.StartTimeKey = CurrentTimeKey;
@@ -324,9 +324,9 @@ void URecordManagerSubsystem::StopRecord()
 	if (bIsRecording)
 	{
 		bIsRecording = false;
-		if (RecordedActor->GetClass()->ImplementsInterface(URecordableInterface::StaticClass()))
+		if (RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass()))
 		{
-			IRecordableInterface::Execute_StartRecording(RecordedActor);
+			IRecordHandlerInterface::Execute_StartRecording(RecordedActor);
 		}
 		RecordingTimeline.RecordTransformKey(RecordedActor, CurrentTimeKey - RecordingTimeline.StartTimeKey);
 		RecordedActor = nullptr;

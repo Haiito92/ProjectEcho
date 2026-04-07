@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "RecordableInterface.generated.h"
+#include "RecordHandlerInterface.generated.h"
 
 #pragma region ActionKeys Structs
 
@@ -22,7 +22,7 @@ enum class ERecordedAction : uint8
 #pragma endregion
 // This class does not need to be modified.
 UINTERFACE()
-class URecordableInterface : public UInterface
+class URecordHandlerInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -30,7 +30,7 @@ class URecordableInterface : public UInterface
 /**
  * 
  */
-class PROJECTECHO_API IRecordableInterface
+class PROJECTECHO_API IRecordHandlerInterface
 {
 	GENERATED_BODY()
 public:
