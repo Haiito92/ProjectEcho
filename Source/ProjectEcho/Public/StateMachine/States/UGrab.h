@@ -1,7 +1,7 @@
 #pragma once
 #include "StateMachine/UState.h"
 
-class Throw : public UState
+class UGrab : public UState
 {
 public:
 	

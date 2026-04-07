@@ -18,7 +18,4 @@ public:
 	void OnRunningReleased(bool InRunning);
 	UFUNCTION()
 	void OnMovingReleased(bool InRunning);
-	
-private:
-	bool IsRunning;
 };
