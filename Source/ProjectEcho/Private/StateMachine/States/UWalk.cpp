@@ -14,6 +14,7 @@ void UWalk::Enter()
 	Character->OnMovePressed.AddDynamic(this,&UWalk::OnMovePressed);
 	Character->OnMoveReleased.AddDynamic(this,&UWalk::OnMoveReleased);
 	Character->OnRunningStarted.AddDynamic(this,&UWalk::OnRunningStarted);
+	
 	Character->GetCharacterMovement()->MaxWalkSpeed = Character->WalkSpeed;
 }
 
