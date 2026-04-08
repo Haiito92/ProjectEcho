@@ -22,4 +22,13 @@ class PROJECTECHO_API IActivator
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, CallInEditor)
+	void ToggleSwitch();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, CallInEditor)
+	void SwitchOn();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, CallInEditor)
+	void SwitchOff();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool IsSwitchOn();
 };
