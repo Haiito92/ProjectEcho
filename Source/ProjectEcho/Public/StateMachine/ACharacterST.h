@@ -64,8 +64,8 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveReleased, bool, isReleased);
 	FMoveReleased OnMoveReleased;
 	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FJumpPressed, bool, isJumping);
-	FJumpPressed OnJumping;
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FJumpStarted);
+	FJumpStarted OnJumpingStarted;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRunPressed, bool, isRunning);
 	FRunPressed OnRunning;

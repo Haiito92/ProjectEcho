@@ -12,5 +12,5 @@ public:
 	virtual void Exit() override;
 private:
 	UFUNCTION()
-	void OnMoveStarted(bool IsPressed);
+	void OnMovePressed(FVector2D dir);
 };

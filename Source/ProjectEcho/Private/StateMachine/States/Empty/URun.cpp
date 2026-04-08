@@ -16,6 +16,7 @@ void URun::Enter()
 	Character->OnMoveReleased.AddDynamic(this,&URun::OnMovingReleased);
 	Character->OnRunningReleased.AddDynamic(this,&URun::OnRunningReleased);
 	Character->OnGrabbingStarted.AddDynamic(this,&URun::OnGrabbingStarted);
+	Character->OnJumpingStarted.AddDynamic(this,&URun::OnjumpingStarted);
 	
 	Character->GetCharacterMovement()->MaxWalkSpeed = Character->RunSpeed;
 }
@@ -27,6 +28,7 @@ void URun::Exit()
 	Character->OnMoveReleased.RemoveDynamic(this,&URun::OnMovingReleased);
 	Character->OnRunningReleased.RemoveDynamic(this,&URun::OnRunningReleased);
 	Character->OnGrabbingStarted.RemoveDynamic(this,&URun::OnGrabbingStarted);
+	Character->OnJumpingStarted.RemoveDynamic(this,&URun::OnjumpingStarted);
 }
 
 void URun::OnMoving(FVector2D MoveInput)
@@ -49,5 +51,10 @@ void URun::OnMovingReleased(bool InRunning)
 void URun::OnGrabbingStarted()
 {
 	StateMachine->ChangeState(EState::RunGrab);
+}
+
+void URun::OnjumpingStarted()
+{
+	StateMachine->ChangeState(EState::Jump);
 }
 

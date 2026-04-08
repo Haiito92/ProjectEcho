@@ -11,18 +11,20 @@ void UIdle::Tick(float DeltaTime)
 void UIdle::Enter()
 {
 	Super::Enter();
-	Character->OnMoveStarted.AddDynamic(this,&UIdle::OnMoveStarted);
+	Character->OnMovePressed.AddDynamic(this,&UIdle::OnMovePressed);
 	Character->OnGrabbingStarted.AddDynamic(this,&UIdle::OnGrabbingStarted);
+	Character->OnJumpingStarted.AddDynamic(this,&UIdle::OnjumpingStarted);
 }
 
 void UIdle::Exit()
 {
 	Super::Exit();
-	Character->OnMoveStarted.RemoveDynamic(this,&UIdle::OnMoveStarted);
+	Character->OnMovePressed.RemoveDynamic(this,&UIdle::OnMovePressed);
 	Character->OnGrabbingStarted.RemoveDynamic(this,&UIdle::OnGrabbingStarted);
+	Character->OnJumpingStarted.RemoveDynamic(this,&UIdle::OnjumpingStarted);
 }
 
-void UIdle::OnMoveStarted(bool IsPressed)
+void UIdle::OnMovePressed(FVector2D dir)
 {
 	StateMachine->ChangeState(EState::Walk);
 }
@@ -30,5 +32,10 @@ void UIdle::OnMoveStarted(bool IsPressed)
 void UIdle::OnGrabbingStarted()
 {
 	StateMachine->ChangeState(EState::IdleGrab);
+}
+
+void UIdle::OnjumpingStarted()
+{
+	StateMachine->ChangeState(EState::Jump);
 }
 

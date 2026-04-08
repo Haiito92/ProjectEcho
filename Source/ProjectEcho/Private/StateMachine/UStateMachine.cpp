@@ -1,4 +1,6 @@
 #include "StateMachine/UStateMachine.h"
+
+#include "EchoSystem.h"
 #include "StateMachine/States/Empty/UIdle.h"
 #include "StateMachine/States/Empty/UWalk.h"
 #include "StateMachine/States/Empty/URun.h"
@@ -17,6 +19,8 @@
 #include "StateMachine/States/Hold/UIdleHold.h"
 #include "StateMachine/States/Hold/UWalkHold.h"
 #include "StateMachine/States/Hold/URunHold.h"
+#include "Tools/Debug/EchoDebug.h"
+#include "Tools/Debug/EchoMessageType.h"
 
 void UStateMachine::InitStates(ACharacterST* InCharacter)
 {
@@ -117,9 +121,7 @@ void UStateMachine::ChangeState(const EState& newState)
 		return;
 	}
 	
-	
-	if(GEngine)
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, UEnum::GetValueAsString(newState));
+	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine,EEchoMessageType::Log,UEnum::GetValueAsString(newState), FColor::White, 3.0f);
 	
 	CurrentState->Exit();
 	PreviousState = CurrentState;

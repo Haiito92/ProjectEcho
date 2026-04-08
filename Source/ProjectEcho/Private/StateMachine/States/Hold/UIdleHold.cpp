@@ -11,18 +11,18 @@ void UIdleHold::Tick(float DeltaTime)
 void UIdleHold::Enter()
 {
 	Super::Enter();
-	Character->OnMoveStarted.AddDynamic(this,&UIdleHold::OnMoveStarted);
+	Character->OnMovePressed.AddDynamic(this,&UIdleHold::OnMovePressed);
 	Character->OnThrowingStarted.AddDynamic(this,&UIdleHold::OnThrowingStarted);
 }
 
 void UIdleHold::Exit()
 {
 	Super::Exit();
-	Character->OnMoveStarted.RemoveDynamic(this,&UIdleHold::OnMoveStarted);
+	Character->OnMovePressed.RemoveDynamic(this,&UIdleHold::OnMovePressed);
 	Character->OnThrowingStarted.RemoveDynamic(this,&UIdleHold::OnThrowingStarted);
 }
 
-void UIdleHold::OnMoveStarted(bool IsPressed)
+void UIdleHold::OnMovePressed(FVector2D dir)
 {
 	StateMachine->ChangeState(EState::WalkHold);
 }

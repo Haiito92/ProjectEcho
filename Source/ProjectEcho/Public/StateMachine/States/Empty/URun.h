@@ -21,4 +21,7 @@ public:
 	
 	UFUNCTION()
 	void OnGrabbingStarted();
+	
+	UFUNCTION()
+	void OnjumpingStarted();
 };

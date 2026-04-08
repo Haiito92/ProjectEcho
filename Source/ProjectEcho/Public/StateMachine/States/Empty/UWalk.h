@@ -22,4 +22,7 @@ private:
 	
 	UFUNCTION()
 	void OnGrabbingStarted();
+	
+	UFUNCTION()
+	void OnjumpingStarted();
 };

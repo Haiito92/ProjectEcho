@@ -11,17 +11,17 @@ void UIdleGrab::Tick(float DeltaTime)
 void UIdleGrab::Enter()
 {
 	Super::Enter();
-	Character->OnMoveStarted.AddDynamic(this,&UIdleGrab::OnMoveStarted);
+	Character->OnMovePressed.AddDynamic(this,&UIdleGrab::OnMovePressed);
 	StateMachine->ChangeState(EState::IdleHold);
 }
 
 void UIdleGrab::Exit()
 {
 	Super::Exit();
-	Character->OnMoveStarted.RemoveDynamic(this,&UIdleGrab::OnMoveStarted);
+	Character->OnMovePressed.RemoveDynamic(this,&UIdleGrab::OnMovePressed);
 }
 
-void UIdleGrab::OnMoveStarted(bool IsPressed)
+void UIdleGrab::OnMovePressed(FVector2D dir)
 {
 	StateMachine->ChangeState(EState::WalkGrab);
 }

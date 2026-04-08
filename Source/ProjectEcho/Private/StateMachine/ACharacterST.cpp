@@ -137,8 +137,7 @@ void ACharacterST::ARunReleased(const FInputActionValue& Value)
 
 void ACharacterST::AJump(const FInputActionValue& Value)
 {
-	bool bJumping = Value.Get<bool>();
-	OnJumping.Broadcast(bJumping);
+	OnJumpingStarted.Broadcast();
 }
 
 void ACharacterST::ALook(const FInputActionValue& Value)
