@@ -9,6 +9,13 @@ void UJump::Tick(float DeltaTime)
 		StateMachine->ChangeState(EState::Fall);
 }
 
+void UJump::OnMovePressed(FVector2D InMoveInput)
+{
+	FVector Dir = Character->GetActorForwardVector() * InMoveInput.Y + Character->GetActorRightVector() * InMoveInput.X;
+	Dir.Normalize();
+	Character->AddMovementInput(Dir);
+}
+
 void UJump::Enter()
 {
 	Super::Enter();
