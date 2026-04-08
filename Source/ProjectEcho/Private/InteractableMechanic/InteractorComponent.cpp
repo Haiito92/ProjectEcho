@@ -28,9 +28,9 @@ bool UInteractorComponent::TryInteract_Implementation(const FVector& CastStartLo
 
 	FVector CastEndLocation = CastStartLocation + CastForwardVector * InteractDistance;
 	
-	TArray<FHitResult> HitResults;
-	GetWorld()->SweepMultiByChannel(
-		HitResults,
+	FHitResult HitResult;
+	GetWorld()->SweepSingleByChannel(
+		HitResult,
 		CastStartLocation,
 		CastEndLocation,
 		FQuat::Identity,
@@ -42,7 +42,7 @@ bool UInteractorComponent::TryInteract_Implementation(const FVector& CastStartLo
 	UEchoDebug::DrawLine(this, EEchoSystem::Interact, CastStartLocation, CastEndLocation, FColor::Red, 4.0f);
 	UEchoDebug::DrawSphere(this, EEchoSystem::Interact, CastEndLocation, InteractRadius, 12, FColor::Red, 4.0f);
 	
-	if (HitResults.IsEmpty())
+	if (!HitResult.bBlockingHit)
 	{
 		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Interact, EEchoMessageType::Error,
 			"Failed to interact, no interactable.", FColor::Red, 5.0f);
@@ -50,16 +50,13 @@ bool UInteractorComponent::TryInteract_Implementation(const FVector& CastStartLo
 		return false;
 	}
 	
-	for (FHitResult HitResult : HitResults)
+	AActor* HitActor = HitResult.GetActor();
+	
+	if(HitActor->Implements<UInteractable>())
 	{
-		AActor* HitActor = HitResult.GetActor();
-		
-		if(HitActor->Implements<UInteractable>())
-		{
-			IInteractable::Execute_Interact(HitActor);
-		}
+		IInteractable::Execute_Interact(HitActor);
 	}
 	
-	return false;
+	return true;
 }
 

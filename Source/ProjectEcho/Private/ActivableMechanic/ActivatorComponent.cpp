@@ -38,7 +38,9 @@ void UActivatorComponent::SwitchOn_Implementation()
 		{
 			IActivable::Execute_Activate(Activable);
 		}
-	} 
+	}
+
+	OnActivatorSwitchedOn.Broadcast();
 }
 
 void UActivatorComponent::SwitchOff_Implementation()
@@ -52,6 +54,8 @@ void UActivatorComponent::SwitchOff_Implementation()
 			IActivable::Execute_Deactivate(Activable);
 		}
 	}
+
+	OnActivatorSwitchedOff.Broadcast();
 }
 
 bool UActivatorComponent::IsSwitchOn_Implementation()

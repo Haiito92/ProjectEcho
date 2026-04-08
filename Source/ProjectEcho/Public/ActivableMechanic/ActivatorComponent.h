@@ -7,6 +7,8 @@
 #include "Components/ActorComponent.h"
 #include "ActivatorComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnActivatorSwitchedOnSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnActivatorSwitchedOffSignature);
 
 class UActivable;
 class IActivable;
@@ -25,6 +27,13 @@ public:
 	virtual void SwitchOff_Implementation() override;
 
 	virtual bool IsSwitchOn_Implementation() override;
+
+
+	UPROPERTY(BlueprintAssignable, DisplayName="On Activator Switched On")
+	FOnActivatorSwitchedOnSignature OnActivatorSwitchedOn;
+	UPROPERTY(BlueprintAssignable, DisplayName="On Activator Switched Off")
+	FOnActivatorSwitchedOffSignature OnActivatorSwitchedOff;
+
 protected:
 	UPROPERTY(EditAnywhere)
 	TArray<AActor*> Activables;
