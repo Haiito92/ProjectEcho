@@ -1,9 +1,9 @@
 #pragma once
 #include "StateMachine/UState.h"
-#include "UWalk.generated.h"
+#include "UWalkGrab.generated.h"
 
 UCLASS()
-class UWalk : public UState
+class UWalkGrab : public UState
 {
 public:
 	GENERATED_BODY()

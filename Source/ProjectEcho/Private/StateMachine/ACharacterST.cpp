@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GrabMechanic/GrabbingComponent.h"
 #include "StateMachine/InputDataConfig.h"
 
 
@@ -42,6 +43,8 @@ ACharacterST::ACharacterST()
 	
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 	GetCharacterMovement()->AirControl = 0.5f;
+	
+	
 }
 
 
@@ -52,7 +55,7 @@ void ACharacterST::BeginPlay()
 
 void ACharacterST::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);	
+	Super::Tick(DeltaTime);
 	if (StateMachine == nullptr)
 		return;
 	StateMachine->Tick(DeltaTime);
@@ -71,6 +74,7 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	if (PlayerController == nullptr) return;
 	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	    
+	GrabbingComponent = FindComponentByClass<UGrabbingComponent>();
 	
 	if(InputActions == nullptr)
 	{
@@ -92,6 +96,10 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Input->BindAction(InputActions->AJump, ETriggerEvent::Triggered, this, &ACharacterST::AJump);
 	
 	Input->BindAction(InputActions->ALook, ETriggerEvent::Triggered, this, &ACharacterST::ALook);
+	
+	Input->BindAction(InputActions->AGrab, ETriggerEvent::Started, this, &ACharacterST::AGrabStarted);
+	
+	Input->BindAction(InputActions->AThrow, ETriggerEvent::Started, this, &ACharacterST::AThrowStarted);
 }
 
 void ACharacterST::AMove(const FInputActionValue& Value)
@@ -138,6 +146,18 @@ void ACharacterST::ALook(const FInputActionValue& Value)
 	FVector2D Input = Value.Get<FVector2D>();
 	AddControllerYawInput(Input.X);
 	AddControllerPitchInput(-Input.Y);
+}
+
+void ACharacterST::AGrabStarted(const FInputActionValue& Value)
+{
+	if (GrabbingComponent->TryGrab(GetControlRotation()))
+		OnGrabbingStarted.Broadcast();
+}
+
+void ACharacterST::AThrowStarted(const FInputActionValue& Value)
+{
+	if (GrabbingComponent->TryThrow(GetControlRotation()))
+		OnThrowingStarted.Broadcast();
 }
 
 void ACharacterST::InitStateMachine()

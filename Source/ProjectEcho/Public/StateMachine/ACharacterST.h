@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GrabMechanic/GrabbingComponent.h"
 #include "ACharacterST.generated.h"
 
 class UInputComponent;
@@ -43,8 +44,15 @@ public:
 	
 	UFUNCTION()
 	void AJump(const FInputActionValue& Value);
+	
 	UFUNCTION()
 	void ALook(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void AGrabStarted(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void AThrowStarted(const FInputActionValue& Value);
 	
 	UFUNCTION()
 	void InitStateMachine();
@@ -66,6 +74,12 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRunReleased, bool, isRunning);
 	FRunReleased OnRunningReleased;
 	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGrabStarted);
+	FGrabStarted OnGrabbingStarted;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FThrowStarted);
+	FThrowStarted OnThrowingStarted;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputDataConfig* InputActions;
 	UPROPERTY(EditDefaultsOnly,  Category = "Input")
@@ -76,7 +90,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	float RunSpeed = 900.f;
 	
-	
 	UPROPERTY(BlueprintReadOnly,VisibleAnywhere)
 	UStateMachine* StateMachine;
 	
@@ -85,4 +98,7 @@ public:
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
+	
+	UPROPERTY()
+	UGrabbingComponent* GrabbingComponent;
 };

@@ -1,4 +1,4 @@
-#include "StateMachine/States/URun.h"
+#include "StateMachine/States/Empty/URun.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "StateMachine/ACharacterST.h"
 #include "StateMachine/UStateMachine.h"
@@ -15,6 +15,8 @@ void URun::Enter()
 	Character->OnMovePressed.AddDynamic(this,&URun::OnMoving);
 	Character->OnMoveReleased.AddDynamic(this,&URun::OnMovingReleased);
 	Character->OnRunningReleased.AddDynamic(this,&URun::OnRunningReleased);
+	Character->OnGrabbingStarted.AddDynamic(this,&URun::OnGrabbingStarted);
+	
 	Character->GetCharacterMovement()->MaxWalkSpeed = Character->RunSpeed;
 }
 
@@ -24,6 +26,7 @@ void URun::Exit()
 	Character->OnMovePressed.RemoveDynamic(this,&URun::OnMoving);
 	Character->OnMoveReleased.RemoveDynamic(this,&URun::OnMovingReleased);
 	Character->OnRunningReleased.RemoveDynamic(this,&URun::OnRunningReleased);
+	Character->OnGrabbingStarted.RemoveDynamic(this,&URun::OnGrabbingStarted);
 }
 
 void URun::OnMoving(FVector2D MoveInput)
@@ -41,5 +44,10 @@ void URun::OnRunningReleased(bool InRunning)
 void URun::OnMovingReleased(bool InRunning)
 {
 	StateMachine->ChangeState(EState::Idle);
+}
+
+void URun::OnGrabbingStarted()
+{
+	StateMachine->ChangeState(EState::RunGrab);
 }
 

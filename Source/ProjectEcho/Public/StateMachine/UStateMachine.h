@@ -8,6 +8,18 @@ class UJump;
 class UFall;
 class UWallRun;
 
+class UIdleHold;
+class UWalkHold;
+class URunHold;
+
+class UIdleThrow;
+class UWalkThrow;
+class URunThrow;
+
+class UIdleGrab;
+class UWalkGrab;
+class URunGrab;
+
 
 class UInputDataConfig;
 class UInputMappingContext;
@@ -20,7 +32,16 @@ enum class EState : uint8
 	Run,
 	Jump,
 	Fall,
-	WallRun
+	WallRun,
+	IdleGrab,
+	WalkGrab,
+	RunGrab,
+	IdleHold,
+	WalkHold,
+	RunHold,
+	IdleThrow,
+	WalkThrow,
+	RunThrow,
 };
 
 UCLASS()
@@ -42,7 +63,7 @@ public:
 	UPROPERTY()
 	UIdle* Idle;
 	UPROPERTY()
-	UWalk* Move;
+	UWalk* Walk;
 	UPROPERTY()
 	URun* Run;
 	UPROPERTY()
@@ -51,6 +72,27 @@ public:
 	UFall* Fall;
 	UPROPERTY()
 	UWallRun* WallRun;
+	
+	UPROPERTY()
+	UIdleGrab* IdleGrab;
+	UPROPERTY()
+	UWalkGrab* WalkGrab;
+	UPROPERTY()
+	URunGrab* RunGrab;
+	
+	UPROPERTY()
+	UIdleThrow* IdleThrow;
+	UPROPERTY()
+	UWalkThrow* WalkThrow;
+	UPROPERTY()
+	URunThrow* RunThrow;
+	
+	UPROPERTY()
+	UIdleHold* IdleHold;
+	UPROPERTY()
+	UWalkHold* WalkHold;
+	UPROPERTY()
+	URunHold* RunHold;
 	
 	
 	UPROPERTY(EditDefaultsOnly,  Category = "State Machine")
