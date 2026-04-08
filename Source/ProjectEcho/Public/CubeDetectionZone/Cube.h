@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "ICube.generated.h"
+#include "Cube.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE()
-class UICube : public UInterface
+class UCube : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,7 +16,7 @@ class UICube : public UInterface
 /**
  * 
  */
-class PROJECTECHO_API IICube
+class PROJECTECHO_API ICube
 {
 	GENERATED_BODY()
 
