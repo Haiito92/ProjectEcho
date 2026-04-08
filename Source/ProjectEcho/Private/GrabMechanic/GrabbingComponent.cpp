@@ -66,7 +66,7 @@ bool UGrabbingComponent::TryGrab(const FRotator& ControlRotation)
 			IGrabbableInterface::Execute_OnGrabbed(GrabbedActor);
 		}
 	}
-	return false;
+	return true;
 }
 
 bool UGrabbingComponent::TryRelease()
