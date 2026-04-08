@@ -19,23 +19,29 @@ UInteractorComponent::UInteractorComponent()
 	// ...
 }
 
-bool UInteractorComponent::TryInteract_Implementation()
+bool UInteractorComponent::TryInteract_Implementation(const FVector& CastStartLocation, const FVector& CastForwardVector)
 {
 	FCollisionQueryParams QueryParams = FCollisionQueryParams::DefaultQueryParam;
 	QueryParams.bTraceComplex = true;
 	QueryParams.bReturnPhysicalMaterial = true;
 	QueryParams.AddIgnoredActor(GetOwner());
+
+	FVector CastEndLocation = CastStartLocation + CastForwardVector * InteractDistance;
 	
 	TArray<FHitResult> HitResults;
 	GetWorld()->SweepMultiByChannel(
 		HitResults,
-		GetComponentLocation(),
-		GetComponentLocation(),
+		CastStartLocation,
+		CastEndLocation,
 		FQuat::Identity,
 		ECollisionChannel::ECC_WorldStatic,
 		FCollisionShape::MakeSphere(InteractRadius),
 		QueryParams);
 
+	UEchoDebug::DrawSphere(this, EEchoSystem::Interact, CastStartLocation, InteractRadius, 12, FColor::Red, 4.0f);
+	UEchoDebug::DrawLine(this, EEchoSystem::Interact, CastStartLocation, CastEndLocation, FColor::Red, 4.0f);
+	UEchoDebug::DrawSphere(this, EEchoSystem::Interact, CastEndLocation, InteractRadius, 12, FColor::Red, 4.0f);
+	
 	if (HitResults.IsEmpty())
 	{
 		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Interact, EEchoMessageType::Error,

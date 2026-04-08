@@ -17,9 +17,12 @@ public:
 	// Sets default values for this component's properties
 	UInteractorComponent();
 
-	virtual bool TryInteract_Implementation() override;
+	virtual bool TryInteract_Implementation(const FVector& CastStartLocation, const FVector& CastForwardVector) override;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float InteractRadius = 20.0f;
+	float InteractRadius = 5.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float InteractDistance = 100.0f;
 };
