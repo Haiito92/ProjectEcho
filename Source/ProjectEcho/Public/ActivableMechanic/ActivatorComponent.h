@@ -20,15 +20,6 @@ public:
 	// Sets default values for this component's properties
 	UActivatorComponent();
 
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
-
 	virtual void ToggleSwitch_Implementation() override;
 	virtual void SwitchOn_Implementation() override;
 	virtual void SwitchOff_Implementation() override;

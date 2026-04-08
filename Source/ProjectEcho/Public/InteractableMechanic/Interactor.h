@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "Activator.generated.h"
+#include "Interactor.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE()
-class UActivator : public UInterface
+class UInteractor : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,19 +16,12 @@ class UActivator : public UInterface
 /**
  * 
  */
-class PROJECTECHO_API IActivator
+class PROJECTECHO_API IInteractor
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void ToggleSwitch();
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void SwitchOn();
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void SwitchOff();
-	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	bool IsSwitchOn();
+	bool TryInteract();
 };
