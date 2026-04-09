@@ -1,4 +1,4 @@
-#include "StateMachine/States/Empty/UFall.h"
+#include "StateMachine/States/UFall.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "StateMachine/ACharacterST.h"
@@ -10,13 +10,6 @@ void UFall::Tick(float DeltaTime)
 		StateMachine->ChangeState(EState::Idle);
 }
 
-
-void UFall::OnMovePressed(FVector2D InMoveInput)
-{
-	FVector Dir = Character->GetActorForwardVector() * InMoveInput.Y + Character->GetActorRightVector() * InMoveInput.X;
-	Dir.Normalize();
-	Character->AddMovementInput(Dir);
-}
 
 void UFall::Enter()
 {

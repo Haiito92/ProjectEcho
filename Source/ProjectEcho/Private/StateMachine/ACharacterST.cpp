@@ -73,8 +73,6 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	
 	if (PlayerController == nullptr) return;
 	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	    
-	GrabbingComponent = FindComponentByClass<UGrabbingComponent>();
 	
 	if(InputActions == nullptr)
 	{
@@ -115,8 +113,7 @@ void ACharacterST::AMoveStarted(const FInputActionValue& Value)
 
 void ACharacterST::AMoveReleased(const FInputActionValue& Value)
 {
-	bool bReleased = Value.Get<bool>();
-	OnMoveReleased.Broadcast(bReleased);
+	OnMoveReleased.Broadcast();
 }
 
 void ACharacterST::ARun(const FInputActionValue& Value)
@@ -149,19 +146,13 @@ void ACharacterST::ALook(const FInputActionValue& Value)
 
 void ACharacterST::AGrabStarted(const FInputActionValue& Value)
 {
-	if (GrabbingComponent->TryRelease())
-	{
-		OnGrabbingStarted.Broadcast();
-		return;
-	}
-	if (GrabbingComponent->TryGrab(GetControlRotation()))
-		OnGrabbingStarted.Broadcast();
+	OnReleaseStarted.Broadcast();
+	OnGrabbingStarted.Broadcast();
 }
 
 void ACharacterST::AThrowStarted(const FInputActionValue& Value)
 {
-	if (GrabbingComponent->TryThrow(GetControlRotation()))
-		OnThrowingStarted.Broadcast();
+	OnThrowingStarted.Broadcast();
 }
 
 void ACharacterST::InitStateMachine()

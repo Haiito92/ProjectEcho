@@ -100,49 +100,6 @@ public:
 	UPROPERTY()
 	UWallRun* WallRun;
 	
-	UPROPERTY()
-	UIdleGrab* IdleGrab;
-	UPROPERTY()
-	UWalkGrab* WalkGrab;
-	UPROPERTY()
-	URunGrab* RunGrab;
-	UPROPERTY()
-	UJumpGrab* JumpGrab;
-	UPROPERTY()
-	UFallGrab* FallGrab;
-	
-	UPROPERTY()
-	UIdleThrow* IdleThrow;
-	UPROPERTY()
-	UWalkThrow* WalkThrow;
-	UPROPERTY()
-	URunThrow* RunThrow;
-	UPROPERTY()
-	UJumpThrow* JumpThrow;
-	UPROPERTY()
-	UFallThrow* FallThrow;
-	
-	UPROPERTY()
-	UIdleHold* IdleHold;
-	UPROPERTY()
-	UWalkHold* WalkHold;
-	UPROPERTY()
-	URunHold* RunHold;
-	UPROPERTY()
-	UJumpHold* JumpHold;
-	UPROPERTY()
-	UFallHold* FallHold;
-	
-	UPROPERTY()
-	UIdleRelease* IdleRelease;
-	UPROPERTY()
-	UWalkRelease* WalkRelease;
-	UPROPERTY()
-	URunRelease* RunRelease;
-	UPROPERTY()
-	UJumpRelease* JumpRelease;
-	UPROPERTY()
-	UFallRelease* FallRelease;
 	
 	UPROPERTY(EditDefaultsOnly,  Category = "State Machine")
 	float MinimumSpeedToRun;

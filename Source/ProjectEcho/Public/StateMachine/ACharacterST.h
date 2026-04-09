@@ -61,7 +61,7 @@ public:
 	FMovePressed OnMovePressed;
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveStarted, bool, isPress);
 	FMoveStarted OnMoveStarted;
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveReleased, bool, isReleased);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMoveReleased);
 	FMoveReleased OnMoveReleased;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FJumpStarted);
@@ -76,6 +76,9 @@ public:
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGrabStarted);
 	FGrabStarted OnGrabbingStarted;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReleaseStarted);
+	FReleaseStarted OnReleaseStarted;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FThrowStarted);
 	FThrowStarted OnThrowingStarted;
@@ -99,6 +102,5 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
 	
-	UPROPERTY()
-	UGrabbingComponent* GrabbingComponent;
+	
 };

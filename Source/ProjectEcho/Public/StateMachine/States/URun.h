@@ -12,16 +12,5 @@ public:
 	virtual void Exit() override;
 	
 	UFUNCTION()
-	void OnMoving(FVector2D MoveInput);
-	
-	UFUNCTION()
 	void OnRunningReleased(bool InRunning);
-	UFUNCTION()
-	void OnMovingReleased(bool InRunning);
-	
-	UFUNCTION()
-	void OnGrabbingStarted();
-	
-	UFUNCTION()
-	void OnjumpingStarted();
 };
