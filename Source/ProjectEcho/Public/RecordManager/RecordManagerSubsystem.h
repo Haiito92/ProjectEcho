@@ -132,10 +132,12 @@ class PROJECTECHO_API URecordManagerSubsystem : public UTickableWorldSubsystem
 	GENERATED_BODY()
 	
 	virtual TStatId GetStatId() const override;
-	
+
+public:
 	UFUNCTION(BlueprintCallable)
 	virtual void InitRecordManager(const int& NbTimelineSlot);
-	
+
+private:
 	UFUNCTION(BlueprintCallable)
 	void StartRecord(AActor* InRecordedActor);
 	
