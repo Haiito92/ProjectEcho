@@ -17,7 +17,7 @@ public:
 	// Sets default values for this component's properties
 	UInteractorComponent();
 
-	virtual bool TryInteract_Implementation(const FVector& CastStartLocation, const FVector& CastForwardVector) override;
+	virtual bool TryInteract_Implementation() override;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
