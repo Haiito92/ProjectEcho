@@ -93,7 +93,7 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Input->BindAction(InputActions->ARun, ETriggerEvent::Started, this, &ACharacterST::ARunStarted);
 	Input->BindAction(InputActions->ARun, ETriggerEvent::Completed, this, &ACharacterST::ARunReleased);
 	
-	Input->BindAction(InputActions->AJump, ETriggerEvent::Triggered, this, &ACharacterST::AJump);
+	Input->BindAction(InputActions->AJump, ETriggerEvent::Started, this, &ACharacterST::AJump);
 	
 	Input->BindAction(InputActions->ALook, ETriggerEvent::Triggered, this, &ACharacterST::ALook);
 	
@@ -149,6 +149,11 @@ void ACharacterST::ALook(const FInputActionValue& Value)
 
 void ACharacterST::AGrabStarted(const FInputActionValue& Value)
 {
+	if (GrabbingComponent->TryRelease())
+	{
+		OnGrabbingStarted.Broadcast();
+		return;
+	}
 	if (GrabbingComponent->TryGrab(GetControlRotation()))
 		OnGrabbingStarted.Broadcast();
 }

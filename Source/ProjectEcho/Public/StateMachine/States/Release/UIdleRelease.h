@@ -1,9 +1,9 @@
 #pragma once
 #include "StateMachine/UState.h"
-#include "UIdleGrab.generated.h"
+#include "UIdleRelease.generated.h"
 
 UCLASS()
-class UIdleGrab : public UState
+class UIdleRelease : public UState
 {
 	GENERATED_BODY()
 public:
@@ -13,7 +13,6 @@ public:
 private:
 	UFUNCTION()
 	void OnMovePressed(FVector2D dir);
-	
 	UFUNCTION()
 	void OnjumpingStarted();
 };

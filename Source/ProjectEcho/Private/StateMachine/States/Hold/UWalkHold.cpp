@@ -6,6 +6,8 @@
 void UWalkHold::Tick(float DeltaTime)
 {
 	UState::Tick(DeltaTime);
+	if (Character->GetCharacterMovement()->IsFalling())
+		StateMachine->ChangeState(EState::FallHold);
 }
 
 void UWalkHold::Enter()
@@ -15,6 +17,8 @@ void UWalkHold::Enter()
 	Character->OnMoveReleased.AddDynamic(this,&UWalkHold::OnMoveReleased);
 	Character->OnRunningStarted.AddDynamic(this,&UWalkHold::OnRunningStarted);
 	Character->OnThrowingStarted.AddDynamic(this,&UWalkHold::OnThrowingStarted);
+	Character->OnGrabbingStarted.AddDynamic(this,&UWalkHold::OnReleaseStarted);
+	Character->OnJumpingStarted.AddDynamic(this,&UWalkHold::OnjumpingStarted);
 	
 	Character->GetCharacterMovement()->MaxWalkSpeed = Character->WalkSpeed;
 }
@@ -26,6 +30,8 @@ void UWalkHold::Exit()
 	Character->OnMoveReleased.RemoveDynamic(this,&UWalkHold::OnMoveReleased);
 	Character->OnRunningStarted.RemoveDynamic(this,&UWalkHold::OnRunningStarted);
 	Character->OnThrowingStarted.RemoveDynamic(this,&UWalkHold::OnThrowingStarted);
+	Character->OnGrabbingStarted.RemoveDynamic(this,&UWalkHold::OnReleaseStarted);
+	Character->OnJumpingStarted.RemoveDynamic(this,&UWalkHold::OnjumpingStarted);
 }
 
 void UWalkHold::OnMoveReleased(bool IsReleased)
@@ -48,4 +54,14 @@ void UWalkHold::OnMovePressed(FVector2D InMoveInput)
 void UWalkHold::OnThrowingStarted()
 {
 	StateMachine->ChangeState(EState::WalkThrow);
+}
+
+void UWalkHold::OnReleaseStarted()
+{
+	StateMachine->ChangeState(EState::WalkRelease);
+}
+
+void UWalkHold::OnjumpingStarted()
+{
+	StateMachine->ChangeState(EState::JumpHold);
 }

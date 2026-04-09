@@ -15,4 +15,8 @@ private:
 	void OnMovePressed(FVector2D dir);
 	UFUNCTION()
 	void OnThrowingStarted();
+	UFUNCTION()
+	void OnReleaseStarted();
+	UFUNCTION()
+	void OnjumpingStarted();
 };

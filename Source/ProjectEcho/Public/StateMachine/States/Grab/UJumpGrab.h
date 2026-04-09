@@ -1,25 +1,16 @@
 #pragma once
 #include "StateMachine/UState.h"
-#include "UWalkThrow.generated.h"
+#include "UJumpGrab.generated.h"
 
 UCLASS()
-class UWalkThrow : public UState
+class UJumpGrab : public UState
 {
-public:
 	GENERATED_BODY()
+public:
 	virtual void Tick(float DeltaTime) override;	
 	virtual void Enter() override;
 	virtual void Exit() override;
-private:
-	UFUNCTION()
-	void OnMoveReleased(bool IsReleased);
-	
-	UFUNCTION()
-	void OnRunningStarted(bool InRunningStarted);
 	
 	UFUNCTION()
 	void OnMovePressed(FVector2D InMoveInput);
-	
-	UFUNCTION()
-	void OnjumpingStarted();
 };

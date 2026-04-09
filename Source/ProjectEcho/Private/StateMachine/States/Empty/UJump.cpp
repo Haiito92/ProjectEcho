@@ -19,10 +19,12 @@ void UJump::OnMovePressed(FVector2D InMoveInput)
 void UJump::Enter()
 {
 	Super::Enter();
+	Character->OnMovePressed.AddDynamic(this,&UJump::OnMovePressed);
 	Character->Jump();
 }
 
 void UJump::Exit()
 {
 	Super::Exit();
+	Character->OnMovePressed.RemoveDynamic(this,&UJump::OnMovePressed);
 }

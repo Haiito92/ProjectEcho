@@ -1,21 +1,15 @@
 #pragma once
 #include "StateMachine/UState.h"
-#include "UWalkHold.generated.h"
+#include "UJumpHold.generated.h"
 
 UCLASS()
-class UWalkHold : public UState
+class UJumpHold : public UState
 {
-public:
 	GENERATED_BODY()
+public:
 	virtual void Tick(float DeltaTime) override;	
 	virtual void Enter() override;
 	virtual void Exit() override;
-private:
-	UFUNCTION()
-	void OnMoveReleased(bool IsReleased);
-	
-	UFUNCTION()
-	void OnRunningStarted(bool InRunningStarted);
 	
 	UFUNCTION()
 	void OnMovePressed(FVector2D InMoveInput);
@@ -25,7 +19,4 @@ private:
 	
 	UFUNCTION()
 	void OnReleaseStarted();
-	
-	UFUNCTION()
-	void OnjumpingStarted();
 };

@@ -18,4 +18,6 @@ public:
 	void OnRunningReleased(bool InRunning);
 	UFUNCTION()
 	void OnMovingReleased(bool InRunning);
+	UFUNCTION()
+	void OnjumpingStarted();
 };

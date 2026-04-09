@@ -7,6 +7,8 @@
 void URunThrow::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (Character->GetCharacterMovement()->IsFalling())
+		StateMachine->ChangeState(EState::FallThrow);
 }
 
 void URunThrow::Enter()
@@ -15,6 +17,8 @@ void URunThrow::Enter()
 	Character->OnMovePressed.AddDynamic(this,&URunThrow::OnMoving);
 	Character->OnMoveReleased.AddDynamic(this,&URunThrow::OnMovingReleased);
 	Character->OnRunningReleased.AddDynamic(this,&URunThrow::OnRunningReleased);
+	Character->OnJumpingStarted.AddDynamic(this,&URunThrow::OnjumpingStarted);
+	
 	Character->GetCharacterMovement()->MaxWalkSpeed = Character->RunSpeed;
 	StateMachine->ChangeState(EState::Run);
 }
@@ -25,6 +29,7 @@ void URunThrow::Exit()
 	Character->OnMovePressed.RemoveDynamic(this,&URunThrow::OnMoving);
 	Character->OnMoveReleased.RemoveDynamic(this,&URunThrow::OnMovingReleased);
 	Character->OnRunningReleased.RemoveDynamic(this,&URunThrow::OnRunningReleased);
+	Character->OnJumpingStarted.RemoveDynamic(this,&URunThrow::OnjumpingStarted);
 }
 
 void URunThrow::OnMoving(FVector2D MoveInput)
@@ -44,3 +49,7 @@ void URunThrow::OnMovingReleased(bool InRunning)
 	StateMachine->ChangeState(EState::IdleThrow);
 }
 
+void URunThrow::OnjumpingStarted()
+{
+	StateMachine->ChangeState(EState::JumpThrow);
+}

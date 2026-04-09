@@ -20,4 +20,8 @@ public:
 	void OnMovingReleased(bool InRunning);
 	UFUNCTION()
 	void OnThrowingStarted();
+	UFUNCTION()
+	void OnReleaseStarted();
+	UFUNCTION()
+	void OnjumpingStarted();
 };

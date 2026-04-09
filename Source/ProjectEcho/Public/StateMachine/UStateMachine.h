@@ -11,14 +11,26 @@ class UWallRun;
 class UIdleHold;
 class UWalkHold;
 class URunHold;
+class UJumpHold;
+class UFallHold;
 
 class UIdleThrow;
 class UWalkThrow;
 class URunThrow;
+class UJumpThrow;
+class UFallThrow;
 
 class UIdleGrab;
 class UWalkGrab;
 class URunGrab;
+class UJumpGrab;
+class UFallGrab;
+
+class UIdleRelease;
+class UWalkRelease;
+class URunRelease;
+class UJumpRelease;
+class UFallRelease;
 
 
 class UInputDataConfig;
@@ -30,18 +42,33 @@ enum class EState : uint8
 	Idle,
 	Walk,
 	Run,
-	Jump,
 	Fall,
+	Jump,
 	WallRun,
+	
 	IdleGrab,
 	WalkGrab,
 	RunGrab,
+	FallGrab,
+	JumpGrab,
+	
 	IdleHold,
 	WalkHold,
 	RunHold,
+	FallHold,
+	JumpHold,
+	
 	IdleThrow,
 	WalkThrow,
 	RunThrow,
+	FallThrow,
+	JumpThrow,
+	
+	IdleRelease,
+	WalkRelease,
+	RunRelease,
+	FallRelease,
+	JumpRelease
 };
 
 UCLASS()
@@ -79,6 +106,10 @@ public:
 	UWalkGrab* WalkGrab;
 	UPROPERTY()
 	URunGrab* RunGrab;
+	UPROPERTY()
+	UJumpGrab* JumpGrab;
+	UPROPERTY()
+	UFallGrab* FallGrab;
 	
 	UPROPERTY()
 	UIdleThrow* IdleThrow;
@@ -86,6 +117,10 @@ public:
 	UWalkThrow* WalkThrow;
 	UPROPERTY()
 	URunThrow* RunThrow;
+	UPROPERTY()
+	UJumpThrow* JumpThrow;
+	UPROPERTY()
+	UFallThrow* FallThrow;
 	
 	UPROPERTY()
 	UIdleHold* IdleHold;
@@ -93,7 +128,21 @@ public:
 	UWalkHold* WalkHold;
 	UPROPERTY()
 	URunHold* RunHold;
+	UPROPERTY()
+	UJumpHold* JumpHold;
+	UPROPERTY()
+	UFallHold* FallHold;
 	
+	UPROPERTY()
+	UIdleRelease* IdleRelease;
+	UPROPERTY()
+	UWalkRelease* WalkRelease;
+	UPROPERTY()
+	URunRelease* RunRelease;
+	UPROPERTY()
+	UJumpRelease* JumpRelease;
+	UPROPERTY()
+	UFallRelease* FallRelease;
 	
 	UPROPERTY(EditDefaultsOnly,  Category = "State Machine")
 	float MinimumSpeedToRun;

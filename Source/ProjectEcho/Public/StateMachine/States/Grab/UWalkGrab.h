@@ -19,4 +19,7 @@ private:
 	
 	UFUNCTION()
 	void OnMovePressed(FVector2D InMoveInput);
+	
+	UFUNCTION()
+	void OnjumpingStarted();
 };

@@ -7,6 +7,8 @@
 void URunGrab::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (Character->GetCharacterMovement()->IsFalling())
+		StateMachine->ChangeState(EState::FallGrab);
 }
 
 void URunGrab::Enter()
@@ -15,6 +17,8 @@ void URunGrab::Enter()
 	Character->OnMovePressed.AddDynamic(this,&URunGrab::OnMoving);
 	Character->OnMoveReleased.AddDynamic(this,&URunGrab::OnMovingReleased);
 	Character->OnRunningReleased.AddDynamic(this,&URunGrab::OnRunningReleased);
+	Character->OnJumpingStarted.AddDynamic(this,&URunGrab::OnjumpingStarted);
+	
 	Character->GetCharacterMovement()->MaxWalkSpeed = Character->RunSpeed;
 	StateMachine->ChangeState(EState::RunHold);
 }
@@ -25,6 +29,7 @@ void URunGrab::Exit()
 	Character->OnMovePressed.RemoveDynamic(this,&URunGrab::OnMoving);
 	Character->OnMoveReleased.RemoveDynamic(this,&URunGrab::OnMovingReleased);
 	Character->OnRunningReleased.RemoveDynamic(this,&URunGrab::OnRunningReleased);
+	Character->OnJumpingStarted.RemoveDynamic(this,&URunGrab::OnjumpingStarted);
 }
 
 void URunGrab::OnMoving(FVector2D MoveInput)
@@ -42,5 +47,10 @@ void URunGrab::OnRunningReleased(bool InRunning)
 void URunGrab::OnMovingReleased(bool InRunning)
 {
 	StateMachine->ChangeState(EState::IdleGrab);
+}
+
+void URunGrab::OnjumpingStarted()
+{
+	StateMachine->ChangeState(EState::JumpGrab);
 }
 

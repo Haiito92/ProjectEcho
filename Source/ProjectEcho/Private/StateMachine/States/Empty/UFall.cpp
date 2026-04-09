@@ -10,12 +10,22 @@ void UFall::Tick(float DeltaTime)
 		StateMachine->ChangeState(EState::Idle);
 }
 
+
+void UFall::OnMovePressed(FVector2D InMoveInput)
+{
+	FVector Dir = Character->GetActorForwardVector() * InMoveInput.Y + Character->GetActorRightVector() * InMoveInput.X;
+	Dir.Normalize();
+	Character->AddMovementInput(Dir);
+}
+
 void UFall::Enter()
 {
 	Super::Enter();
+	Character->OnMovePressed.AddDynamic(this,&UFall::OnMovePressed);
 }
 
 void UFall::Exit()
 {
 	Super::Exit();
+	Character->OnMovePressed.RemoveDynamic(this,&UFall::OnMovePressed);
 }

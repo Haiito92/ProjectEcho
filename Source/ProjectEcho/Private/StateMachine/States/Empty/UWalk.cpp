@@ -6,6 +6,8 @@
 void UWalk::Tick(float DeltaTime)
 {
 	UState::Tick(DeltaTime);
+	if (Character->GetCharacterMovement()->IsFalling())
+		StateMachine->ChangeState(EState::Fall);
 }
 
 void UWalk::Enter()

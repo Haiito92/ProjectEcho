@@ -6,6 +6,8 @@
 void UWalkGrab::Tick(float DeltaTime)
 {
 	UState::Tick(DeltaTime);
+	if (Character->GetCharacterMovement()->IsFalling())
+		StateMachine->ChangeState(EState::FallGrab);
 	
 }
 
@@ -15,6 +17,7 @@ void UWalkGrab::Enter()
 	Character->OnMovePressed.AddDynamic(this,&UWalkGrab::OnMovePressed);
 	Character->OnMoveReleased.AddDynamic(this,&UWalkGrab::OnMoveReleased);
 	Character->OnRunningStarted.AddDynamic(this,&UWalkGrab::OnRunningStarted);
+	Character->OnJumpingStarted.AddDynamic(this,&UWalkGrab::OnjumpingStarted);
 	
 	Character->GetCharacterMovement()->MaxWalkSpeed = Character->WalkSpeed;
 	StateMachine->ChangeState(EState::WalkHold);
@@ -26,6 +29,7 @@ void UWalkGrab::Exit()
 	Character->OnMovePressed.RemoveDynamic(this,&UWalkGrab::OnMovePressed);
 	Character->OnMoveReleased.RemoveDynamic(this,&UWalkGrab::OnMoveReleased);
 	Character->OnRunningStarted.RemoveDynamic(this,&UWalkGrab::OnRunningStarted);
+	Character->OnJumpingStarted.RemoveDynamic(this,&UWalkGrab::OnjumpingStarted);
 }
 
 void UWalkGrab::OnMoveReleased(bool IsReleased)
@@ -43,4 +47,9 @@ void UWalkGrab::OnMovePressed(FVector2D InMoveInput)
 	FVector Dir = Character->GetActorForwardVector() * InMoveInput.Y + Character->GetActorRightVector() * InMoveInput.X;
 	Dir.Normalize();
 	Character->AddMovementInput(Dir);
+}
+
+void UWalkGrab::OnjumpingStarted()
+{
+	StateMachine->ChangeState(EState::JumpGrab);
 }

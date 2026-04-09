@@ -13,4 +13,6 @@ public:
 private:
 	UFUNCTION()
 	void OnMovePressed(FVector2D dir);
+	UFUNCTION()
+	void OnjumpingStarted();
 };

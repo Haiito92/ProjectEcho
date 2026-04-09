@@ -7,6 +7,8 @@
 void URun::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (Character->GetCharacterMovement()->IsFalling())
+		StateMachine->ChangeState(EState::Fall);
 }
 
 void URun::Enter()

@@ -1,4 +1,6 @@
 #include "StateMachine/States/Empty/UIdle.h"
+
+#include "GameFramework/CharacterMovementComponent.h"
 #include "StateMachine/ACharacterST.h"
 #include "StateMachine/UStateMachine.h"
 
@@ -6,6 +8,8 @@
 void UIdle::Tick(float DeltaTime)
 {
 	UState::Tick(DeltaTime);
+	if (Character->GetCharacterMovement()->IsFalling())
+		StateMachine->ChangeState(EState::Fall);
 }
 
 void UIdle::Enter()
