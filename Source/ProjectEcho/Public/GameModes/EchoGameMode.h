@@ -21,12 +21,12 @@ class PROJECTECHO_API AEchoGameMode : public AGameModeBase
 	void EndGame();
 
 protected:
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive Initialize Game")
 	void ReceiveInitializeGame();
 	
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive Start Game")
 	void ReceiveStartGame();
 	
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive End Game")
 	void ReceiveEndGame();
 };
