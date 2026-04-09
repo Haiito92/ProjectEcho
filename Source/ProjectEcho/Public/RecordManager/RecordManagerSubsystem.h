@@ -167,6 +167,7 @@ protected:
 	//Current Recording Timeline;
 	FEchoTimeline RecordingTimeline;
 	
+	UPROPERTY()
 	TObjectPtr<AActor> RecordedActor = nullptr;
 	
 	//Current TimeKey, used for Recording and Replays;
@@ -178,8 +179,10 @@ protected:
 	int SelectedSlot = 0;
 	
 private:
+	UPROPERTY()
 	TObjectPtr<URecordManagerSettings> RecordManagerSettings = nullptr;
 	
+	UPROPERTY()
 	//Pool of EchoActor to display Timelines (avoid runtime Spawning)
 	TArray<TObjectPtr<AEchoActor>> EchoActorsPool;
 };

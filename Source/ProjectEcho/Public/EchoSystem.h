@@ -14,6 +14,8 @@ enum class EEchoSystem : uint8
 	PlayerStateMachine,
 	Record,
 	Grab,
+	Activable,
+	Interact,
 	Count UMETA(Hidden)
 };
 ENUM_RANGE_BY_COUNT(EEchoSystem, EEchoSystem::Count)
