@@ -9,6 +9,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GrabMechanic/GrabbingComponent.h"
+#include "RecordManager/RecordManagerSubsystem.h"
 #include "StateMachine/InputDataConfig.h"
 
 
@@ -153,6 +154,30 @@ void ACharacterST::AGrabStarted(const FInputActionValue& Value)
 void ACharacterST::AThrowStarted(const FInputActionValue& Value)
 {
 	OnThrowingStarted.Broadcast();
+}
+
+void ACharacterST::IncrementSlot()
+{
+	URecordManagerSubsystem::IncrementSelectedSlot();
+}
+
+void ACharacterST::DecrementSlot()
+{
+	URecordManagerSubsystem::DecrementSelectedSlot();
+}
+
+void ACharacterST::DestroySlot()
+{
+	URecordManagerSubsystem::DestroySelectedTimeline();
+}
+
+void ACharacterST::Register()
+{
+	if (IsRecording)
+		URecordManagerSubsystem::StopRecord();
+	else
+		URecordManagerSubsystem::StartRecord();
+	IsRecording = !IsRecording;
 }
 
 void ACharacterST::InitStateMachine()

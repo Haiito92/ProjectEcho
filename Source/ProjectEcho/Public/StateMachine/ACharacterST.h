@@ -55,6 +55,19 @@ public:
 	void AThrowStarted(const FInputActionValue& Value);
 	
 	UFUNCTION()
+	void IncrementSlot();
+	
+	UFUNCTION()
+	void DecrementSlot();
+	
+	UFUNCTION()
+	void DestroySlot();
+	
+	UFUNCTION()
+	void Register();
+	
+	
+	UFUNCTION()
 	void InitStateMachine();
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
@@ -93,6 +106,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	float RunSpeed = 900.f;
 	
+	UPROPERTY()
+	bool IsRecording = false;
+	
 	UPROPERTY(BlueprintReadOnly,VisibleAnywhere)
 	UStateMachine* StateMachine;
 	
@@ -101,6 +117,4 @@ public:
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
-	
-	
 };
