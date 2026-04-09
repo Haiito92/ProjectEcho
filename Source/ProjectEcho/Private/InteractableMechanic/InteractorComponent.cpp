@@ -17,6 +17,8 @@ UInteractorComponent::UInteractorComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
+	SetGenerateOverlapEvents(false);
+	UPrimitiveComponent::SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 bool UInteractorComponent::TryInteract_Implementation()
@@ -33,10 +35,10 @@ bool UInteractorComponent::TryInteract_Implementation()
 		GetComponentLocation(),
 		FQuat::Identity,
 		ECollisionChannel::ECC_WorldStatic,
-		FCollisionShape::MakeSphere(InteractRadius),
+		FCollisionShape::MakeSphere(SphereRadius),
 		QueryParams);
 
-	UEchoDebug::DrawSphere(this, EEchoSystem::Interact, GetComponentLocation(), InteractRadius, 12, FColor::Red, 4.0f);
+	UEchoDebug::DrawSphere(this, EEchoSystem::Interact, GetComponentLocation(), SphereRadius, 12, FColor::Red, 4.0f);
 	
 	if (!HitResult.bBlockingHit)
 	{

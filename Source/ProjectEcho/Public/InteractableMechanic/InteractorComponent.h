@@ -5,11 +5,12 @@
 #include "CoreMinimal.h"
 #include "Interactor.h"
 #include "Components/ActorComponent.h"
+#include "Components/SphereComponent.h"
 #include "InteractorComponent.generated.h"
 
 
 UCLASS(ClassGroup=(Custom), Blueprintable, BlueprintType, meta=(BlueprintSpawnableComponent))
-class PROJECTECHO_API UInteractorComponent : public USceneComponent, public IInteractor
+class PROJECTECHO_API UInteractorComponent : public USphereComponent, public IInteractor
 {
 	GENERATED_BODY()
 
@@ -18,11 +19,4 @@ public:
 	UInteractorComponent();
 
 	virtual bool TryInteract_Implementation() override;
-
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float InteractRadius = 5.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float InteractDistance = 100.0f;
 };
