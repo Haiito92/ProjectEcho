@@ -2,3 +2,8 @@
 
 
 #include "HUDs/EchoHUD.h"
+
+void AEchoHUD::InitHUD()
+{
+	ReceiveInitHUD();
+}
