@@ -78,6 +78,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void Kill();
+
+	UFUNCTION(BlueprintCallable)
+	void DeathEnd();
 	
 	UFUNCTION(BlueprintCallable)
 	void Revive();
@@ -126,6 +129,9 @@ public:
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
 	FOnDeath OnDeath;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathEnd);
+	FOnDeathEnd OnDeathEnd;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRevive);
 	FOnRevive OnRevive;

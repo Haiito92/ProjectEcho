@@ -206,6 +206,11 @@ void ACharacterST::Kill()
 	Life = 0;
 }
 
+void ACharacterST::DeathEnd()
+{
+	OnDeathEnd.Broadcast();
+}
+
 void ACharacterST::Revive()
 {
 	OnRevive.Broadcast();
