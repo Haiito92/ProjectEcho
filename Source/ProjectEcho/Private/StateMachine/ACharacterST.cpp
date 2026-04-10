@@ -10,10 +10,11 @@
 #include "EnhancedInputSubsystems.h"
 #include "GrabMechanic/GrabbingComponent.h"
 #include "RecordManager/RecordManagerSubsystem.h"
-#include "StateMachine/InputDataConfig.h"
+#include "StateMachine/Data/UInputDataConfig.h"
+#include "StateMachine/Data/UPlayerData.h"
 
 
-
+class UPlayerData;
 class UEnhancedInputLocalPlayerSubsystem;
 // Sets default values
 ACharacterST::ACharacterST()
@@ -108,6 +109,14 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 void ACharacterST::InitPlayer()
 {
 	InitStateMachine();
+	LoadData();
+}
+
+void ACharacterST::LoadData()
+{
+	Life = GetDefault<UPlayerData>()->InitLife;
+	WalkSpeed = GetDefault<UPlayerData>()->WalkSpeed;
+	RunSpeed = GetDefault<UPlayerData>()->RunSpeed;
 }
 
 void ACharacterST::AMove(const FInputActionValue& Value)
@@ -193,7 +202,7 @@ void ACharacterST::AInteract()
 	OnInteract.Broadcast();
 }
 
-void ACharacterST::TakeDamage(int value)
+void ACharacterST::PlayerTakeDamage(int value)
 {
 	Life = FMath::Max(Life-value,0);
 	if (Life <= 0)

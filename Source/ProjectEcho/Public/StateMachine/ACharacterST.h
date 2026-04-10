@@ -33,6 +33,9 @@ public:
 	void InitPlayer();
 	
 	UFUNCTION()
+	void LoadData();
+	
+	UFUNCTION()
 	void AMove(const FInputActionValue& Value);
 	UFUNCTION()
 	void AMoveStarted(const FInputActionValue& Value);
@@ -74,7 +77,7 @@ public:
 	void AInteract();
 	
 	UFUNCTION(BlueprintCallable)
-	void TakeDamage(int value);
+	void PlayerTakeDamage(int value);
 	
 	UFUNCTION(BlueprintCallable)
 	void Kill();
@@ -142,8 +145,6 @@ public:
 	float WalkSpeed = 600.f;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float RunSpeed = 900.f;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	int NumberSlot = 5;
 	
 	UPROPERTY()
 	bool IsRunInputOn = false;
