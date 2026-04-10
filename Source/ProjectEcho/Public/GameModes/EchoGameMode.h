@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "EchoGameMode.generated.h"
 
+class AEchoHUD;
+class ACharacterST;
 /**
  * 
  */
@@ -29,4 +31,7 @@ protected:
 	
 	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive End Game")
 	void ReceiveEndGame();
+
+	TObjectPtr<ACharacterST> PlayerCharacter;
+	TObjectPtr<AEchoHUD> HUD;
 };
