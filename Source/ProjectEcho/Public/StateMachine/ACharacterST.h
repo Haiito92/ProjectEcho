@@ -28,6 +28,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
+	UFUNCTION(BlueprintCallable)
+	void InitPlayer();
+	
 	UFUNCTION()
 	void AMove(const FInputActionValue& Value);
 	UFUNCTION()
@@ -55,13 +58,26 @@ public:
 	void AThrowStarted(const FInputActionValue& Value);
 	
 	UFUNCTION()
+	void IncrementSlot();
+	
+	UFUNCTION()
+	void DecrementSlot();
+	
+	UFUNCTION()
+	void DestroySlot();
+	
+	UFUNCTION()
+	void Record();
+	
+	
+	UFUNCTION()
 	void InitStateMachine();
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
 	FMovePressed OnMovePressed;
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveStarted, bool, isPress);
 	FMoveStarted OnMoveStarted;
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveReleased, bool, isReleased);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMoveReleased);
 	FMoveReleased OnMoveReleased;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FJumpStarted);
@@ -77,18 +93,38 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGrabStarted);
 	FGrabStarted OnGrabbingStarted;
 	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReleaseStarted);
+	FReleaseStarted OnReleaseStarted;
+	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FThrowStarted);
 	FThrowStarted OnThrowingStarted;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRecord);
+	FOnRecord OnRecord;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDestroySlot);
+	FOnDestroySlot OnDestroySlot;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnIncrementSlot);
+	FOnIncrementSlot OnIncrementSlot;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDecrementSlot);
+	FOnDecrementSlot OnDecrementSlot;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputDataConfig* InputActions;
 	UPROPERTY(EditDefaultsOnly,  Category = "Input")
 	UInputMappingContext* InputMapping;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float WalkSpeed = 600.f;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float RunSpeed = 900.f;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	int NumberSlot = 5;
+	
+	UPROPERTY()
+	bool IsRecording = false;
 	
 	UPROPERTY(BlueprintReadOnly,VisibleAnywhere)
 	UStateMachine* StateMachine;
@@ -98,7 +134,4 @@ public:
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
-	
-	UPROPERTY()
-	UGrabbingComponent* GrabbingComponent;
 };
