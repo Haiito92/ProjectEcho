@@ -83,7 +83,7 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FJumpStarted);
 	FJumpStarted OnJumpingStarted;
 	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRunPressed, bool, isRunning);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRunPressed);
 	FRunPressed OnRunning;
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRunStarted, bool, isRunning);
 	FRunStarted OnRunningStarted;
@@ -125,6 +125,12 @@ public:
 	
 	UPROPERTY()
 	bool IsRecording = false;
+	
+	UPROPERTY()
+	bool IsRunInputOn = false;
+	
+	UPROPERTY()
+	FVector2D MoveInputDir = FVector2D::ZeroVector;
 	
 	UPROPERTY(BlueprintReadOnly,VisibleAnywhere)
 	UStateMachine* StateMachine;
