@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "GrabMechanic/GrabbingComponent.h"
+#include "RecordManager/RecordHandlerInterface.h"
 #include "ACharacterST.generated.h"
 
 class UInputComponent;
@@ -57,22 +58,34 @@ public:
 	UFUNCTION()
 	void AThrowStarted(const FInputActionValue& Value);
 	
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void IncrementSlot();
 	
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void DecrementSlot();
 	
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void DestroySlot();
 	
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void Record();
+	
+	UFUNCTION(BlueprintCallable)
+	void AInteract();
+	
+	UFUNCTION(BlueprintCallable)
+	void TakeDamage(int value);
+	
+	UFUNCTION(BlueprintCallable)
+	void Kill();
+	
+	UFUNCTION(BlueprintCallable)
+	void Revive();
 	
 	
 	UFUNCTION()
 	void InitStateMachine();
-	
+
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
 	FMovePressed OnMovePressed;
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveStarted, bool, isPress);
@@ -83,7 +96,7 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FJumpStarted);
 	FJumpStarted OnJumpingStarted;
 	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRunPressed, bool, isRunning);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRunPressed);
 	FRunPressed OnRunning;
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRunStarted, bool, isRunning);
 	FRunStarted OnRunningStarted;
@@ -111,6 +124,15 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDecrementSlot);
 	FOnDecrementSlot OnDecrementSlot;
 	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
+	FOnDeath OnDeath;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRevive);
+	FOnRevive OnRevive;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInteract);
+	FOnRevive OnInteract;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputDataConfig* InputActions;
 	UPROPERTY(EditDefaultsOnly,  Category = "Input")
@@ -124,7 +146,13 @@ public:
 	int NumberSlot = 5;
 	
 	UPROPERTY()
-	bool IsRecording = false;
+	bool IsRunInputOn = false;
+	
+	UPROPERTY(BlueprintReadWrite)
+	int Life = 100;
+	
+	UPROPERTY()
+	FVector2D MoveInputDir = FVector2D::ZeroVector;
 	
 	UPROPERTY(BlueprintReadOnly,VisibleAnywhere)
 	UStateMachine* StateMachine;

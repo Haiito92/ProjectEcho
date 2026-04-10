@@ -8,5 +8,5 @@ class UFall : public UState
 public:
 	virtual void Tick(float DeltaTime) override;	
 	virtual void Enter() override;
-	virtual void Exit() override;
+	virtual void Exit() override;	
 };

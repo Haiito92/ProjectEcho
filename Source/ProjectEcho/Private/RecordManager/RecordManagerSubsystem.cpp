@@ -337,6 +337,11 @@ void URecordManagerSubsystem::StopRecord()
 	}
 }
 
+bool URecordManagerSubsystem::IsRecording()
+{
+	return bIsRecording;
+}
+
 void URecordManagerSubsystem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
