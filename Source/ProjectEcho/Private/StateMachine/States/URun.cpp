@@ -29,8 +29,6 @@ void URun::Exit()
 	Character->OnMovePressed.RemoveDynamic(this,&URun::OnMovePressed);
 	Character->OnRunningReleased.RemoveDynamic(this,&URun::OnRunningReleased);
 	Character->OnJumpingStarted.RemoveDynamic(this,&URun::OnJumpingStarted);
-	
-	Character->GetCharacterMovement()->MaxWalkSpeed = Character->WalkSpeed;
 }
 
 void URun::OnRunningReleased(bool InRunning)
