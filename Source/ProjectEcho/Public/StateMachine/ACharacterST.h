@@ -139,9 +139,6 @@ public:
 	int NumberSlot = 5;
 	
 	UPROPERTY()
-	bool IsRecording = false;
-	
-	UPROPERTY()
 	bool IsRunInputOn = false;
 	
 	UPROPERTY(BlueprintReadWrite)

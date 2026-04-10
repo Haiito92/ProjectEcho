@@ -98,11 +98,10 @@ void UState::OnRecord()
 {
 	if (CanUseRecord())
 	{
-		if (Character->IsRecording)
+		if (RecordManagerSubsystem->IsRecording())
 			RecordManagerSubsystem->StopRecord();
 		else
 			RecordManagerSubsystem->StartRecord(Character);
-		Character->IsRecording = !Character->IsRecording;
 	}
 }
 
