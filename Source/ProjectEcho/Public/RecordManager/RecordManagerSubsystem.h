@@ -142,7 +142,10 @@ public:
     
     UFUNCTION(BlueprintCallable)
     void StopRecord();
-    
+
+	UFUNCTION(BlueprintCallable)
+	bool IsRecording();
+	
     UFUNCTION(BlueprintCallable)
     void DestroySelectedTimeline();
     	

@@ -1,4 +1,6 @@
 #include "StateMachine/States/UWalk.h"
+
+#include "GameFramework/CharacterMovementComponent.h"
 #include "StateMachine/ACharacterST.h"
 #include "StateMachine/UStateMachine.h"
 
@@ -15,6 +17,8 @@ void UWalk::Enter()
 	Character->OnMovePressed.AddDynamic(this,&UWalk::OnMovePressed);
 	Character->OnRunningStarted.AddDynamic(this,&UWalk::OnRunningStarted);
 	Character->OnJumpingStarted.AddDynamic(this,&UWalk::OnJumpingStarted);
+	
+	Character->GetCharacterMovement()->MaxWalkSpeed = Character->WalkSpeed;
 }
 
 void UWalk::Exit()

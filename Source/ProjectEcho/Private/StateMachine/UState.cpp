@@ -1,8 +1,13 @@
 #include "Public/StateMachine/UState.h"
 
+#include "EchoSystem.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "RecordManager/EchoActor.h"
+#include "RecordManager/RecordHandlerComponent.h"
 #include "RecordManager/RecordManagerSubsystem.h"
 #include "StateMachine/ACharacterST.h"
+#include "Tools/Debug/EchoDebug.h"
+#include "Tools/Debug/EchoMessageType.h"
 
 class UStateMachine;
 
@@ -16,6 +21,8 @@ void UState::InitState(UStateMachine* InStateMachine,ACharacterST* InCharacter)
 	Character = InCharacter;
 	GrabbingComponent = Character->FindComponentByClass<UGrabbingComponent>();
 	RecordManagerSubsystem = GetWorld()->GetSubsystem<URecordManagerSubsystem>();
+	InteractorComponent = Character->FindComponentByClass<UInteractorComponent>();
+	RecordHandlerComponent = Character->FindComponentByClass<URecordHandlerComponent>();
 }
 
 void UState::Enter()
@@ -26,6 +33,8 @@ void UState::Enter()
 	Character->OnDestroySlot.AddDynamic(this, &UState::OnDestroySlot);
 	Character->OnIncrementSlot.AddDynamic(this, &UState::OnIncrementSlot);
 	Character->OnDecrementSlot.AddDynamic(this, &UState::OnDecrementSlot);
+	Character->OnDeath.AddDynamic(this, &UState::OnDeath);
+	Character->OnInteract.AddDynamic(this, &UState::OnInteract);
 }
 
 void UState::Tick(float DeltaTime)
@@ -40,6 +49,8 @@ void UState::Exit()
 	Character->OnDestroySlot.RemoveDynamic(this, &UState::OnDestroySlot);
 	Character->OnIncrementSlot.RemoveDynamic(this, &UState::OnIncrementSlot);
 	Character->OnDecrementSlot.RemoveDynamic(this, &UState::OnDecrementSlot);
+	Character->OnDeath.RemoveDynamic(this, &UState::OnDeath);
+	Character->OnInteract.RemoveDynamic(this, &UState::OnInteract);
 }
 
 bool UState::CanUseGrab()
@@ -48,6 +59,11 @@ bool UState::CanUseGrab()
 }
 
 bool UState::CanUseRecord()
+{
+	return true;
+}
+
+bool UState::CanUseInteract()
 {
 	return true;
 }
@@ -64,15 +80,28 @@ void UState::OnGrabbingStarted()
 	if (CanUseGrab())
 	{
 		if (GrabbingComponent->IsGrabbing())
+		{
 			GrabbingComponent->TryRelease();
+			
+			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(ERecordedAction::TryRelease);
+		}
 		else
+		{
 			GrabbingComponent->TryGrab(Character->GetControlRotation());
+			
+			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(ERecordedAction::TryGrab);
+		}
 	}
 }
 
 void UState::OnThrowingStarted()
 {
-	GrabbingComponent->TryThrow(Character->GetControlRotation());
+	if (CanUseGrab())
+	{
+		GrabbingComponent->TryThrow(Character->GetControlRotation());
+		
+		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(ERecordedAction::TryThrow);
+	}
 }
 
 void UState::CheckIsFalling() const
@@ -95,11 +124,10 @@ void UState::OnRecord()
 {
 	if (CanUseRecord())
 	{
-		if (Character->IsRecording)
+		if (RecordManagerSubsystem->IsRecording())
 			RecordManagerSubsystem->StopRecord();
 		else
 			RecordManagerSubsystem->StartRecord(Character);
-		Character->IsRecording = !Character->IsRecording;
 	}
 }
 
@@ -119,4 +147,28 @@ void UState::OnDestroySlot()
 {
 	if (CanUseRecord())
 		RecordManagerSubsystem->DestroySelectedTimeline();
+}
+
+void UState::OnDeath()
+{
+	StateMachine->ChangeState(EState::Death);
+}
+
+void UState::OnInteract()
+{
+	if (CanUseInteract())
+	{
+		IInteractor::Execute_TryInteract(InteractorComponent);
+		
+		
+		if (IsValid(RecordHandlerComponent))
+		{
+			UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine, EEchoMessageType::Log, "Valid Record Handler", FColor::Green, 3.0f);
+			RecordHandlerComponent->RegisterActionInRecord(ERecordedAction::Interact);
+		}
+	}
+}
+
+void UState::OnRevive()
+{
 }
