@@ -59,6 +59,12 @@ protected:
 	void OnDestroySlot();
 	
 	UFUNCTION()
+	void OnDeath();
+	
+	UFUNCTION()
+	virtual void OnRevive();
+	
+	UFUNCTION()
 	void CheckIsFalling() const;
 	
 	UPROPERTY()

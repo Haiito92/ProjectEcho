@@ -57,17 +57,26 @@ public:
 	UFUNCTION()
 	void AThrowStarted(const FInputActionValue& Value);
 	
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void IncrementSlot();
 	
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void DecrementSlot();
 	
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void DestroySlot();
 	
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void Record();
+	
+	UFUNCTION(BlueprintCallable)
+	void TakeDamage(int value);
+	
+	UFUNCTION(BlueprintCallable)
+	void Kill();
+	
+	UFUNCTION(BlueprintCallable)
+	void Revive();
 	
 	
 	UFUNCTION()
@@ -111,6 +120,12 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDecrementSlot);
 	FOnDecrementSlot OnDecrementSlot;
 	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
+	FOnDeath OnDeath;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRevive);
+	FOnRevive OnRevive;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputDataConfig* InputActions;
 	UPROPERTY(EditDefaultsOnly,  Category = "Input")
@@ -128,6 +143,9 @@ public:
 	
 	UPROPERTY()
 	bool IsRunInputOn = false;
+	
+	UPROPERTY(BlueprintReadWrite)
+	int Life = 100;
 	
 	UPROPERTY()
 	FVector2D MoveInputDir = FVector2D::ZeroVector;

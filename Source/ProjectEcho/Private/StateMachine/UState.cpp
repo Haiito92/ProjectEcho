@@ -26,6 +26,7 @@ void UState::Enter()
 	Character->OnDestroySlot.AddDynamic(this, &UState::OnDestroySlot);
 	Character->OnIncrementSlot.AddDynamic(this, &UState::OnIncrementSlot);
 	Character->OnDecrementSlot.AddDynamic(this, &UState::OnDecrementSlot);
+	Character->OnDeath.AddDynamic(this, &UState::OnDeath);
 }
 
 void UState::Tick(float DeltaTime)
@@ -40,6 +41,7 @@ void UState::Exit()
 	Character->OnDestroySlot.RemoveDynamic(this, &UState::OnDestroySlot);
 	Character->OnIncrementSlot.RemoveDynamic(this, &UState::OnIncrementSlot);
 	Character->OnDecrementSlot.RemoveDynamic(this, &UState::OnDecrementSlot);
+	Character->OnDeath.RemoveDynamic(this, &UState::OnDeath);
 }
 
 bool UState::CanUseGrab()
@@ -72,7 +74,8 @@ void UState::OnGrabbingStarted()
 
 void UState::OnThrowingStarted()
 {
-	GrabbingComponent->TryThrow(Character->GetControlRotation());
+	if (CanUseGrab())
+		GrabbingComponent->TryThrow(Character->GetControlRotation());
 }
 
 void UState::CheckIsFalling() const
@@ -119,4 +122,13 @@ void UState::OnDestroySlot()
 {
 	if (CanUseRecord())
 		RecordManagerSubsystem->DestroySelectedTimeline();
+}
+
+void UState::OnDeath()
+{
+	StateMachine->ChangeState(EState::Death);
+}
+
+void UState::OnRevive()
+{
 }

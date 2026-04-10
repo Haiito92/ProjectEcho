@@ -189,6 +189,24 @@ void ACharacterST::Record()
 	OnRecord.Broadcast();
 }
 
+void ACharacterST::TakeDamage(int value)
+{
+	Life = FMath::Max(Life-value,0);
+	if (Life <= 0)
+		OnDeath.Broadcast();
+}
+
+void ACharacterST::Kill()
+{
+	OnDeath.Broadcast();
+	Life = 0;
+}
+
+void ACharacterST::Revive()
+{
+	OnRevive.Broadcast();
+}
+
 void ACharacterST::InitStateMachine()
 {
 	StateMachine = NewObject<UStateMachine>(this);
