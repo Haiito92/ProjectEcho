@@ -1,4 +1,4 @@
-#include "StateMachine/States/Empty/UFall.h"
+#include "StateMachine/States/UFall.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "StateMachine/ACharacterST.h"
@@ -10,12 +10,15 @@ void UFall::Tick(float DeltaTime)
 		StateMachine->ChangeState(EState::Idle);
 }
 
+
 void UFall::Enter()
 {
 	Super::Enter();
+	Character->OnMovePressed.AddDynamic(this,&UFall::OnMovePressed);
 }
 
 void UFall::Exit()
 {
 	Super::Exit();
+	Character->OnMovePressed.RemoveDynamic(this,&UFall::OnMovePressed);
 }

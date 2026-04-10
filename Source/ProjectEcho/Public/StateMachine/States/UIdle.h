@@ -11,12 +11,6 @@ public:
 	virtual void Enter() override;
 	virtual void Exit() override;
 private:
-	UFUNCTION()
-	void OnMovePressed(FVector2D dir);
-	
-	UFUNCTION()
-	void OnGrabbingStarted();
-	
-	UFUNCTION()
-	void OnjumpingStarted();
+
+	virtual void OnMovePressed(FVector2D InMoveInput) override;
 };
