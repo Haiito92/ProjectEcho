@@ -54,6 +54,11 @@ bool UState::CanUseRecord()
 	return true;
 }
 
+bool UState::CanUseInteract()
+{
+	return true;
+}
+
 void UState::OnMovePressed(FVector2D InMoveInput)
 {
 	FVector Dir = Character->GetActorForwardVector() * InMoveInput.Y + Character->GetActorRightVector() * InMoveInput.X;

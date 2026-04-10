@@ -104,6 +104,7 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Input->BindAction(InputActions->ADecrementSlot, ETriggerEvent::Started, this, &ACharacterST::DecrementSlot);
 	Input->BindAction(InputActions->ARegister, ETriggerEvent::Started, this, &ACharacterST::Record);
 	Input->BindAction(InputActions->ADestroySlot, ETriggerEvent::Started, this, &ACharacterST::DestroySlot);
+	I
 }
 
 void ACharacterST::InitPlayer()

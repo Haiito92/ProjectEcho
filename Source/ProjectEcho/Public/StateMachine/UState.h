@@ -30,6 +30,9 @@ protected:
 	
 	UFUNCTION()
 	virtual bool CanUseRecord();
+	
+	UFUNCTION()
+	virtual bool CanUseInteract();
 
 	UFUNCTION()
 	virtual void OnMovePressed(FVector2D InMoveInput);
