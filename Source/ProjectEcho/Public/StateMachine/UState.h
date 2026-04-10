@@ -2,6 +2,7 @@
 #include "StateMachine/UStateMachine.h"
 #include "UState.generated.h"
 
+class URecordHandlerComponent;
 class ACharacterST;
 class UStateMachine;
 class UGrabbingComponent;
@@ -78,4 +79,7 @@ protected:
 	
 	UPROPERTY()
 	UGrabbingComponent* GrabbingComponent;
+
+	UPROPERTY()
+	TObjectPtr<URecordHandlerComponent> RecordHandlerComponent;
 };

@@ -1,6 +1,8 @@
 #include "Public/StateMachine/UState.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
+#include "RecordManager/EchoActor.h"
+#include "RecordManager/RecordHandlerComponent.h"
 #include "RecordManager/RecordManagerSubsystem.h"
 #include "StateMachine/ACharacterST.h"
 
@@ -16,6 +18,7 @@ void UState::InitState(UStateMachine* InStateMachine,ACharacterST* InCharacter)
 	Character = InCharacter;
 	GrabbingComponent = Character->FindComponentByClass<UGrabbingComponent>();
 	RecordManagerSubsystem = GetWorld()->GetSubsystem<URecordManagerSubsystem>();
+	RecordHandlerComponent = Character->FindComponentByClass<URecordHandlerComponent>();
 }
 
 void UState::Enter()
@@ -66,16 +69,28 @@ void UState::OnGrabbingStarted()
 	if (CanUseGrab())
 	{
 		if (GrabbingComponent->IsGrabbing())
+		{
 			GrabbingComponent->TryRelease();
+			
+			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(ERecordedAction::TryRelease);
+		}
 		else
+		{
 			GrabbingComponent->TryGrab(Character->GetControlRotation());
+			
+			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(ERecordedAction::TryGrab);
+		}
 	}
 }
 
 void UState::OnThrowingStarted()
 {
 	if (CanUseGrab())
+	{
 		GrabbingComponent->TryThrow(Character->GetControlRotation());
+		
+		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(ERecordedAction::TryThrow);
+	}
 }
 
 void UState::CheckIsFalling() const
