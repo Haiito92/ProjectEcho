@@ -1,4 +1,5 @@
 #pragma once
+#include "InteractableMechanic/InteractorComponent.h"
 #include "StateMachine/UStateMachine.h"
 #include "UState.generated.h"
 
@@ -31,6 +32,9 @@ protected:
 	
 	UFUNCTION()
 	virtual bool CanUseRecord();
+	
+	UFUNCTION()
+	virtual bool CanUseInteract();
 
 	UFUNCTION()
 	virtual void OnMovePressed(FVector2D InMoveInput);
@@ -63,6 +67,9 @@ protected:
 	void OnDeath();
 	
 	UFUNCTION()
+	void OnInteract();
+	
+	UFUNCTION()
 	virtual void OnRevive();
 	
 	UFUNCTION()
@@ -79,6 +86,9 @@ protected:
 	
 	UPROPERTY()
 	UGrabbingComponent* GrabbingComponent;
+	
+	UPROPERTY()
+	UInteractorComponent* InteractorComponent;
 
 	UPROPERTY()
 	TObjectPtr<URecordHandlerComponent> RecordHandlerComponent;

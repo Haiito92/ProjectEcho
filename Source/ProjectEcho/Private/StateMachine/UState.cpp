@@ -18,6 +18,7 @@ void UState::InitState(UStateMachine* InStateMachine,ACharacterST* InCharacter)
 	Character = InCharacter;
 	GrabbingComponent = Character->FindComponentByClass<UGrabbingComponent>();
 	RecordManagerSubsystem = GetWorld()->GetSubsystem<URecordManagerSubsystem>();
+	InteractorComponent = Character->FindComponentByClass<UInteractorComponent>();
 	RecordHandlerComponent = Character->FindComponentByClass<URecordHandlerComponent>();
 }
 
@@ -30,6 +31,7 @@ void UState::Enter()
 	Character->OnIncrementSlot.AddDynamic(this, &UState::OnIncrementSlot);
 	Character->OnDecrementSlot.AddDynamic(this, &UState::OnDecrementSlot);
 	Character->OnDeath.AddDynamic(this, &UState::OnDeath);
+	Character->OnInteract.AddDynamic(this, &UState::OnInteract);
 }
 
 void UState::Tick(float DeltaTime)
@@ -45,6 +47,7 @@ void UState::Exit()
 	Character->OnIncrementSlot.RemoveDynamic(this, &UState::OnIncrementSlot);
 	Character->OnDecrementSlot.RemoveDynamic(this, &UState::OnDecrementSlot);
 	Character->OnDeath.RemoveDynamic(this, &UState::OnDeath);
+	Character->OnInteract.RemoveDynamic(this, &UState::OnInteract);
 }
 
 bool UState::CanUseGrab()
@@ -53,6 +56,11 @@ bool UState::CanUseGrab()
 }
 
 bool UState::CanUseRecord()
+{
+	return true;
+}
+
+bool UState::CanUseInteract()
 {
 	return true;
 }
@@ -141,6 +149,12 @@ void UState::OnDestroySlot()
 void UState::OnDeath()
 {
 	StateMachine->ChangeState(EState::Death);
+}
+
+void UState::OnInteract()
+{
+	if (CanUseInteract())
+		IInteractor::Execute_TryInteract(InteractorComponent);
 }
 
 void UState::OnRevive()

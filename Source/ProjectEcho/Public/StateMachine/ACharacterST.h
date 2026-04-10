@@ -70,6 +70,9 @@ public:
 	void Record();
 	
 	UFUNCTION(BlueprintCallable)
+	void AInteract();
+	
+	UFUNCTION(BlueprintCallable)
 	void TakeDamage(int value);
 	
 	UFUNCTION(BlueprintCallable)
@@ -125,6 +128,9 @@ public:
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRevive);
 	FOnRevive OnRevive;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInteract);
+	FOnRevive OnInteract;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputDataConfig* InputActions;
