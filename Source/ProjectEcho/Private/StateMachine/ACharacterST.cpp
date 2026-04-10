@@ -82,6 +82,8 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		return;
 	}
 	
+	InitPlayer();
+	
 	Input->BindAction(InputActions->AMove, ETriggerEvent::Triggered, this, &ACharacterST::AMove);
 	Input->BindAction(InputActions->AMove, ETriggerEvent::Started, this, &ACharacterST::AMoveStarted);
 	Input->BindAction(InputActions->AMove, ETriggerEvent::Completed, this, &ACharacterST::AMoveReleased);
@@ -111,34 +113,37 @@ void ACharacterST::InitPlayer()
 
 void ACharacterST::AMove(const FInputActionValue& Value)
 {
-	FVector2D Input = Value.Get<FVector2D>();
-	OnMovePressed.Broadcast(Input);
+	MoveInputDir = Value.Get<FVector2D>();
+	OnMovePressed.Broadcast(MoveInputDir);
 }
 
 void ACharacterST::AMoveStarted(const FInputActionValue& Value)
 {
+	MoveInputDir = Value.Get<FVector2D>();
 	OnMoveStarted.Broadcast(true);
 }
 
 void ACharacterST::AMoveReleased(const FInputActionValue& Value)
 {
+	MoveInputDir = Value.Get<FVector2D>();
 	OnMoveReleased.Broadcast();
 }
 
 void ACharacterST::ARun(const FInputActionValue& Value)
 {
-	bool bRunning = Value.Get<bool>();
-	OnRunning.Broadcast(bRunning);
+	OnRunning.Broadcast();
 }
 
 void ACharacterST::ARunStarted(const FInputActionValue& Value)
 {
-	OnRunningStarted.Broadcast(true);
+	IsRunInputOn = true;
+	OnRunningStarted.Broadcast(IsRunInputOn);
 }
 
 void ACharacterST::ARunReleased(const FInputActionValue& Value)
 {
-	OnRunningReleased.Broadcast(true);
+	IsRunInputOn = false;
+	OnRunningReleased.Broadcast(IsRunInputOn);
 }
 
 void ACharacterST::AJump(const FInputActionValue& Value)
