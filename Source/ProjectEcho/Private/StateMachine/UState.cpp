@@ -1,10 +1,13 @@
 #include "Public/StateMachine/UState.h"
 
+#include "EchoSystem.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "RecordManager/EchoActor.h"
 #include "RecordManager/RecordHandlerComponent.h"
 #include "RecordManager/RecordManagerSubsystem.h"
 #include "StateMachine/ACharacterST.h"
+#include "Tools/Debug/EchoDebug.h"
+#include "Tools/Debug/EchoMessageType.h"
 
 class UStateMachine;
 
@@ -154,7 +157,16 @@ void UState::OnDeath()
 void UState::OnInteract()
 {
 	if (CanUseInteract())
+	{
 		IInteractor::Execute_TryInteract(InteractorComponent);
+		
+		
+		if (IsValid(RecordHandlerComponent))
+		{
+			UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine, EEchoMessageType::Log, "Valid Record Handler", FColor::Green, 3.0f);
+			RecordHandlerComponent->RegisterActionInRecord(ERecordedAction::Interact);
+		}
+	}
 }
 
 void UState::OnRevive()

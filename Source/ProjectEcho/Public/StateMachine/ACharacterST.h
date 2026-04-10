@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "GrabMechanic/GrabbingComponent.h"
+#include "RecordManager/RecordHandlerInterface.h"
 #include "ACharacterST.generated.h"
 
 class UInputComponent;
@@ -84,7 +85,7 @@ public:
 	
 	UFUNCTION()
 	void InitStateMachine();
-	
+
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
 	FMovePressed OnMovePressed;
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveStarted, bool, isPress);
