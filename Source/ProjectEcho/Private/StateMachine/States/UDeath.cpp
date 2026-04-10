@@ -33,6 +33,11 @@ bool UDeath::CanUseRecord()
 	return false;
 }
 
+bool UDeath::CanUseInteract()
+{
+	return false;
+}
+
 void UDeath::OnRevive()
 {
 	StateMachine->ChangeState(EState::Revive);

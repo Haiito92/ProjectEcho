@@ -102,9 +102,9 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	
 	Input->BindAction(InputActions->AIncrementSlot, ETriggerEvent::Started, this, &ACharacterST::IncrementSlot);
 	Input->BindAction(InputActions->ADecrementSlot, ETriggerEvent::Started, this, &ACharacterST::DecrementSlot);
-	Input->BindAction(InputActions->ARegister, ETriggerEvent::Started, this, &ACharacterST::Record);
+	Input->BindAction(InputActions->ARecord, ETriggerEvent::Started, this, &ACharacterST::Record);
 	Input->BindAction(InputActions->ADestroySlot, ETriggerEvent::Started, this, &ACharacterST::DestroySlot);
-	I
+	Input->BindAction(InputActions->AInteract, ETriggerEvent::Started,this,&ACharacterST::AInteract);
 }
 
 void ACharacterST::InitPlayer()
@@ -188,6 +188,11 @@ void ACharacterST::DestroySlot()
 void ACharacterST::Record()
 {
 	OnRecord.Broadcast();
+}
+
+void ACharacterST::AInteract()
+{
+	OnInteract.Broadcast();
 }
 
 void ACharacterST::TakeDamage(int value)

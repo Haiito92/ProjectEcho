@@ -1,4 +1,5 @@
 #pragma once
+#include "InteractableMechanic/InteractorComponent.h"
 #include "StateMachine/UStateMachine.h"
 #include "UState.generated.h"
 
@@ -65,6 +66,9 @@ protected:
 	void OnDeath();
 	
 	UFUNCTION()
+	void OnInteract();
+	
+	UFUNCTION()
 	virtual void OnRevive();
 	
 	UFUNCTION()
@@ -81,4 +85,7 @@ protected:
 	
 	UPROPERTY()
 	UGrabbingComponent* GrabbingComponent;
+	
+	UPROPERTY()
+	UInteractorComponent* InteractorComponent;
 };

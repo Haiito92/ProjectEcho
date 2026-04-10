@@ -30,3 +30,8 @@ bool URevive::CanUseRecord()
 {
 	return false;
 }
+
+bool URevive::CanUseInteract()
+{
+	return false;
+}

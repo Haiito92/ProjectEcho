@@ -30,7 +30,7 @@ public:
 	UInputAction* AThrow;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UInputAction* ARegister;
+	UInputAction* ARecord;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UInputAction* AIncrementSlot;

@@ -70,6 +70,9 @@ public:
 	void Record();
 	
 	UFUNCTION(BlueprintCallable)
+	void AInteract();
+	
+	UFUNCTION(BlueprintCallable)
 	void TakeDamage(int value);
 	
 	UFUNCTION(BlueprintCallable)
