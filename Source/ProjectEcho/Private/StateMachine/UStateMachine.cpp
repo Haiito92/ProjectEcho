@@ -1,11 +1,13 @@
 #include "StateMachine/UStateMachine.h"
 #include "EchoSystem.h"
+#include "StateMachine/States/UDeath.h"
 
 #include "StateMachine/States/UIdle.h"
 #include "StateMachine/States/UWalk.h"
 #include "StateMachine/States/URun.h"
 #include "StateMachine/States/UJump.h"
 #include "StateMachine/States/UFall.h"
+#include "StateMachine/States/URevive.h"
 #include "StateMachine/States/UWallRun.h"
 
 #include "Tools/Debug/EchoDebug.h"
@@ -19,6 +21,8 @@ void UStateMachine::InitStates(ACharacterST* InCharacter)
 	Jump = NewObject<UJump>(this);
 	Fall = NewObject<UFall>(this);
 	WallRun = NewObject<UWallRun>(this);
+	Death = NewObject<UDeath>(this);
+	Revive = NewObject<URevive>(this);
 	
 	Idle->InitState(this,InCharacter);
 	Walk->InitState(this,InCharacter);
@@ -26,6 +30,8 @@ void UStateMachine::InitStates(ACharacterST* InCharacter)
 	Jump->InitState(this,InCharacter);
 	Fall->InitState(this,InCharacter);
 	WallRun->InitState(this,InCharacter);
+	Death->InitState(this,InCharacter);
+	Revive->InitState(this,InCharacter);
 	
 	AddState(Idle,EState::Idle);
 	AddState(Walk,EState::Walk);
@@ -33,6 +39,8 @@ void UStateMachine::InitStates(ACharacterST* InCharacter)
 	AddState(Jump,EState::Jump);
 	AddState(Fall,EState::Fall);
 	AddState(WallRun,EState::WallRun);
+	AddState(Death,EState::Death);
+	AddState(Revive,EState::Revive);
 	
 	
 	StartState(EState::Idle);
