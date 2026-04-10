@@ -8,6 +8,7 @@
 
 class AEchoHUD;
 class ACharacterST;
+class APlayerStart;
 /**
  * 
  */

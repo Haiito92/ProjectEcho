@@ -60,11 +60,6 @@ public:
 	UPROPERTY()
 	URevive* Revive;
 	
-	UPROPERTY(EditDefaultsOnly,  Category = "State Machine")
-	float MinimumSpeedToRun;
-	UPROPERTY(EditDefaultsOnly,  Category = "State Machine")
-	float MinimumSpeedToWalk;
-	
 protected:
 
 	UPROPERTY()
