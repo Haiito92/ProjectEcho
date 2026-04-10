@@ -136,16 +136,29 @@ class PROJECTECHO_API URecordManagerSubsystem : public UTickableWorldSubsystem
 public:
 	UFUNCTION(BlueprintCallable)
 	virtual void InitRecordManager(const int& NbTimelineSlot);
+	
+	UFUNCTION(BlueprintCallable)
+    void StartRecord(AActor* InRecordedActor);
+    
+    UFUNCTION(BlueprintCallable)
+    void StopRecord();
+    
+    UFUNCTION(BlueprintCallable)
+    void DestroySelectedTimeline();
+    	
+    	// Increment the Selected Slot Value, if reaches end, goes back to first Slot
+    UFUNCTION(BlueprintCallable)
+    void IncrementSelectedSlot();
+    	
+    	// Decrement the Selected Slot Value, if reaches beginning, goes back to last Slot
+    UFUNCTION(BlueprintCallable)
+    void DecrementSelectedSlot();
 
 private:
-	UFUNCTION(BlueprintCallable)
-	void StartRecord(AActor* InRecordedActor);
+	
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStartRecording, float, CurrentTimeKey);
-	FOnStartRecording OnStartRecording;
-	
-	UFUNCTION(BlueprintCallable)
-	void StopRecord();
+	FOnStartRecording OnStartRecording;	
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopRecording);
 	FOnStopRecording OnStopRecording;
@@ -153,16 +166,7 @@ private:
 	virtual void Tick(float DeltaTime) override;
 	
 	//Destroys the Timeline at the Slot currently selected (if there is one) 
-	UFUNCTION(BlueprintCallable)
-	void DestroySelectedTimeline();
 	
-	// Increment the Selected Slot Value, if reaches end, goes back to first Slot
-	UFUNCTION(BlueprintCallable)
-	void IncrementSelectedSlot();
-	
-	// Decrement the Selected Slot Value, if reaches beginning, goes back to last Slot
-	UFUNCTION(BlueprintCallable)
-	void DecrementSelectedSlot();
 protected:
 	FGlobalTimeline GlobalTimeline;
 

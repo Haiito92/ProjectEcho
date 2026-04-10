@@ -9,6 +9,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GrabMechanic/GrabbingComponent.h"
+#include "RecordManager/RecordManagerSubsystem.h"
 #include "StateMachine/InputDataConfig.h"
 
 
@@ -73,8 +74,6 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	
 	if (PlayerController == nullptr) return;
 	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	    
-	GrabbingComponent = FindComponentByClass<UGrabbingComponent>();
 	
 	if(InputActions == nullptr)
 	{
@@ -82,8 +81,6 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Data Input Missing on Character"));
 		return;
 	}
-	
-	InitStateMachine();
 	
 	Input->BindAction(InputActions->AMove, ETriggerEvent::Triggered, this, &ACharacterST::AMove);
 	Input->BindAction(InputActions->AMove, ETriggerEvent::Started, this, &ACharacterST::AMoveStarted);
@@ -93,13 +90,23 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Input->BindAction(InputActions->ARun, ETriggerEvent::Started, this, &ACharacterST::ARunStarted);
 	Input->BindAction(InputActions->ARun, ETriggerEvent::Completed, this, &ACharacterST::ARunReleased);
 	
-	Input->BindAction(InputActions->AJump, ETriggerEvent::Triggered, this, &ACharacterST::AJump);
+	Input->BindAction(InputActions->AJump, ETriggerEvent::Started, this, &ACharacterST::AJump);
 	
 	Input->BindAction(InputActions->ALook, ETriggerEvent::Triggered, this, &ACharacterST::ALook);
 	
 	Input->BindAction(InputActions->AGrab, ETriggerEvent::Started, this, &ACharacterST::AGrabStarted);
 	
 	Input->BindAction(InputActions->AThrow, ETriggerEvent::Started, this, &ACharacterST::AThrowStarted);
+	
+	Input->BindAction(InputActions->AIncrementSlot, ETriggerEvent::Started, this, &ACharacterST::IncrementSlot);
+	Input->BindAction(InputActions->ADecrementSlot, ETriggerEvent::Started, this, &ACharacterST::DecrementSlot);
+	Input->BindAction(InputActions->ARegister, ETriggerEvent::Started, this, &ACharacterST::Record);
+	Input->BindAction(InputActions->ADestroySlot, ETriggerEvent::Started, this, &ACharacterST::DestroySlot);
+}
+
+void ACharacterST::InitPlayer()
+{
+	InitStateMachine();
 }
 
 void ACharacterST::AMove(const FInputActionValue& Value)
@@ -115,8 +122,7 @@ void ACharacterST::AMoveStarted(const FInputActionValue& Value)
 
 void ACharacterST::AMoveReleased(const FInputActionValue& Value)
 {
-	bool bReleased = Value.Get<bool>();
-	OnMoveReleased.Broadcast(bReleased);
+	OnMoveReleased.Broadcast();
 }
 
 void ACharacterST::ARun(const FInputActionValue& Value)
@@ -149,14 +155,33 @@ void ACharacterST::ALook(const FInputActionValue& Value)
 
 void ACharacterST::AGrabStarted(const FInputActionValue& Value)
 {
-	if (GrabbingComponent->TryGrab(GetControlRotation()))
-		OnGrabbingStarted.Broadcast();
+	OnReleaseStarted.Broadcast();
+	OnGrabbingStarted.Broadcast();
 }
 
 void ACharacterST::AThrowStarted(const FInputActionValue& Value)
 {
-	if (GrabbingComponent->TryThrow(GetControlRotation()))
-		OnThrowingStarted.Broadcast();
+	OnThrowingStarted.Broadcast();
+}
+
+void ACharacterST::IncrementSlot()
+{
+	OnIncrementSlot.Broadcast();
+}
+
+void ACharacterST::DecrementSlot()
+{
+	OnDecrementSlot.Broadcast();
+}
+
+void ACharacterST::DestroySlot()
+{
+	OnDestroySlot.Broadcast();
+}
+
+void ACharacterST::Record()
+{
+	OnRecord.Broadcast();
 }
 
 void ACharacterST::InitStateMachine()

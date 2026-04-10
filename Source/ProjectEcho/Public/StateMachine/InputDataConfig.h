@@ -28,4 +28,19 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UInputAction* AThrow;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UInputAction* ARegister;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UInputAction* AIncrementSlot;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UInputAction* ADecrementSlot;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UInputAction* ADestroySlot;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UInputAction* AInteract;
 };
