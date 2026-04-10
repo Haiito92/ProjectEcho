@@ -5,6 +5,7 @@
 class ACharacterST;
 class UStateMachine;
 class UGrabbingComponent;
+class URecordManagerSubsystem;
 
 UCLASS()
 class UState : public UObject
@@ -26,6 +27,9 @@ protected:
 	
 	UFUNCTION()
 	virtual bool CanUseGrab();
+	
+	UFUNCTION()
+	virtual bool CanUseRecord();
 
 	UFUNCTION()
 	virtual void OnMovePressed(FVector2D InMoveInput);
@@ -43,8 +47,22 @@ protected:
 	void OnMoveReleased();
 	
 	UFUNCTION()
+	void OnRecord();
+	
+	UFUNCTION()
+	void OnIncrementSlot();
+	
+	UFUNCTION()
+	void OnDecrementSlot();
+	
+	UFUNCTION()
+	void OnDestroySlot();
+	
+	UFUNCTION()
 	void CheckIsFalling() const;
 	
+	UPROPERTY()
+	URecordManagerSubsystem* RecordManagerSubsystem;
 	
 	UPROPERTY()
 	UStateMachine* StateMachine;

@@ -28,6 +28,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
+	UFUNCTION(BlueprintCallable)
+	void InitPlayer();
+	
 	UFUNCTION()
 	void AMove(const FInputActionValue& Value);
 	UFUNCTION()
@@ -64,7 +67,7 @@ public:
 	void DestroySlot();
 	
 	UFUNCTION()
-	void Register();
+	void Record();
 	
 	
 	UFUNCTION()
@@ -96,15 +99,29 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FThrowStarted);
 	FThrowStarted OnThrowingStarted;
 	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRecord);
+	FOnRecord OnRecord;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDestroySlot);
+	FOnDestroySlot OnDestroySlot;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnIncrementSlot);
+	FOnIncrementSlot OnIncrementSlot;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDecrementSlot);
+	FOnDecrementSlot OnDecrementSlot;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputDataConfig* InputActions;
 	UPROPERTY(EditDefaultsOnly,  Category = "Input")
 	UInputMappingContext* InputMapping;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float WalkSpeed = 600.f;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float RunSpeed = 900.f;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	int NumberSlot = 5;
 	
 	UPROPERTY()
 	bool IsRecording = false;

@@ -42,5 +42,5 @@ public:
 	UInputAction* ADestroySlot;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UInputAction* APlaySlot;
+	UInputAction* AInteract;
 };

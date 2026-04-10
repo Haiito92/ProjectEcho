@@ -82,8 +82,6 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		return;
 	}
 	
-	InitStateMachine();
-	
 	Input->BindAction(InputActions->AMove, ETriggerEvent::Triggered, this, &ACharacterST::AMove);
 	Input->BindAction(InputActions->AMove, ETriggerEvent::Started, this, &ACharacterST::AMoveStarted);
 	Input->BindAction(InputActions->AMove, ETriggerEvent::Completed, this, &ACharacterST::AMoveReleased);
@@ -99,6 +97,16 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Input->BindAction(InputActions->AGrab, ETriggerEvent::Started, this, &ACharacterST::AGrabStarted);
 	
 	Input->BindAction(InputActions->AThrow, ETriggerEvent::Started, this, &ACharacterST::AThrowStarted);
+	
+	Input->BindAction(InputActions->AIncrementSlot, ETriggerEvent::Started, this, &ACharacterST::IncrementSlot);
+	Input->BindAction(InputActions->ADecrementSlot, ETriggerEvent::Started, this, &ACharacterST::DecrementSlot);
+	Input->BindAction(InputActions->ARegister, ETriggerEvent::Started, this, &ACharacterST::Record);
+	Input->BindAction(InputActions->ADestroySlot, ETriggerEvent::Started, this, &ACharacterST::DestroySlot);
+}
+
+void ACharacterST::InitPlayer()
+{
+	InitStateMachine();
 }
 
 void ACharacterST::AMove(const FInputActionValue& Value)
@@ -158,26 +166,22 @@ void ACharacterST::AThrowStarted(const FInputActionValue& Value)
 
 void ACharacterST::IncrementSlot()
 {
-	URecordManagerSubsystem::IncrementSelectedSlot();
+	OnIncrementSlot.Broadcast();
 }
 
 void ACharacterST::DecrementSlot()
 {
-	URecordManagerSubsystem::DecrementSelectedSlot();
+	OnDecrementSlot.Broadcast();
 }
 
 void ACharacterST::DestroySlot()
 {
-	URecordManagerSubsystem::DestroySelectedTimeline();
+	OnDestroySlot.Broadcast();
 }
 
-void ACharacterST::Register()
+void ACharacterST::Record()
 {
-	if (IsRecording)
-		URecordManagerSubsystem::StopRecord();
-	else
-		URecordManagerSubsystem::StartRecord();
-	IsRecording = !IsRecording;
+	OnRecord.Broadcast();
 }
 
 void ACharacterST::InitStateMachine()

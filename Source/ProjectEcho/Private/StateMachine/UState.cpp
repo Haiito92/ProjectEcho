@@ -1,6 +1,7 @@
 #include "Public/StateMachine/UState.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
+#include "RecordManager/RecordManagerSubsystem.h"
 #include "StateMachine/ACharacterST.h"
 
 class UStateMachine;
@@ -14,12 +15,17 @@ void UState::InitState(UStateMachine* InStateMachine,ACharacterST* InCharacter)
 	StateMachine = InStateMachine;
 	Character = InCharacter;
 	GrabbingComponent = Character->FindComponentByClass<UGrabbingComponent>();
+	RecordManagerSubsystem = GetWorld()->GetSubsystem<URecordManagerSubsystem>();
 }
 
 void UState::Enter()
 {
 	Character->OnGrabbingStarted.AddDynamic(this, &UState::OnGrabbingStarted);
 	Character->OnThrowingStarted.AddDynamic(this, &UState::OnThrowingStarted);
+	Character->OnRecord.AddDynamic(this, &UState::OnRecord);
+	Character->OnDestroySlot.AddDynamic(this, &UState::OnDestroySlot);
+	Character->OnIncrementSlot.AddDynamic(this, &UState::OnIncrementSlot);
+	Character->OnDecrementSlot.AddDynamic(this, &UState::OnDecrementSlot);
 }
 
 void UState::Tick(float DeltaTime)
@@ -30,9 +36,18 @@ void UState::Exit()
 {
 	Character->OnGrabbingStarted.RemoveDynamic(this, &UState::OnGrabbingStarted);
 	Character->OnThrowingStarted.RemoveDynamic(this, &UState::OnThrowingStarted);
+	Character->OnRecord.RemoveDynamic(this, &UState::OnRecord);
+	Character->OnDestroySlot.RemoveDynamic(this, &UState::OnDestroySlot);
+	Character->OnIncrementSlot.RemoveDynamic(this, &UState::OnIncrementSlot);
+	Character->OnDecrementSlot.RemoveDynamic(this, &UState::OnDecrementSlot);
 }
 
 bool UState::CanUseGrab()
+{
+	return true;
+}
+
+bool UState::CanUseRecord()
 {
 	return true;
 }
@@ -74,4 +89,34 @@ void UState::OnJumpingStarted()
 void UState::OnMoveReleased()
 {
 	StateMachine->ChangeState(EState::Idle);
+}
+
+void UState::OnRecord()
+{
+	if (CanUseRecord())
+	{
+		if (Character->IsRecording)
+			RecordManagerSubsystem->StopRecord();
+		else
+			RecordManagerSubsystem->StartRecord(Character);
+		Character->IsRecording = !Character->IsRecording;
+	}
+}
+
+void UState::OnIncrementSlot()
+{
+	if (CanUseRecord())
+		RecordManagerSubsystem->IncrementSelectedSlot();
+}
+
+void UState::OnDecrementSlot()
+{
+	if (CanUseRecord())
+		RecordManagerSubsystem->DecrementSelectedSlot();
+}
+
+void UState::OnDestroySlot()
+{
+	if (CanUseRecord())
+		RecordManagerSubsystem->DestroySelectedTimeline();
 }
