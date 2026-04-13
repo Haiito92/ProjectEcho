@@ -1,8 +1,6 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "GrabMechanic/GrabbingComponent.h"
-#include "RecordManager/RecordHandlerInterface.h"
 #include "ACharacterST.generated.h"
 
 class UInputComponent;
@@ -13,6 +11,7 @@ struct FInputActionValue;
 class UInputDataConfig;
 class UInputMappingContext;
 class UStateMachine;
+class UEnhancedInputLocalPlayerSubsystem;
 
 UCLASS()
 class PROJECTECHO_API ACharacterST : public ACharacter
@@ -21,10 +20,7 @@ class PROJECTECHO_API ACharacterST : public ACharacter
 
 public:
 	ACharacterST();
-
-protected:
 	virtual void BeginPlay() override;
-
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -88,6 +84,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Revive();
 	
+	UFUNCTION()
+	void ActivateCharacterInput();
+	
+	UFUNCTION()
+	void DeactivateCharacterInput();
 	
 	UFUNCTION()
 	void InitStateMachine();
@@ -147,22 +148,24 @@ public:
 	UPROPERTY(EditDefaultsOnly,  Category = "Input")
 	UInputMappingContext* InputMapping;
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UPROPERTY()
 	float WalkSpeed = 600.f;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UPROPERTY()
 	float RunSpeed = 900.f;
-	
+	UPROPERTY()
+	int Life = 100;
 	UPROPERTY()
 	bool IsRunInputOn = false;
 	
-	UPROPERTY(BlueprintReadWrite)
-	int Life = 100;
 	
 	UPROPERTY()
 	FVector2D MoveInputDir = FVector2D::ZeroVector;
 	
-	UPROPERTY(BlueprintReadOnly,VisibleAnywhere)
+	UPROPERTY()
 	UStateMachine* StateMachine;
+	
+	UPROPERTY()
+	UEnhancedInputLocalPlayerSubsystem* Subsystem;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* FirstPersonMesh;

@@ -9,6 +9,7 @@ class UFall;
 class UWallRun;
 class UDeath;
 class URevive;
+class URewind;
 
 
 class UInputDataConfig;
@@ -24,7 +25,8 @@ enum class EState : uint8
 	Jump,
 	WallRun,
 	Death,
-	Revive
+	Revive,
+	Rewind
 };
 
 UCLASS()
@@ -59,6 +61,8 @@ public:
 	UDeath* Death;
 	UPROPERTY()
 	URevive* Revive;
+	UPROPERTY()
+	URewind* Rewind;
 	
 protected:
 
