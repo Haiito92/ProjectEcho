@@ -31,5 +31,9 @@ public:
 	
 	//Time taken for Player to rewind after finishing a record
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Rewind")
-	float PlayerRewindTime = 0.3f;
+	float PlayerRewindTime = 0.5f;
+	
+	//Time taken for GlobalTimeline to rewind to Start
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Replay")
+	float GlobalRewindTime = 1.f;
 };
