@@ -1,7 +1,11 @@
 #include "StateMachine/States/UDeath.h"
+
+#include "EchoSystem.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "StateMachine/ACharacterST.h"
 #include "StateMachine/UStateMachine.h"
+#include "Tools/Debug/EchoDebug.h"
+#include "Tools/Debug/EchoMessageType.h"
 
 
 void UDeath::Tick(float DeltaTime)
@@ -13,14 +17,13 @@ void UDeath::Tick(float DeltaTime)
 void UDeath::Enter()
 {
 	Super::Enter();
-	Character->OnRevive.AddDynamic(this, &UDeath::OnRevive);
-	
+
+	Character->DeathEnd();
 }
 
 void UDeath::Exit()
 {
 	Super::Exit();
-	Character->OnRevive.RemoveDynamic(this, &UDeath::OnRevive);
 }
 
 bool UDeath::CanUseGrab()
@@ -40,5 +43,6 @@ bool UDeath::CanUseInteract()
 
 void UDeath::OnRevive()
 {
+	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine, EEchoMessageType::Log, "Death to Revive", FColor::Blue, 3.0f);
 	StateMachine->ChangeState(EState::Revive);
 }
