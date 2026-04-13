@@ -158,7 +158,7 @@ void UState::OnDeath()
 
 void UState::OnInteract()
 {
-	if (CanUseInteract())
+	if (CanUseInteract() && !GrabbingComponent->IsGrabbing())
 	{
 		IInteractor::Execute_TryInteract(InteractorComponent);
 		
