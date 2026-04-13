@@ -13,4 +13,11 @@ UCLASS()
 class PROJECTECHO_API AEchoHUD : public AHUD
 {
 	GENERATED_BODY()
+
+public:
+	void InitHUD();
+
+protected:
+	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive Init HUD")
+	void ReceiveInitHUD();
 };

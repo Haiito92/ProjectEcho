@@ -6,6 +6,9 @@
 #include "GameFramework/GameModeBase.h"
 #include "EchoGameMode.generated.h"
 
+class AEchoHUD;
+class ACharacterST;
+class APlayerStart;
 /**
  * 
  */
@@ -15,6 +18,7 @@ class PROJECTECHO_API AEchoGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 	virtual void BeginPlay() override;
+
 	
 	void InitializeGame();
 	void StartGame();
@@ -29,4 +33,11 @@ protected:
 	
 	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive End Game")
 	void ReceiveEndGame();
+
+	UFUNCTION()
+	void OnPlayerDeathEnd();
+	
+	TObjectPtr<APlayerStart> EchoPlayerStart;
+	TObjectPtr<ACharacterST> EchoPlayerCharacter;
+	TObjectPtr<AEchoHUD> EchoHUD;
 };
