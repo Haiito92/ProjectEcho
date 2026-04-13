@@ -142,6 +142,12 @@ public:
     
     UFUNCTION(BlueprintCallable)
     void StopRecord();
+	
+	UFUNCTION()
+	void StartPlayerRewind();
+	
+	UFUNCTION()
+	void StopPlayerRewind();
 
 	UFUNCTION(BlueprintCallable)
 	bool IsRecording();
@@ -156,15 +162,20 @@ public:
     	// Decrement the Selected Slot Value, if reaches beginning, goes back to last Slot
     UFUNCTION(BlueprintCallable)
     void DecrementSelectedSlot();
-
-private:
-	
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStartRecording, float, CurrentTimeKey);
 	FOnStartRecording OnStartRecording;	
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopRecording);
 	FOnStopRecording OnStopRecording;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartPlayerRewinding);
+	FOnStartPlayerRewinding OnStartPlayerRewinding;	
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopPlayerRewinding);
+	FOnStopPlayerRewinding OnStopPlayerRewinding;
+	
+private:
 	
 	virtual void Tick(float DeltaTime) override;
 	
@@ -185,6 +196,13 @@ protected:
 	//Is Recording
 	bool bIsRecording = false;
 	
+	//Is Timeline Replay in Rewind
+	bool bIsInRewind = false;
+	
+	//Is Currently rewinding Player's Actions after a record
+	bool bIsPlayerRewinding = false;
+	
+	//Current Selected Timeline Slot
 	int SelectedSlot = 0;
 	
 private:
