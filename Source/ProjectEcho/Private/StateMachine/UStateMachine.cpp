@@ -8,6 +8,7 @@
 #include "StateMachine/States/UJump.h"
 #include "StateMachine/States/UFall.h"
 #include "StateMachine/States/URevive.h"
+#include "StateMachine/States/URewind.h"
 #include "StateMachine/States/UWallRun.h"
 
 #include "Tools/Debug/EchoDebug.h"
@@ -23,6 +24,7 @@ void UStateMachine::InitStates(ACharacterST* InCharacter)
 	WallRun = NewObject<UWallRun>(this);
 	Death = NewObject<UDeath>(this);
 	Revive = NewObject<URevive>(this);
+	Rewind = NewObject<URewind>(this);
 	
 	Idle->InitState(this,InCharacter);
 	Walk->InitState(this,InCharacter);
@@ -32,6 +34,7 @@ void UStateMachine::InitStates(ACharacterST* InCharacter)
 	WallRun->InitState(this,InCharacter);
 	Death->InitState(this,InCharacter);
 	Revive->InitState(this,InCharacter);
+	Rewind->InitState(this,InCharacter);
 	
 	AddState(Idle,EState::Idle);
 	AddState(Walk,EState::Walk);
@@ -41,6 +44,7 @@ void UStateMachine::InitStates(ACharacterST* InCharacter)
 	AddState(WallRun,EState::WallRun);
 	AddState(Death,EState::Death);
 	AddState(Revive,EState::Revive);
+	AddState(Rewind,EState::Rewind);
 	
 	
 	StartState(EState::Idle);
