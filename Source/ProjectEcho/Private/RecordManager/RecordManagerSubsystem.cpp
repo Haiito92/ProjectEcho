@@ -329,12 +329,29 @@ void URecordManagerSubsystem::StopRecord()
 			IRecordHandlerInterface::Execute_StartRecording(RecordedActor);
 		}
 		RecordingTimeline.RecordTransformKey(RecordedActor, CurrentTimeKey - RecordingTimeline.StartTimeKey);
-		RecordedActor = nullptr;
 		GlobalTimeline.RegisterTimeline(RecordingTimeline);
 		OnStopRecording.Broadcast();
+		RecordedActor = nullptr;
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
 		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Stop Recording", FColor::Turquoise, 3.f);
+	
+		//Start Player Rewind
 	}
+}
+
+void URecordManagerSubsystem::StartPlayerRewind()
+{
+	bIsInRewind = true;
+	bIsPlayerRewinding = true;
+	OnStartPlayerRewinding.Broadcast();
+}
+
+void URecordManagerSubsystem::StopPlayerRewind()
+{
+	OnStopPlayerRewinding.Broadcast();
+	RecordedActor = nullptr;
+	bIsInRewind = false;
+	bIsPlayerRewinding = false;
 }
 
 bool URecordManagerSubsystem::IsRecording()

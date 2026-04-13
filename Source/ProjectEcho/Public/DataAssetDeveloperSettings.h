@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DeveloperSettings.h"
+#include "StateMachine/Data/UPlayerData.h"
 #include "Tools/Debug/DebugDataAsset.h"
 #include "DataAssetDeveloperSettings.generated.h"
 
@@ -28,4 +29,7 @@ public:
 	//Data Asset of Grab Mechanic Settings
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Grab Settings")
 	TSoftObjectPtr<UGrabMechanicSettings> GrabMechanicSettings;
+	
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Player Settings")
+	TSoftObjectPtr<UPlayerData> PlayerData;
 };
