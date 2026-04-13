@@ -35,6 +35,7 @@ void UState::Enter()
 	Character->OnDecrementSlot.AddDynamic(this, &UState::OnDecrementSlot);
 	Character->OnDeath.AddDynamic(this, &UState::OnDeath);
 	Character->OnInteract.AddDynamic(this, &UState::OnInteract);
+	Character->OnRevive.AddDynamic(this, &UState::OnRevive);
 }
 
 void UState::Tick(float DeltaTime)
@@ -51,6 +52,7 @@ void UState::Exit()
 	Character->OnDecrementSlot.RemoveDynamic(this, &UState::OnDecrementSlot);
 	Character->OnDeath.RemoveDynamic(this, &UState::OnDeath);
 	Character->OnInteract.RemoveDynamic(this, &UState::OnInteract);
+	Character->OnRevive.RemoveDynamic(this, &UState::OnRevive);
 }
 
 bool UState::CanUseGrab()

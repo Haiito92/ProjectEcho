@@ -33,6 +33,9 @@ public:
 	void InitPlayer();
 	
 	UFUNCTION()
+	void LoadData();
+	
+	UFUNCTION()
 	void AMove(const FInputActionValue& Value);
 	UFUNCTION()
 	void AMoveStarted(const FInputActionValue& Value);
@@ -74,10 +77,13 @@ public:
 	void AInteract();
 	
 	UFUNCTION(BlueprintCallable)
-	void TakeDamage(int value);
+	void PlayerTakeDamage(int value);
 	
 	UFUNCTION(BlueprintCallable)
 	void Kill();
+
+	UFUNCTION(BlueprintCallable)
+	void DeathEnd();
 	
 	UFUNCTION(BlueprintCallable)
 	void Revive();
@@ -126,6 +132,9 @@ public:
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
 	FOnDeath OnDeath;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathEnd);
+	FOnDeathEnd OnDeathEnd;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRevive);
 	FOnRevive OnRevive;
@@ -142,8 +151,6 @@ public:
 	float WalkSpeed = 600.f;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float RunSpeed = 900.f;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	int NumberSlot = 5;
 	
 	UPROPERTY()
 	bool IsRunInputOn = false;
