@@ -64,9 +64,13 @@ public:
 	UPROPERTY()
 	URewind* Rewind;
 	
+	DECLARE_DYNAMIC_DELEGATE_OneParam(FOnChangeState,EState,newState);
+	UPROPERTY(BlueprintAssignable)
+	FOnChangeState OnChangeState;
+	
 protected:
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly,VisibleAnywhere)
 	UState* CurrentState;
 	UPROPERTY()
 	UState* PreviousState;
