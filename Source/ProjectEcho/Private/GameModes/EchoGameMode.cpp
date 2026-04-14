@@ -20,9 +20,26 @@ void AEchoGameMode::BeginPlay()
 	StartGame();
 }
 
+void AEchoGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+}
+
 void AEchoGameMode::InitializeGame()
 {
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Initialize Game", FColor::Orange, 3.0f);
+
+	int32 StreamingLevelIndex = 0;
+	for (const ULevelStreaming* StreamingLevel : GetWorld()->GetStreamingLevels())
+	{
+		FString LevelNameString = FPaths::GetBaseFilename(StreamingLevel->GetWorldAssetPackageName());
+		LevelNameString.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Add stream level id for name: " + LevelNameString, FColor::Orange, 3.0f);
+
+		FName LevelName = FName(LevelNameString);
+		StreamLevelIds.Add(LevelName, StreamingLevelIndex);
+		StreamingLevelIndex++;
+	}
 	
 	URecordManagerSubsystem* RecordManagerSubsystem = GetWorld()->GetSubsystem<URecordManagerSubsystem>();
 
@@ -57,7 +74,7 @@ void AEchoGameMode::InitializeGame()
 	}
 
 	EchoPlayerStart = Cast<APlayerStart>(UGameplayStatics::GetActorOfClass(this, APlayerStart::StaticClass()));
-	
+	 
 	ReceiveInitializeGame();
 }
 
@@ -71,6 +88,33 @@ void AEchoGameMode::EndGame()
 {
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "End Game", FColor::Orange, 3.0f);
 	ReceiveEndGame();
+}
+
+void AEchoGameMode::LoadStreamLevel(const FName& LevelName)
+{
+	FLatentActionInfo Info = {};
+	Info.CallbackTarget = this;
+	Info.ExecutionFunction = FName("OnStreamLevelLoaded");
+	Info.UUID = 0;
+	Info.Linkage = -1;
+
+	int32* Id = StreamLevelIds.Find(LevelName);
+	if (Id) Info.Linkage = *Id;
+	
+	UGameplayStatics::LoadStreamLevel(this, LevelName, true, false, Info);
+}
+
+void AEchoGameMode::OnStreamLevelLoaded(int32 Linkage)
+{
+	if (Linkage == -1) return;
+
+	
+}
+
+void AEchoGameMode::OnStreamLevelUnloaded(int32 Linkage)
+{
+	if (Linkage == -1) return;
+	
 }
 
 void AEchoGameMode::OnPlayerDeathEnd()

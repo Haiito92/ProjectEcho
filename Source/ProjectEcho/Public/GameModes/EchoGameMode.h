@@ -12,18 +12,20 @@ class APlayerStart;
 /**
  * 
  */
-UCLASS(Blueprintable)
+UCLASS(Blueprintable, BlueprintType)
 class PROJECTECHO_API AEchoGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
 	virtual void BeginPlay() override;
-
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
 	void InitializeGame();
 	void StartGame();
 	void EndGame();
 
+	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="LevelName"))
+	void LoadStreamLevel(const FName& LevelName);
 protected:
 	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive Initialize Game")
 	void ReceiveInitializeGame();
@@ -35,9 +37,21 @@ protected:
 	void ReceiveEndGame();
 
 	UFUNCTION()
+	void OnStreamLevelLoaded(int32 Linkage);
+	
+	UFUNCTION()
+	void OnStreamLevelUnloaded(int32 Linkage);
+	
+	UFUNCTION()
 	void OnPlayerDeathEnd();
 	
+	UPROPERTY()
 	TObjectPtr<APlayerStart> EchoPlayerStart;
+	UPROPERTY()
 	TObjectPtr<ACharacterST> EchoPlayerCharacter;
+	UPROPERTY()
 	TObjectPtr<AEchoHUD> EchoHUD;
+
+	UPROPERTY()
+	TMap<FName, int32> StreamLevelIds;
 };
