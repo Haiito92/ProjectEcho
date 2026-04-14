@@ -64,7 +64,7 @@ public:
 	UPROPERTY()
 	URewind* Rewind;
 	
-	DECLARE_DYNAMIC_DELEGATE_OneParam(FOnChangeState,EState,newState);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeState,EState,newState);
 	UPROPERTY(BlueprintAssignable)
 	FOnChangeState OnChangeState;
 	
