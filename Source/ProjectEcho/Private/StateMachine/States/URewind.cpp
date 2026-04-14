@@ -1,5 +1,7 @@
 #include "StateMachine/States/URewind.h"
 
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "StateMachine/ACharacterST.h"
 
 void URewind::Tick(float DeltaTime)
@@ -10,13 +12,14 @@ void URewind::Tick(float DeltaTime)
 void URewind::Enter()
 {
 	Super::Enter();
-	Character->GetMesh()->SetSimulatePhysics(false);
+	Character->GetCharacterMovement()->DisableMovement();
+	Character->GetCharacterMovement()->StopMovementImmediately();
 	Character->DeactivateCharacterInput();
 }
 
 void URewind::Exit()
 {
 	Super::Exit();
-	Character->GetMesh()->SetSimulatePhysics(true);
+	Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	Character->ActivateCharacterInput();
 }

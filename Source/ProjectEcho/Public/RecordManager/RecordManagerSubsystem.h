@@ -85,6 +85,7 @@ struct FEchoTimeline
 	 * Play Current Frame of the Replay with given PreviousKey Played and CurrentTimeKey 
 	 * This function will : 
 	 * - Calculate the Transform of the Actor based on last and next TransformKey
+	 * - Execute Actions that occured between previousTimeKey and currentTimeKey
 	 */
 	void PlayReplay(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind);
 	
@@ -118,9 +119,13 @@ struct FGlobalTimeline
 	//Find Last Time Key of the Global Timeline (Last Key of Last Timeline played)
 	float GetLastTimeKey() const;
 	
+	//Get Length of GlobalTimeline
+	float GetLength() const;
+	
 	//Add Timeline to Global Timeline
 	void RegisterTimeline(const FEchoTimeline& Timeline);
 	
+	//Destroy Current Timeline 
 	void DestroyTimeline(int TimelineIndex, TArray<TObjectPtr<AEchoActor>>& OutEchoActorPool);
 };
 
@@ -152,14 +157,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsRecording();
 	
+	//Destroys the Timeline at the Slot currently selected (if there is one) 
     UFUNCTION(BlueprintCallable)
     void DestroySelectedTimeline();
     	
-    	// Increment the Selected Slot Value, if reaches end, goes back to first Slot
+    // Increment the Selected Slot Value, if reaches end, goes back to first Slot
     UFUNCTION(BlueprintCallable)
     void IncrementSelectedSlot();
     	
-    	// Decrement the Selected Slot Value, if reaches beginning, goes back to last Slot
+    // Decrement the Selected Slot Value, if reaches beginning, goes back to last Slot
     UFUNCTION(BlueprintCallable)
     void DecrementSelectedSlot();
 	
@@ -176,10 +182,10 @@ public:
 	FOnStopPlayerRewinding OnStopPlayerRewinding;
 	
 private:
-	
 	virtual void Tick(float DeltaTime) override;
 	
-	//Destroys the Timeline at the Slot currently selected (if there is one) 
+	//Handle Replay of Player Rewind (Placement of Actions
+	void PlayPlayerRewind(const float& TimeKey);
 	
 protected:
 	FGlobalTimeline GlobalTimeline;
@@ -204,6 +210,9 @@ protected:
 	
 	//Current Selected Timeline Slot
 	int SelectedSlot = 0;
+	
+	//Speed of Rewind (Calculated when rewind is Called
+	float RewindSpeed = 0.f;
 	
 private:
 	UPROPERTY()
