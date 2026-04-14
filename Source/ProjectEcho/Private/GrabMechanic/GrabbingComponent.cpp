@@ -61,6 +61,7 @@ bool UGrabbingComponent::TryGrab(const FRotator& ControlRotation)
 		{
 			GrabbedActor = HitResult.GetActor();
 			IGrabbableInterface::Execute_OnBeforeGrabbed(GrabbedActor);
+			OnWillGrabActor.Broadcast(GrabbedActor);
 			FAttachmentTransformRules AttachmentTransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
 			GrabbedActor->AttachToComponent(this, AttachmentTransformRules);
 			IGrabbableInterface::Execute_OnGrabbed(GrabbedActor);

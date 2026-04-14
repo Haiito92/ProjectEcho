@@ -4,6 +4,8 @@
 // Sets default values
 #include <RecordManager/EchoActor.h>
 
+#include "RecordManager/RecordableInterface.h"
+
 AEchoActor::AEchoActor()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -22,18 +24,8 @@ void AEchoActor::SetControlRotation(const FRotator& ControlRotation)
 	ReceiveSetControlRotation(ControlRotation);
 }
 
-TArray<TScriptInterface<IRecordableInterface>> AEchoActor::GetAndResetRecordables()
+void AEchoActor::RegisterRecordable(TScriptInterface<IRecordableInterface> Recordable)
 {
-	TArray<TScriptInterface<IRecordableInterface>> Recordables = RecordablesToRegister;
-	RecordablesToRegister.Empty();
-	return Recordables;
-}
-
-void AEchoActor::RegisterRecordable(TScriptInterface<class IRecordableInterface> Recordable)
-{
-	if (!RecordablesToRegister.Contains(Recordable))
-	{
-		RecordablesToRegister.Add(Recordable);
-	}
+	OnRegisterRecordable.Broadcast(Recordable);
 }
 

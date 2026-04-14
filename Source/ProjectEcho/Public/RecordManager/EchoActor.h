@@ -25,9 +25,6 @@ public:
 	UFUNCTION()
 	void SetControlRotation(const FRotator& ControlRotation);
 	
-	UFUNCTION()
-	TArray<TScriptInterface<IRecordableInterface>> GetAndResetRecordables();
-	
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveHandleActionKey(ERecordedAction Action);
@@ -38,7 +35,7 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void RegisterRecordable(TScriptInterface<IRecordableInterface> Recordable);
 	
-private:
-	UPROPERTY()
-	TArray<TScriptInterface<IRecordableInterface>> RecordablesToRegister;
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRegisterRecordable, TScriptInterface<IRecordableInterface>, Recordable);
+	UPROPERTY(BlueprintAssignable)
+	FOnRegisterRecordable OnRegisterRecordable;
 };
