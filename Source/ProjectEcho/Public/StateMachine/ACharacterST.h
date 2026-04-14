@@ -161,7 +161,7 @@ public:
 	UPROPERTY()
 	FVector2D MoveInputDir = FVector2D::ZeroVector;
 	
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State Machine")
 	UStateMachine* StateMachine;
 	
 	UPROPERTY()
