@@ -3,10 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RecordHandlerInterface.h"
 
 #include "EchoActor.generated.h"
 
+class IRecordableInterface;
 enum class ERecordedAction : uint8;
 
 UCLASS()
@@ -25,6 +25,9 @@ public:
 	UFUNCTION()
 	void SetControlRotation(const FRotator& ControlRotation);
 	
+	UFUNCTION()
+	TArray<TScriptInterface<IRecordableInterface>> GetAndResetRecordables();
+	
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveHandleActionKey(ERecordedAction Action);
@@ -32,4 +35,10 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveSetControlRotation(const FRotator& ControlRotation);
 	
+	UFUNCTION(BlueprintCallable)
+	void RegisterRecordable(TScriptInterface<IRecordableInterface> Recordable);
+	
+private:
+	UPROPERTY()
+	TArray<TScriptInterface<IRecordableInterface>> RecordablesToRegister;
 };

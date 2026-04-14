@@ -22,3 +22,18 @@ void AEchoActor::SetControlRotation(const FRotator& ControlRotation)
 	ReceiveSetControlRotation(ControlRotation);
 }
 
+TArray<TScriptInterface<IRecordableInterface>> AEchoActor::GetAndResetRecordables()
+{
+	TArray<TScriptInterface<IRecordableInterface>> Recordables = RecordablesToRegister;
+	RecordablesToRegister.Empty();
+	return Recordables;
+}
+
+void AEchoActor::RegisterRecordable(TScriptInterface<class IRecordableInterface> Recordable)
+{
+	if (!RecordablesToRegister.Contains(Recordable))
+	{
+		RecordablesToRegister.Add(Recordable);
+	}
+}
+

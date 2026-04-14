@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RecordKeysStructs.h"
 #include "RecordManagerSettings.h"
 #include "GameFramework/Actor.h"
 #include "Subsystems/WorldSubsystem.h"
@@ -17,28 +18,6 @@
 enum class ERecordedAction : uint8;
 
 class URecordManagerSettings;
-//Key used to save the position of an element at a set timekey 
-USTRUCT(Blueprintable)
-struct FRecordTransformKey
-{
-	GENERATED_BODY()
-	
-	float TimeKey;
-	FVector Position;
-	FRotator Rotation;
-	FVector Scale;
-	FRotator ControlRotation;
-};
-
-USTRUCT()
-struct FRecordActionKey
-{
-	GENERATED_BODY()
-	
-	float TimeKey;
-	ERecordedAction Action;
-};
-
 
 #pragma region Timeline Struct
 USTRUCT(Blueprintable)
