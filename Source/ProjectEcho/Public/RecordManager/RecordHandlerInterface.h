@@ -49,4 +49,8 @@ public:
 	//Called to Get Control Rotation
 	UFUNCTION(BlueprintNativeEvent)
 	FRotator GetToRecordControlRotation();
+	
+	//Called to Set Control Rotation during a Replay
+	UFUNCTION(BlueprintNativeEvent)
+	void SetControlRotation(FRotator NewControlRotation);
 };
