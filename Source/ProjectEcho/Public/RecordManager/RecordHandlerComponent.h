@@ -33,6 +33,7 @@ public:
 	//Returns Copy of Current ToRecordList and Reset it
 	virtual TArray<ERecordedAction> GetToRecordActions();
 	
+	
 private:
 	//Array of Actions to register in next Key Creation
 	TArray<ERecordedAction> ToRecordActions;
