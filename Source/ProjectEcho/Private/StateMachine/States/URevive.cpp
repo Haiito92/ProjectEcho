@@ -11,7 +11,7 @@ void URevive::Tick(float DeltaTime)
 
 void URevive::Enter()
 {
-	Super::Enter();	
+	Super::Enter();
 	StateMachine->ChangeState(EState::Idle);
 	Character->Life = 100;
 }
@@ -19,6 +19,7 @@ void URevive::Enter()
 void URevive::Exit()
 {
 	Super::Exit();
+	Character->ActivateCharacterInput();
 }
 
 bool URevive::CanUseGrab()

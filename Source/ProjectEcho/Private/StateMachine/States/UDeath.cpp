@@ -17,7 +17,7 @@ void UDeath::Tick(float DeltaTime)
 void UDeath::Enter()
 {
 	Super::Enter();
-
+	Character->DeactivateCharacterInput();
 	Character->DeathEnd();
 }
 

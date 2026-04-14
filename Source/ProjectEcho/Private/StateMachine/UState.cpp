@@ -2,6 +2,7 @@
 
 #include "EchoSystem.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GrabMechanic/GrabbingComponent.h"
 #include "RecordManager/EchoActor.h"
 #include "RecordManager/RecordHandlerComponent.h"
 #include "RecordManager/RecordManagerSubsystem.h"
@@ -36,6 +37,8 @@ void UState::Enter()
 	Character->OnDeath.AddDynamic(this, &UState::OnDeath);
 	Character->OnInteract.AddDynamic(this, &UState::OnInteract);
 	Character->OnRevive.AddDynamic(this, &UState::OnRevive);
+	RecordManagerSubsystem->OnStartPlayerRewinding.AddDynamic(this, &UState::OnRewindingStarted);
+	RecordManagerSubsystem->OnStopPlayerRewinding.AddDynamic(this, &UState::OnRewindingEnded);
 }
 
 void UState::Tick(float DeltaTime)
@@ -53,6 +56,8 @@ void UState::Exit()
 	Character->OnDeath.RemoveDynamic(this, &UState::OnDeath);
 	Character->OnInteract.RemoveDynamic(this, &UState::OnInteract);
 	Character->OnRevive.RemoveDynamic(this, &UState::OnRevive);
+	RecordManagerSubsystem->OnStartPlayerRewinding.RemoveDynamic(this, &UState::OnRewindingStarted);
+	RecordManagerSubsystem->OnStopPlayerRewinding.RemoveDynamic(this, &UState::OnRewindingEnded);
 }
 
 bool UState::CanUseGrab()
@@ -104,6 +109,16 @@ void UState::OnThrowingStarted()
 		
 		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(ERecordedAction::TryThrow);
 	}
+}
+
+void UState::OnRewindingStarted()
+{
+	StateMachine->ChangeState(EState::Rewind);
+}
+
+void UState::OnRewindingEnded()
+{
+	StateMachine->ChangeState(EState::Idle);
 }
 
 void UState::CheckIsFalling() const
@@ -158,11 +173,9 @@ void UState::OnDeath()
 
 void UState::OnInteract()
 {
-	if (CanUseInteract())
+	if (CanUseInteract() && !GrabbingComponent->IsGrabbing())
 	{
 		IInteractor::Execute_TryInteract(InteractorComponent);
-		
-		
 		if (IsValid(RecordHandlerComponent))
 		{
 			UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine, EEchoMessageType::Log, "Valid Record Handler", FColor::Green, 3.0f);

@@ -46,6 +46,12 @@ protected:
 	void OnThrowingStarted();
 	
 	UFUNCTION()
+	void OnRewindingStarted();
+	
+	UFUNCTION()
+	void OnRewindingEnded();
+	
+	UFUNCTION()
 	void OnJumpingStarted();
 	
 	UFUNCTION()

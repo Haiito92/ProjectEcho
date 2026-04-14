@@ -1,5 +1,7 @@
 #pragma once
 #include "StateMachine/ACharacterST.h"
+
+#include "EchoSystem.h"
 #include "StateMachine/UStateMachine.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
@@ -12,6 +14,8 @@
 #include "RecordManager/RecordManagerSubsystem.h"
 #include "StateMachine/Data/UInputDataConfig.h"
 #include "StateMachine/Data/UPlayerData.h"
+#include "Tools/Debug/EchoDebug.h"
+#include "Tools/Debug/EchoMessageType.h"
 
 
 class UPlayerData;
@@ -67,7 +71,7 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+	Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
 	if (Subsystem == nullptr) return;
 	
 	Subsystem->ClearAllMappings();
@@ -223,6 +227,26 @@ void ACharacterST::DeathEnd()
 void ACharacterST::Revive()
 {
 	OnRevive.Broadcast();
+}
+
+void ACharacterST::ActivateCharacterInput()
+{
+	if (Subsystem == nullptr)
+	{
+		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::GameLoop,EEchoMessageType::Error,"Subsystem character null");
+		return;
+	}
+	Subsystem->AddMappingContext(InputMapping,0);
+}
+
+void ACharacterST::DeactivateCharacterInput()
+{
+	if (Subsystem == nullptr)
+	{
+		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::GameLoop,EEchoMessageType::Error,"Subsystem character null");
+		return;
+	}
+	Subsystem->RemoveMappingContext(InputMapping);
 }
 
 void ACharacterST::InitStateMachine()
