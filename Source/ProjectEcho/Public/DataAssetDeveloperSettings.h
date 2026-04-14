@@ -8,6 +8,7 @@
 #include "Tools/Debug/DebugDataAsset.h"
 #include "DataAssetDeveloperSettings.generated.h"
 
+class UInteractMechanicSettings;
 class UGrabMechanicSettings;
 class URecordManagerSettings;
 /**
@@ -19,6 +20,7 @@ class PROJECTECHO_API UDataAssetDeveloperSettings : public UDeveloperSettings
 	GENERATED_BODY()
 
 public:
+	//Data Asset of Debug Domain Tool Settings
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Echo Debug Settings")
 	TSoftObjectPtr<UDebugDataAsset> DebutDataAsset;
 	
@@ -29,6 +31,10 @@ public:
 	//Data Asset of Grab Mechanic Settings
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Grab Settings")
 	TSoftObjectPtr<UGrabMechanicSettings> GrabMechanicSettings;
+
+	//Data Asset of Interact Mechanic Settings
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Interact Settings")
+	TSoftObjectPtr<UInteractMechanicSettings> InteractMechanicSettings;
 	
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Player Settings")
 	TSoftObjectPtr<UPlayerData> PlayerData;
