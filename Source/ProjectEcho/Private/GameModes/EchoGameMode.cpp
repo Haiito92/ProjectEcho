@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerStart.h"
 #include "HUDs/EchoHUD.h"
 #include "Kismet/GameplayStatics.h"
+#include "LevelInstance/LevelInstanceTypes.h"
 #include "LevelStreaming/StreamingLevelInfo.h"
 #include "RecordManager/RecordManagerSubsystem.h"
 #include "StateMachine/ACharacterST.h"
@@ -102,11 +103,17 @@ void AEchoGameMode::EndGame()
 
 void AEchoGameMode::LoadStreamLevel(const FName& LevelName)
 {
+	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Try Load Stream Level", FColor::Magenta, 3.0f);
+	
 	FStreamingLevelInfo* LoadedStreamLevelInfo = StreamLevelInfos.FindByPredicate([&](const FStreamingLevelInfo& StreamLevelInfo)
 	{
 		return StreamLevelInfo.ShortName == LevelName; 
 	});
-	if (!LoadedStreamLevelInfo) return;
+	if (!LoadedStreamLevelInfo)
+	{
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Can't load stream level: LevelStreamingInfo invalid", FColor::Red, 3.0f);
+		return;
+	}
 	
 	FLatentActionInfo Info = {};
 	Info.CallbackTarget = this;
@@ -119,12 +126,45 @@ void AEchoGameMode::LoadStreamLevel(const FName& LevelName)
 
 void AEchoGameMode::UnloadStreamLevel(const FName& LevelName)
 {
+	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Try Unload Stream Level", FColor::Magenta, 3.0f);
+	
 	FStreamingLevelInfo* LoadedStreamLevelInfo = StreamLevelInfos.FindByPredicate([&](const FStreamingLevelInfo& StreamLevelInfo)
 	{
 		return StreamLevelInfo.ShortName == LevelName; 
 	});
 	if (!LoadedStreamLevelInfo) return;
+
+	const TArray<ULevelStreaming*>& StreamingLevels = GetWorld()->GetStreamingLevels();
+
+	ULevelStreaming* StreamLevel = nullptr;
+	for (int i = 0; i < StreamingLevels.Num(); i++)
+	{
+		if (StreamingLevels[i]->GetWorldAssetPackageName() == LoadedStreamLevelInfo->Path)
+		{
+			StreamLevel = StreamingLevels[i];
+			break;
+		}
+	}
+
+	if (!StreamLevel)
+	{
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Can't unload stream level: LevelStreaming invalid", FColor::Red, 3.0f);
+		return;
+	}
+
+	ULevel* Level = StreamLevel->GetLoadedLevel();
+
+	if (!Level)
+	{
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Can't unload stream level: Level invalid", FColor::Red, 3.0f);
+		return;
+	}
 	
+	for (const TObjectPtr<AActor> Actor : Level->Actors)
+	{
+		UEchoDebug::Log(EEchoSystem::GameLoop, EEchoMessageType::Log, "Stream Unloaded Actor Name: " + Actor->GetName());
+	}
+
 	FLatentActionInfo Info = {};
 	Info.CallbackTarget = this;
 	Info.ExecutionFunction = FName("OnStreamLevelUnloaded");
@@ -152,38 +192,29 @@ void AEchoGameMode::OnStreamLevelLoaded(int32 Linkage)
 		}
 	}
 
-	if (!StreamLevel) return;
-
-	for (const TObjectPtr<AActor> Actor : StreamLevel->GetLoadedLevel()->Actors)
+	if (!StreamLevel)
 	{
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Stream Loaded Actor Name: " + Actor->GetName(), FColor::Turquoise, 3.0f);
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "On load stream level: LevelStreaming invalid", FColor::Red, 3.0f);
+		return;
+	}
+
+	ULevel* Level = StreamLevel->GetLoadedLevel();
+
+	if (!Level)
+	{
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "On load stream level: Level invalid", FColor::Red, 3.0f);
+		return;
+	}
+	
+	for (const TObjectPtr<AActor> Actor : Level->Actors)
+	{
+		UEchoDebug::Log(EEchoSystem::GameLoop, EEchoMessageType::Log, "Stream Loaded Actor Name: " + Actor->GetName());
 	}
 }
 
 void AEchoGameMode::OnStreamLevelUnloaded(int32 Linkage)
 {
 	if (Linkage == INDEX_NONE) return;
-
-	const FStreamingLevelInfo& LoadedStreamLevelInfo = StreamLevelInfos[Linkage];
-
-	const TArray<ULevelStreaming*>& StreamingLevels = GetWorld()->GetStreamingLevels();
-
-	ULevelStreaming* StreamLevel = nullptr;
-	for (int i = 0; i < StreamingLevels.Num(); i++)
-	{
-		if (StreamingLevels[i]->GetWorldAssetPackageName() == LoadedStreamLevelInfo.Path)
-		{
-			StreamLevel = StreamingLevels[i];
-			break;
-		}
-	}
-
-	if (!StreamLevel) return;
-
-	for (const TObjectPtr<AActor> Actor : StreamLevel->GetLoadedLevel()->Actors)
-	{
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Stream Unloaded Actor Name: " + Actor->GetName(), FColor::Emerald, 3.0f);
-	}
 }
 
 void AEchoGameMode::OnPlayerDeathEnd()
