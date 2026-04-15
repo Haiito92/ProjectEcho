@@ -158,8 +158,6 @@ void FGlobalTimeline::Initiate(const int InNbSlots)
 
 void FGlobalTimeline::Play(const float& PreviousTimeKey, const float& CurrentTimeKey, bool bIsInRewind, bool& bOutHasReachedEnd)
 {
-	//TODO: Add Rewind behavior
-	
 	bool bHasNotReachedEnd = false;
 
 	for (int i = 0; i < NbSlots; ++i)
@@ -170,9 +168,9 @@ void FGlobalTimeline::Play(const float& PreviousTimeKey, const float& CurrentTim
 		float LocalTimeKey = CurrentTimeKey - Timelines[i].StartTimeKey;
 		if (Timelines[i].bIsActive)
 		{
-			if (Timelines[i].GetLastTimeKey() < LocalTimeKey)
+			if (bIsInRewind? LocalTimeKey < 0 : Timelines[i].GetLastTimeKey() < LocalTimeKey)
 			{
-				//Timeline Desactivation (Reached End of Last Key)
+				//Timeline Desactivation (Reached End of Last Key // In Rewind, Reached passed FirstKey)
 				Timelines[i].ActivateTimeline(false);
 				continue;
 			}
@@ -201,7 +199,7 @@ void FGlobalTimeline::Play(const float& PreviousTimeKey, const float& CurrentTim
 		Timelines[i].PlayReplay(PreviousTimeKey - Timelines[i].StartTimeKey, LocalTimeKey, bIsInRewind);
 	}
 	
-	bOutHasReachedEnd = !bHasNotReachedEnd;
+	bOutHasReachedEnd = bIsInRewind ? false : !bHasNotReachedEnd;
 }
 
 bool FGlobalTimeline::HasAvailableTimelineSlot() const
@@ -331,7 +329,7 @@ void URecordManagerSubsystem::InitRecordManager(const int& NbTimelineSlot)
 
 void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor)
 {
-	if (bIsRecording || !GlobalTimeline.HasAvailableTimelineSlot()) return;
+	if (!CanStartRecord()) return;
 	if (!IsValid(InRecordedActor)) return;
 	if (EchoActorsPool.IsEmpty()) return;
 	RecordedActor = InRecordedActor;
@@ -349,9 +347,19 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor)
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Start Recording", FColor::Turquoise, 3.f);
 }
 
+bool URecordManagerSubsystem::CanStartRecord() const
+{
+	return !bIsRecording && GlobalTimeline.HasAvailableTimelineSlot() && !bIsInRewind;
+}
+
+bool URecordManagerSubsystem::CanStopRecord() const
+{
+	return bIsRecording && (CurrentTimeKey - RecordingTimeline.StartTimeKey) > RecordManagerSettings->MinRecordTime;
+}
+
 void URecordManagerSubsystem::StopRecord()
 {
-	if (bIsRecording)
+	if (CanStopRecord())
 	{
 		bIsRecording = false;
 		if (RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass()))
@@ -440,7 +448,7 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 			if (!IsValid(RecordableComponent)) continue;
 			if (RecordableComponent->IsRecording())
 			{
-				if (CurrentTimeKey > RecordingTimeline.StartTimeKey)
+				if (CurrentTimeKey > RecordableComponent->GetFirstInteractedKey())
 				{
 					RecordableComponent->ReplayKey(previousTimeKey, CurrentTimeKey);
 				}
@@ -484,22 +492,13 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 		
 		if (bHasReachedEnd && !bIsRecording && !bIsInRewind)
 		{
-			//RewindSpeed = GlobalTimeline.GetLength() / RecordManagerSettings->GlobalRewindTime;
-			//bIsInRewind = true;
-			CurrentTimeKey = 0;
-			for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
-			{
-				if (!RecordableComponent->IsRecording()) continue;
-				RecordableComponent->StartRewind();
-				RecordableComponent->ReplayFirstKey();
-				RecordableComponent->StopRecording();
-				RecordableComponent->StopRewind();
-			}
+			RewindSpeed = GlobalTimeline.GetLength() / RecordManagerSettings->GlobalRewindTime;
+			StartRewind();
 		}
 		else if (bIsInRewind && CurrentTimeKey <= 0)
 		{
 			CurrentTimeKey = 0;
-			bIsInRewind = false;
+			StopRewind();
 		}
 	}
 	
@@ -542,6 +541,7 @@ void URecordManagerSubsystem::PlayPlayerRewind(const float& TimeKey)
 
 void URecordManagerSubsystem::DestroySelectedTimeline()
 {
+	if (bIsInRewind) return; //Forbid Timeline Destruction during Rewind
 	GlobalTimeline.DestroyTimeline(SelectedSlot, EchoActorsPool);
 	if (GlobalTimeline.Timelines.IsEmpty())
 	{

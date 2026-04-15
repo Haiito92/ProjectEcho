@@ -124,6 +124,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
     void StartRecord(AActor* InRecordedActor);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool CanStartRecord() const;
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool CanStopRecord() const;
     
     UFUNCTION(BlueprintCallable)
     void StopRecord();
