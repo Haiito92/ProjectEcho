@@ -7,6 +7,8 @@
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "RecordManager/EchoActor.h"
+#include "RecordManager/RecordableComponent.h"
+#include "RecordManager/RecordableInterface.h"
 #include "RecordManager/RecordHandlerInterface.h"
 #include "Tools/Debug/EchoDebug.h"
 
@@ -310,6 +312,21 @@ void URecordManagerSubsystem::InitRecordManager(const int& NbTimelineSlot)
 		SpawnedEchoActor->FinishSpawning(SpawnTransform);
 		EchoActorsPool.Add(SpawnedEchoActor);
 	}
+	
+	//Find All Recordables
+	TArray<AActor*> RecordableActors;
+	UGameplayStatics::GetAllActorsWithInterface(GetWorld(), URecordableInterface::StaticClass(), RecordableActors);
+	for (AActor* RecordableActor : RecordableActors)
+	{
+		if (RecordableActor != nullptr)
+		{
+			if (URecordableComponent* RecordableComponent = RecordableActor->GetComponentByClass<URecordableComponent>(); RecordableComponent != nullptr)
+			{
+				RecordableComponents.Add(RecordableComponent);
+				RecordableComponent->OnInteracted.AddDynamic(this, &URecordManagerSubsystem::OnRecordableInteractedWith);
+			}
+		}
+	}
 }
 
 void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor)
@@ -403,6 +420,41 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 	{
 		bool bHasReachedEnd = false;
 		GlobalTimeline.Play(previousTimeKey, CurrentTimeKey, bIsInRewind, bHasReachedEnd);
+		
+		//Handle Recordables
+		if (bIsInRewind)
+		{
+			for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
+			{
+				if (!IsValid(RecordableComponent)) continue;
+				if (RecordableComponent->IsRecording())
+				{
+					if (CurrentTimeKey > RecordingTimeline.StartTimeKey)
+					{
+						RecordableComponent->ReplayKey(previousTimeKey, CurrentTimeKey);
+					}
+					else
+					{
+						RecordableComponent->ReplayFirstKey();
+						RecordableComponent->StopRecording();
+						RecordableComponent->StopRewind();
+					}
+				}
+			}
+		}
+		else
+		{
+			for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
+			{
+				if (!IsValid(RecordableComponent)) continue;
+				if (RecordableComponent->IsRecording())
+				{
+					RecordableComponent->RecordKey(CurrentTimeKey);
+				}
+			}
+		}
+		
+		//Handle Player Rewinding
 		if (bIsPlayerRewinding)
 		{
 			if (RecordingTimeline.StartTimeKey >= CurrentTimeKey)
@@ -482,4 +534,17 @@ void URecordManagerSubsystem::DecrementSelectedSlot()
 {
 	SelectedSlot--;
 	if (SelectedSlot < 0) SelectedSlot = GlobalTimeline.NbSlots - 1;
+}
+
+void URecordManagerSubsystem::OnRecordableInteractedWith(URecordableComponent* Self, bool bShouldRecord)
+{
+	if (bShouldRecord)
+	{
+		Self->StartRecording(CurrentTimeKey);
+		Self->RecordKey(CurrentTimeKey);
+	}
+	else
+	{
+		Self->StopRecording();
+	}
 }

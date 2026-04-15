@@ -56,8 +56,45 @@ void URecordableComponent::ReplayKey(const float& PreviousTimeKey, const float& 
 	}
 }
 
+void URecordableComponent::ReplayFirstKey()
+{
+	if (TransformKeys.IsEmpty()) return;
+	GetOwner()->SetActorLocation(TransformKeys[0].Position);
+	GetOwner()->SetActorRotation(TransformKeys[0].Rotation);
+	GetOwner()->SetActorScale3D(TransformKeys[0].Scale);
+}
+
 void URecordableComponent::StartRewind()
 {
+	OnStartRewind.Broadcast();
+}
+
+void URecordableComponent::StopRewind()
+{
+	OnStopRewind.Broadcast();
+}
+
+void URecordableComponent::StartRecording(const float& CurrentTimeKey)
+{
+	bIsRecording = true;
+	FirstInteractedKey = CurrentTimeKey;
+}
+
+void URecordableComponent::StopRecording()
+{
+	bIsRecording = false;
+	FirstInteractedKey = -1;
+	TransformKeys.Empty();
+}
+
+bool URecordableComponent::IsRecording() const
+{
+	return bIsRecording;
+}
+
+const float& URecordableComponent::GetFirstInteractedKey() const
+{
+	return FirstInteractedKey;
 }
 
 const FRecordTransformKey* URecordableComponent::FindClosestTransformKey(const float& CurrentTimeKey, bool bFindNextOne)

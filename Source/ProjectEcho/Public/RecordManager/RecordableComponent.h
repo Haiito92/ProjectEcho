@@ -24,16 +24,64 @@ public:
 	//Record a TransformKey at CurrentTimeKey (given in global Timeline) for Owner
 	UFUNCTION()
 	void RecordKey(const float& CurrentTimeKey);
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRecordKey, const float&, CurrentTimeKey);
+	UPROPERTY(BlueprintAssignable)
+	FOnRecordKey OnRecordKey;
 	
 	UFUNCTION()
 	//Replay Current Transform Key (given in global Timeline) in Rewind for Owner
 	void ReplayKey(const float& PreviousTimeKey, const float& CurrentTimeKey);
 	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnReplayKey, const float&, PreviousTimeKey, const float&, CurrentTimeKey);
+	UPROPERTY(BlueprintAssignable)
+	FOnReplayKey OnReplayKey;
+	
 	UFUNCTION()
+	void ReplayFirstKey();
+	
+	
+	UFUNCTION()
+	//Called to Set Actor in Rewind Mode (Has delegate for extra behaviour)
 	void StartRewind();
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartRewind);
+	UPROPERTY(BlueprintAssignable)
+	FOnStartRewind OnStartRewind;
+	
+	UFUNCTION()
+	//Called to Reset Actor after Rewind Mode (Has delegate for extra behaviour)
+	void StopRewind();
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopRewind);
+	UPROPERTY(BlueprintAssignable)
+	FOnStopRewind OnStopRewind;
+	
+	//Delegate called to warn other systems when Recordable is Interacted with
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInteracted, URecordableComponent*, self, bool, bShouldRecord);
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FOnInteracted OnInteracted;
+	
+	UFUNCTION()
+	void StartRecording(const float& CurrentTimeKey);
+	
+	UFUNCTION()
+	//Stop Recording and Reset Keys Recorded
+	void StopRecording();
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool IsRecording() const;
+	
+	UFUNCTION()
+	const float& GetFirstInteractedKey() const;
+	
 private:
 	UPROPERTY()
 	TArray<FRecordTransformKey> TransformKeys;
 	
 	const FRecordTransformKey* FindClosestTransformKey(const float& CurrentTimeKey, bool bFindNextOne);
+	
+	bool bIsRecording;
+	
+	float FirstInteractedKey = -1;
 };
