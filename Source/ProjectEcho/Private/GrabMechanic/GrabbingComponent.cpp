@@ -60,10 +60,11 @@ bool UGrabbingComponent::TryGrab(const FRotator& ControlRotation)
 		if (HitResult.GetActor()->GetClass()->ImplementsInterface(UGrabbableInterface::StaticClass()) && IGrabbableInterface::Execute_CanBeGrabbed(HitResult.GetActor()))
 		{
 			GrabbedActor = HitResult.GetActor();
-			IGrabbableInterface::Execute_OnBeforeGrabbed(GrabbedActor);
+			IGrabbableInterface::Execute_OnBeforeGrabbed(GrabbedActor, this->GetOwner());
+			OnWillGrabActor.Broadcast(GrabbedActor);
 			FAttachmentTransformRules AttachmentTransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
 			GrabbedActor->AttachToComponent(this, AttachmentTransformRules);
-			IGrabbableInterface::Execute_OnGrabbed(GrabbedActor);
+			IGrabbableInterface::Execute_OnGrabbed(GrabbedActor, this->GetOwner());
 		}
 	}
 	return true;

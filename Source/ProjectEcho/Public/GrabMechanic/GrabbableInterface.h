@@ -27,11 +27,11 @@ public:
 	
 	//Called Before Being Grabbed 
 	UFUNCTION(BlueprintNativeEvent)
-	void OnBeforeGrabbed();
+	void OnBeforeGrabbed(AActor* GrabbingActor);
 	
 	//Called when Grabbed
 	UFUNCTION(BlueprintNativeEvent)
-	void OnGrabbed();
+	void OnGrabbed(AActor* GrabbingActor);
 	
 	//Called when Released
 	UFUNCTION(BlueprintNativeEvent)

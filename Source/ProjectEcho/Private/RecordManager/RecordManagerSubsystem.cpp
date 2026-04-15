@@ -7,6 +7,8 @@
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "RecordManager/EchoActor.h"
+#include "RecordManager/RecordableComponent.h"
+#include "RecordManager/RecordableInterface.h"
 #include "RecordManager/RecordHandlerInterface.h"
 #include "Tools/Debug/EchoDebug.h"
 
@@ -310,6 +312,21 @@ void URecordManagerSubsystem::InitRecordManager(const int& NbTimelineSlot)
 		SpawnedEchoActor->FinishSpawning(SpawnTransform);
 		EchoActorsPool.Add(SpawnedEchoActor);
 	}
+	
+	//Find All Recordables
+	TArray<AActor*> RecordableActors;
+	UGameplayStatics::GetAllActorsWithInterface(GetWorld(), URecordableInterface::StaticClass(), RecordableActors);
+	for (AActor* RecordableActor : RecordableActors)
+	{
+		if (RecordableActor != nullptr)
+		{
+			if (URecordableComponent* RecordableComponent = RecordableActor->GetComponentByClass<URecordableComponent>(); RecordableComponent != nullptr)
+			{
+				RecordableComponents.Add(RecordableComponent);
+				RecordableComponent->OnInteracted.AddDynamic(this, &URecordManagerSubsystem::OnRecordableInteractedWith);
+			}
+		}
+	}
 }
 
 void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor)
@@ -353,7 +370,7 @@ void URecordManagerSubsystem::StopRecord()
 
 void URecordManagerSubsystem::StartPlayerRewind()
 {
-	bIsInRewind = true;
+	StartRewind();
 	bIsPlayerRewinding = true;
 	RewindSpeed = RecordingTimeline.GetLastTimeKey() / RecordManagerSettings->PlayerRewindTime;
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Start PlayerRewind at Speed : " + FString::SanitizeFloat(RewindSpeed), FColor::Turquoise, 3.f);
@@ -379,6 +396,23 @@ void URecordManagerSubsystem::StopPlayerRewind()
 	bIsPlayerRewinding = false;
 }
 
+void URecordManagerSubsystem::StartRewind()
+{
+	bIsInRewind = true;
+	for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
+	{
+		if (RecordableComponent->IsRecording())
+		{
+			RecordableComponent->StartRewind();
+		}
+	}
+}
+
+void URecordManagerSubsystem::StopRewind()
+{
+	bIsInRewind = false;
+}
+
 bool URecordManagerSubsystem::IsRecording()
 {
 	return bIsRecording;
@@ -398,11 +432,46 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 	if (bIsInRewind) UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Rewinding at Speed : " + FString::SanitizeFloat(RewindSpeed), FColor::Cyan, DeltaTime);
 	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Current Selected Timeline : " + FString::FromInt(SelectedSlot), FColor::Cyan, DeltaTime);
 	
+	//Handle Recordables
+	if (bIsInRewind)
+	{
+		for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
+		{
+			if (!IsValid(RecordableComponent)) continue;
+			if (RecordableComponent->IsRecording())
+			{
+				if (CurrentTimeKey > RecordingTimeline.StartTimeKey)
+				{
+					RecordableComponent->ReplayKey(previousTimeKey, CurrentTimeKey);
+				}
+				else
+				{
+					RecordableComponent->ReplayFirstKey();
+					RecordableComponent->StopRecording();
+					RecordableComponent->StopRewind();
+				}
+			}
+		}
+	}
+	else
+	{
+		for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
+		{
+			if (!IsValid(RecordableComponent)) continue;
+			if (RecordableComponent->IsRecording())
+			{
+				RecordableComponent->RecordKey(CurrentTimeKey);
+			}
+		}
+	}
+	
 	//--- Handle Replay ---
 	if (!GlobalTimeline.Timelines.IsEmpty() || bIsPlayerRewinding)
 	{
 		bool bHasReachedEnd = false;
 		GlobalTimeline.Play(previousTimeKey, CurrentTimeKey, bIsInRewind, bHasReachedEnd);
+		
+		//Handle Player Rewinding
 		if (bIsPlayerRewinding)
 		{
 			if (RecordingTimeline.StartTimeKey >= CurrentTimeKey)
@@ -418,6 +487,14 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 			//RewindSpeed = GlobalTimeline.GetLength() / RecordManagerSettings->GlobalRewindTime;
 			//bIsInRewind = true;
 			CurrentTimeKey = 0;
+			for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
+			{
+				if (!RecordableComponent->IsRecording()) continue;
+				RecordableComponent->StartRewind();
+				RecordableComponent->ReplayFirstKey();
+				RecordableComponent->StopRecording();
+				RecordableComponent->StopRewind();
+			}
 		}
 		else if (bIsInRewind && CurrentTimeKey <= 0)
 		{
@@ -469,6 +546,15 @@ void URecordManagerSubsystem::DestroySelectedTimeline()
 	if (GlobalTimeline.Timelines.IsEmpty())
 	{
 		CurrentTimeKey = 0.0f;
+		
+		//Reset Recordable to origin Positions
+		for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
+		{
+			RecordableComponent->StartRewind();
+			RecordableComponent->ReplayFirstKey();
+			RecordableComponent->StopRecording();
+			RecordableComponent->StopRewind();
+		}
 	}
 }
 
@@ -482,4 +568,19 @@ void URecordManagerSubsystem::DecrementSelectedSlot()
 {
 	SelectedSlot--;
 	if (SelectedSlot < 0) SelectedSlot = GlobalTimeline.NbSlots - 1;
+}
+
+void URecordManagerSubsystem::OnRecordableInteractedWith(URecordableComponent* Self, bool bShouldRecord)
+{
+	if (bShouldRecord)
+	{
+		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Starting to Record " + Self->GetOwner()->GetName(), FColor::Turquoise, 2.f);
+		Self->StartRecording(CurrentTimeKey);
+		Self->RecordKey(CurrentTimeKey);
+	}
+	else
+	{
+		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Stopping to Record " + Self->GetOwner()->GetName(), FColor::Turquoise, 2.f);
+		Self->StopRecording();
+	}
 }

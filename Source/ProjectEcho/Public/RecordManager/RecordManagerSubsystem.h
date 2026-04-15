@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RecordKeysStructs.h"
 #include "RecordManagerSettings.h"
 #include "GameFramework/Actor.h"
 #include "Subsystems/WorldSubsystem.h"
@@ -14,31 +15,10 @@
  * 
  */
 
+class URecordableComponent;
 enum class ERecordedAction : uint8;
 
 class URecordManagerSettings;
-//Key used to save the position of an element at a set timekey 
-USTRUCT(Blueprintable)
-struct FRecordTransformKey
-{
-	GENERATED_BODY()
-	
-	float TimeKey;
-	FVector Position;
-	FRotator Rotation;
-	FVector Scale;
-	FRotator ControlRotation;
-};
-
-USTRUCT()
-struct FRecordActionKey
-{
-	GENERATED_BODY()
-	
-	float TimeKey;
-	ERecordedAction Action;
-};
-
 
 #pragma region Timeline Struct
 USTRUCT(Blueprintable)
@@ -153,8 +133,14 @@ public:
 	
 	UFUNCTION()
 	void StopPlayerRewind();
+	
+	UFUNCTION()
+	void StartRewind();
+	
+	UFUNCTION()
+	void StopRewind();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsRecording();
 	
 	//Destroys the Timeline at the Slot currently selected (if there is one) 
@@ -168,6 +154,9 @@ public:
     // Decrement the Selected Slot Value, if reaches beginning, goes back to last Slot
     UFUNCTION(BlueprintCallable)
     void DecrementSelectedSlot();
+	
+	UFUNCTION()
+	void OnRecordableInteractedWith(URecordableComponent* Self, bool bShouldRecord);
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStartRecording, float, CurrentTimeKey);
 	FOnStartRecording OnStartRecording;	
@@ -217,6 +206,9 @@ protected:
 private:
 	UPROPERTY()
 	TObjectPtr<URecordManagerSettings> RecordManagerSettings = nullptr;
+	
+	UPROPERTY()
+	TArray<TObjectPtr<URecordableComponent>> RecordableComponents;
 	
 	UPROPERTY()
 	//Pool of EchoActor to display Timelines (avoid runtime Spawning)
