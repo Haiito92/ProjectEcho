@@ -6,7 +6,6 @@
 #include "GameFramework/GameModeBase.h"
 #include "EchoGameMode.generated.h"
 
-struct FStreamingLevelInfo;
 class AEchoHUD;
 class ACharacterST;
 class APlayerStart;
@@ -25,11 +24,6 @@ class PROJECTECHO_API AEchoGameMode : public AGameModeBase
 	void StartGame();
 	void EndGame();
 
-	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="LevelName"))
-	void LoadStreamLevel(const FName& LevelName);
-
-	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="LevelName"))
-	void UnloadStreamLevel(const FName& LevelName);
 protected:
 	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive Initialize Game")
 	void ReceiveInitializeGame();
@@ -39,12 +33,6 @@ protected:
 	
 	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive End Game")
 	void ReceiveEndGame();
-
-	UFUNCTION()
-	void OnStreamLevelLoaded(int32 Linkage);
-	
-	UFUNCTION()
-	void OnStreamLevelUnloaded(int32 Linkage);
 	
 	UFUNCTION()
 	void OnPlayerDeathEnd();
@@ -55,7 +43,4 @@ protected:
 	TObjectPtr<ACharacterST> EchoPlayerCharacter;
 	UPROPERTY()
 	TObjectPtr<AEchoHUD> EchoHUD;
-
-	UPROPERTY()
-	TArray<FStreamingLevelInfo> StreamLevelInfos;
 };
