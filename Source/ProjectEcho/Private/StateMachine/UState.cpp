@@ -1,8 +1,10 @@
 #include "Public/StateMachine/UState.h"
 
 #include "EchoSystem.h"
+#include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GrabMechanic/GrabbingComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "RecordManager/EchoActor.h"
 #include "RecordManager/RecordHandlerComponent.h"
 #include "RecordManager/RecordManagerSubsystem.h"
@@ -175,7 +177,12 @@ void UState::OnInteract()
 {
 	if (CanUseInteract() && !GrabbingComponent->IsGrabbing())
 	{
-		IInteractor::Execute_TryInteract(InteractorComponent);
+		IInteractor::Execute_TryInteract(
+			InteractorComponent,
+			Character->FirstPersonCameraComponent->GetComponentLocation(),
+			UKismetMathLibrary::GetForwardVector(Character->GetControlRotation())
+			);
+		
 		if (IsValid(RecordHandlerComponent))
 		{
 			UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine, EEchoMessageType::Log, "Valid Record Handler", FColor::Green, 3.0f);
