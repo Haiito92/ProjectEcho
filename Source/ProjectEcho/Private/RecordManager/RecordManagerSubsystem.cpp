@@ -565,11 +565,13 @@ void URecordManagerSubsystem::OnRecordableInteractedWith(URecordableComponent* S
 {
 	if (bShouldRecord)
 	{
+		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Starting to Record " + Self->GetOwner()->GetName(), FColor::Turquoise, 2.f);
 		Self->StartRecording(CurrentTimeKey);
 		Self->RecordKey(CurrentTimeKey);
 	}
 	else
 	{
+		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Stopping to Record " + Self->GetOwner()->GetName(), FColor::Turquoise, 2.f);
 		Self->StopRecording();
 	}
 }
