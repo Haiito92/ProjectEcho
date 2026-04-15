@@ -7,18 +7,9 @@ class URun;
 class UJump;
 class UFall;
 class UWallRun;
-
-class UIdleHold;
-class UWalkHold;
-class URunHold;
-
-class UIdleThrow;
-class UWalkThrow;
-class URunThrow;
-
-class UIdleGrab;
-class UWalkGrab;
-class URunGrab;
+class UDeath;
+class URevive;
+class URewind;
 
 
 class UInputDataConfig;
@@ -30,18 +21,12 @@ enum class EState : uint8
 	Idle,
 	Walk,
 	Run,
-	Jump,
 	Fall,
+	Jump,
 	WallRun,
-	IdleGrab,
-	WalkGrab,
-	RunGrab,
-	IdleHold,
-	WalkHold,
-	RunHold,
-	IdleThrow,
-	WalkThrow,
-	RunThrow,
+	Death,
+	Revive,
+	Rewind
 };
 
 UCLASS()
@@ -72,37 +57,20 @@ public:
 	UFall* Fall;
 	UPROPERTY()
 	UWallRun* WallRun;
+	UPROPERTY()
+	UDeath* Death;
+	UPROPERTY()
+	URevive* Revive;
+	UPROPERTY()
+	URewind* Rewind;
 	
-	UPROPERTY()
-	UIdleGrab* IdleGrab;
-	UPROPERTY()
-	UWalkGrab* WalkGrab;
-	UPROPERTY()
-	URunGrab* RunGrab;
-	
-	UPROPERTY()
-	UIdleThrow* IdleThrow;
-	UPROPERTY()
-	UWalkThrow* WalkThrow;
-	UPROPERTY()
-	URunThrow* RunThrow;
-	
-	UPROPERTY()
-	UIdleHold* IdleHold;
-	UPROPERTY()
-	UWalkHold* WalkHold;
-	UPROPERTY()
-	URunHold* RunHold;
-	
-	
-	UPROPERTY(EditDefaultsOnly,  Category = "State Machine")
-	float MinimumSpeedToRun;
-	UPROPERTY(EditDefaultsOnly,  Category = "State Machine")
-	float MinimumSpeedToWalk;
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeState,EState,newState);
+	UPROPERTY(BlueprintAssignable)
+	FOnChangeState OnChangeState;
 	
 protected:
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly,VisibleAnywhere)
 	UState* CurrentState;
 	UPROPERTY()
 	UState* PreviousState;

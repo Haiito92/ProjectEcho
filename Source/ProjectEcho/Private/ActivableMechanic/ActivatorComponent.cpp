@@ -34,7 +34,7 @@ void UActivatorComponent::SwitchOn_Implementation()
 
 	for (AActor* Activable : Activables)
 	{
-		if (Activable->Implements<UActivable>())
+		if (IsValid(Activable) && Activable->Implements<UActivable>())
 		{
 			IActivable::Execute_Activate(Activable);
 		}
@@ -49,7 +49,7 @@ void UActivatorComponent::SwitchOff_Implementation()
 
 	for (AActor* Activable : Activables)
 	{
-		if (Activable->Implements<UActivable>())
+		if (IsValid(Activable) && Activable->Implements<UActivable>())
 		{
 			IActivable::Execute_Deactivate(Activable);
 		}

@@ -85,6 +85,7 @@ struct FEchoTimeline
 	 * Play Current Frame of the Replay with given PreviousKey Played and CurrentTimeKey 
 	 * This function will : 
 	 * - Calculate the Transform of the Actor based on last and next TransformKey
+	 * - Execute Actions that occured between previousTimeKey and currentTimeKey
 	 */
 	void PlayReplay(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind);
 	
@@ -118,9 +119,13 @@ struct FGlobalTimeline
 	//Find Last Time Key of the Global Timeline (Last Key of Last Timeline played)
 	float GetLastTimeKey() const;
 	
+	//Get Length of GlobalTimeline
+	float GetLength() const;
+	
 	//Add Timeline to Global Timeline
 	void RegisterTimeline(const FEchoTimeline& Timeline);
 	
+	//Destroy Current Timeline 
 	void DestroyTimeline(int TimelineIndex, TArray<TObjectPtr<AEchoActor>>& OutEchoActorPool);
 };
 
@@ -132,35 +137,56 @@ class PROJECTECHO_API URecordManagerSubsystem : public UTickableWorldSubsystem
 	GENERATED_BODY()
 	
 	virtual TStatId GetStatId() const override;
-	
+
+public:
 	UFUNCTION(BlueprintCallable)
 	virtual void InitRecordManager(const int& NbTimelineSlot);
 	
 	UFUNCTION(BlueprintCallable)
-	void StartRecord(AActor* InRecordedActor);
+    void StartRecord(AActor* InRecordedActor);
+    
+    UFUNCTION(BlueprintCallable)
+    void StopRecord();
+	
+	UFUNCTION()
+	void StartPlayerRewind();
+	
+	UFUNCTION()
+	void StopPlayerRewind();
+
+	UFUNCTION(BlueprintCallable)
+	bool IsRecording();
+	
+	//Destroys the Timeline at the Slot currently selected (if there is one) 
+    UFUNCTION(BlueprintCallable)
+    void DestroySelectedTimeline();
+    	
+    // Increment the Selected Slot Value, if reaches end, goes back to first Slot
+    UFUNCTION(BlueprintCallable)
+    void IncrementSelectedSlot();
+    	
+    // Decrement the Selected Slot Value, if reaches beginning, goes back to last Slot
+    UFUNCTION(BlueprintCallable)
+    void DecrementSelectedSlot();
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStartRecording, float, CurrentTimeKey);
-	FOnStartRecording OnStartRecording;
-	
-	UFUNCTION(BlueprintCallable)
-	void StopRecord();
+	FOnStartRecording OnStartRecording;	
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopRecording);
 	FOnStopRecording OnStopRecording;
 	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartPlayerRewinding);
+	FOnStartPlayerRewinding OnStartPlayerRewinding;	
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopPlayerRewinding);
+	FOnStopPlayerRewinding OnStopPlayerRewinding;
+	
+private:
 	virtual void Tick(float DeltaTime) override;
 	
-	//Destroys the Timeline at the Slot currently selected (if there is one) 
-	UFUNCTION(BlueprintCallable)
-	void DestroySelectedTimeline();
+	//Handle Replay of Player Rewind (Placement of Actions
+	void PlayPlayerRewind(const float& TimeKey);
 	
-	// Increment the Selected Slot Value, if reaches end, goes back to first Slot
-	UFUNCTION(BlueprintCallable)
-	void IncrementSelectedSlot();
-	
-	// Decrement the Selected Slot Value, if reaches beginning, goes back to last Slot
-	UFUNCTION(BlueprintCallable)
-	void DecrementSelectedSlot();
 protected:
 	FGlobalTimeline GlobalTimeline;
 
@@ -176,7 +202,17 @@ protected:
 	//Is Recording
 	bool bIsRecording = false;
 	
+	//Is Timeline Replay in Rewind
+	bool bIsInRewind = false;
+	
+	//Is Currently rewinding Player's Actions after a record
+	bool bIsPlayerRewinding = false;
+	
+	//Current Selected Timeline Slot
 	int SelectedSlot = 0;
+	
+	//Speed of Rewind (Calculated when rewind is Called
+	float RewindSpeed = 0.f;
 	
 private:
 	UPROPERTY()

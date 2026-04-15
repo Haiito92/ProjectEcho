@@ -22,6 +22,6 @@ class PROJECTECHO_API IInteractor
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	bool TryInteract();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, meta=(AutoCreateRefTerm="CastStartPos,CastDirection"))
+	bool TryInteract(const FVector& CastStartPos, const FVector& CastDirection);
 };

@@ -27,4 +27,7 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void Deactivate();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool IsActivated() const;
 };

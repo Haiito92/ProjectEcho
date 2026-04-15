@@ -1,5 +1,7 @@
 #pragma once
 #include "StateMachine/ACharacterST.h"
+
+#include "EchoSystem.h"
 #include "StateMachine/UStateMachine.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
@@ -9,10 +11,14 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GrabMechanic/GrabbingComponent.h"
-#include "StateMachine/InputDataConfig.h"
+#include "RecordManager/RecordManagerSubsystem.h"
+#include "StateMachine/Data/UInputDataConfig.h"
+#include "StateMachine/Data/UPlayerData.h"
+#include "Tools/Debug/EchoDebug.h"
+#include "Tools/Debug/EchoMessageType.h"
 
 
-
+class UPlayerData;
 class UEnhancedInputLocalPlayerSubsystem;
 // Sets default values
 ACharacterST::ACharacterST()
@@ -65,7 +71,7 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+	Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
 	if (Subsystem == nullptr) return;
 	
 	Subsystem->ClearAllMappings();
@@ -73,8 +79,6 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	
 	if (PlayerController == nullptr) return;
 	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	    
-	GrabbingComponent = FindComponentByClass<UGrabbingComponent>();
 	
 	if(InputActions == nullptr)
 	{
@@ -82,8 +86,6 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Data Input Missing on Character"));
 		return;
 	}
-	
-	InitStateMachine();
 	
 	Input->BindAction(InputActions->AMove, ETriggerEvent::Triggered, this, &ACharacterST::AMove);
 	Input->BindAction(InputActions->AMove, ETriggerEvent::Started, this, &ACharacterST::AMoveStarted);
@@ -93,46 +95,67 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Input->BindAction(InputActions->ARun, ETriggerEvent::Started, this, &ACharacterST::ARunStarted);
 	Input->BindAction(InputActions->ARun, ETriggerEvent::Completed, this, &ACharacterST::ARunReleased);
 	
-	Input->BindAction(InputActions->AJump, ETriggerEvent::Triggered, this, &ACharacterST::AJump);
+	Input->BindAction(InputActions->AJump, ETriggerEvent::Started, this, &ACharacterST::AJump);
 	
 	Input->BindAction(InputActions->ALook, ETriggerEvent::Triggered, this, &ACharacterST::ALook);
 	
 	Input->BindAction(InputActions->AGrab, ETriggerEvent::Started, this, &ACharacterST::AGrabStarted);
 	
 	Input->BindAction(InputActions->AThrow, ETriggerEvent::Started, this, &ACharacterST::AThrowStarted);
+	
+	Input->BindAction(InputActions->AIncrementSlot, ETriggerEvent::Started, this, &ACharacterST::IncrementSlot);
+	Input->BindAction(InputActions->ADecrementSlot, ETriggerEvent::Started, this, &ACharacterST::DecrementSlot);
+	Input->BindAction(InputActions->ARecord, ETriggerEvent::Started, this, &ACharacterST::Record);
+	Input->BindAction(InputActions->ADestroySlot, ETriggerEvent::Started, this, &ACharacterST::DestroySlot);
+	Input->BindAction(InputActions->AInteract, ETriggerEvent::Started,this,&ACharacterST::AInteract);
+}
+
+void ACharacterST::InitPlayer()
+{
+	InitStateMachine();
+	LoadData();
+}
+
+void ACharacterST::LoadData()
+{
+	Life = GetDefault<UPlayerData>()->InitLife;
+	WalkSpeed = GetDefault<UPlayerData>()->WalkSpeed;
+	RunSpeed = GetDefault<UPlayerData>()->RunSpeed;
 }
 
 void ACharacterST::AMove(const FInputActionValue& Value)
 {
-	FVector2D Input = Value.Get<FVector2D>();
-	OnMovePressed.Broadcast(Input);
+	MoveInputDir = Value.Get<FVector2D>();
+	OnMovePressed.Broadcast(MoveInputDir);
 }
 
 void ACharacterST::AMoveStarted(const FInputActionValue& Value)
 {
+	MoveInputDir = Value.Get<FVector2D>();
 	OnMoveStarted.Broadcast(true);
 }
 
 void ACharacterST::AMoveReleased(const FInputActionValue& Value)
 {
-	bool bReleased = Value.Get<bool>();
-	OnMoveReleased.Broadcast(bReleased);
+	MoveInputDir = Value.Get<FVector2D>();
+	OnMoveReleased.Broadcast();
 }
 
 void ACharacterST::ARun(const FInputActionValue& Value)
 {
-	bool bRunning = Value.Get<bool>();
-	OnRunning.Broadcast(bRunning);
+	OnRunning.Broadcast();
 }
 
 void ACharacterST::ARunStarted(const FInputActionValue& Value)
 {
-	OnRunningStarted.Broadcast(true);
+	IsRunInputOn = true;
+	OnRunningStarted.Broadcast(IsRunInputOn);
 }
 
 void ACharacterST::ARunReleased(const FInputActionValue& Value)
 {
-	OnRunningReleased.Broadcast(true);
+	IsRunInputOn = false;
+	OnRunningReleased.Broadcast(IsRunInputOn);
 }
 
 void ACharacterST::AJump(const FInputActionValue& Value)
@@ -149,14 +172,81 @@ void ACharacterST::ALook(const FInputActionValue& Value)
 
 void ACharacterST::AGrabStarted(const FInputActionValue& Value)
 {
-	if (GrabbingComponent->TryGrab(GetControlRotation()))
-		OnGrabbingStarted.Broadcast();
+	OnReleaseStarted.Broadcast();
+	OnGrabbingStarted.Broadcast();
 }
 
 void ACharacterST::AThrowStarted(const FInputActionValue& Value)
 {
-	if (GrabbingComponent->TryThrow(GetControlRotation()))
-		OnThrowingStarted.Broadcast();
+	OnThrowingStarted.Broadcast();
+}
+
+void ACharacterST::IncrementSlot()
+{
+	OnIncrementSlot.Broadcast();
+}
+
+void ACharacterST::DecrementSlot()
+{
+	OnDecrementSlot.Broadcast();
+}
+
+void ACharacterST::DestroySlot()
+{
+	OnDestroySlot.Broadcast();
+}
+
+void ACharacterST::Record()
+{
+	OnRecord.Broadcast();
+}
+
+void ACharacterST::AInteract()
+{
+	OnInteract.Broadcast();
+}
+
+void ACharacterST::PlayerTakeDamage(int value)
+{
+	Life = FMath::Max(Life-value,0);
+	if (Life <= 0)
+		OnDeath.Broadcast();
+}
+
+void ACharacterST::Kill()
+{
+	OnDeath.Broadcast();
+	Life = 0;
+}
+
+void ACharacterST::DeathEnd()
+{
+	OnDeathEnd.Broadcast();
+}
+
+void ACharacterST::Revive()
+{
+	OnRevive.Broadcast();
+}
+
+void ACharacterST::ActivateCharacterInput()
+{
+	if (Subsystem == nullptr)
+	{
+		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::GameLoop,EEchoMessageType::Error,"Subsystem character null");
+		return;
+	}
+	Subsystem->AddMappingContext(InputMapping,0);
+}
+
+void ACharacterST::DeactivateCharacterInput()
+{
+	if (Subsystem == nullptr)
+	{
+		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::GameLoop,EEchoMessageType::Error,"Subsystem character null");
+		return;
+	}
+	Subsystem->RemoveMappingContext(InputMapping);
 }
 
 void ACharacterST::InitStateMachine()

@@ -1,7 +1,6 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "GrabMechanic/GrabbingComponent.h"
 #include "ACharacterST.generated.h"
 
 class UInputComponent;
@@ -12,6 +11,7 @@ struct FInputActionValue;
 class UInputDataConfig;
 class UInputMappingContext;
 class UStateMachine;
+class UEnhancedInputLocalPlayerSubsystem;
 
 UCLASS()
 class PROJECTECHO_API ACharacterST : public ACharacter
@@ -20,13 +20,16 @@ class PROJECTECHO_API ACharacterST : public ACharacter
 
 public:
 	ACharacterST();
-
-protected:
 	virtual void BeginPlay() override;
-
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+	UFUNCTION(BlueprintCallable)
+	void InitPlayer();
+	
+	UFUNCTION()
+	void LoadData();
 	
 	UFUNCTION()
 	void AMove(const FInputActionValue& Value);
@@ -54,20 +57,53 @@ public:
 	UFUNCTION()
 	void AThrowStarted(const FInputActionValue& Value);
 	
+	UFUNCTION(BlueprintCallable)
+	void IncrementSlot();
+	
+	UFUNCTION(BlueprintCallable)
+	void DecrementSlot();
+	
+	UFUNCTION(BlueprintCallable)
+	void DestroySlot();
+	
+	UFUNCTION(BlueprintCallable)
+	void Record();
+	
+	UFUNCTION(BlueprintCallable)
+	void AInteract();
+	
+	UFUNCTION(BlueprintCallable)
+	void PlayerTakeDamage(int value);
+	
+	UFUNCTION(BlueprintCallable)
+	void Kill();
+
+	UFUNCTION(BlueprintCallable)
+	void DeathEnd();
+	
+	UFUNCTION(BlueprintCallable)
+	void Revive();
+	
+	UFUNCTION()
+	void ActivateCharacterInput();
+	
+	UFUNCTION()
+	void DeactivateCharacterInput();
+	
 	UFUNCTION()
 	void InitStateMachine();
-	
+
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
 	FMovePressed OnMovePressed;
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveStarted, bool, isPress);
 	FMoveStarted OnMoveStarted;
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveReleased, bool, isReleased);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMoveReleased);
 	FMoveReleased OnMoveReleased;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FJumpStarted);
 	FJumpStarted OnJumpingStarted;
 	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRunPressed, bool, isRunning);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRunPressed);
 	FRunPressed OnRunning;
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRunStarted, bool, isRunning);
 	FRunStarted OnRunningStarted;
@@ -77,28 +113,63 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGrabStarted);
 	FGrabStarted OnGrabbingStarted;
 	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReleaseStarted);
+	FReleaseStarted OnReleaseStarted;
+	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FThrowStarted);
 	FThrowStarted OnThrowingStarted;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRecord);
+	FOnRecord OnRecord;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDestroySlot);
+	FOnDestroySlot OnDestroySlot;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnIncrementSlot);
+	FOnIncrementSlot OnIncrementSlot;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDecrementSlot);
+	FOnDecrementSlot OnDecrementSlot;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
+	FOnDeath OnDeath;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathEnd);
+	FOnDeathEnd OnDeathEnd;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRevive);
+	FOnRevive OnRevive;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInteract);
+	FOnRevive OnInteract;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputDataConfig* InputActions;
 	UPROPERTY(EditDefaultsOnly,  Category = "Input")
 	UInputMappingContext* InputMapping;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	float WalkSpeed = 600.f;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	float RunSpeed = 900.f;
+	UPROPERTY()
+	int Life = 100;
+	UPROPERTY()
+	bool IsRunInputOn = false;
 	
-	UPROPERTY(BlueprintReadOnly,VisibleAnywhere)
+	
+	UPROPERTY()
+	FVector2D MoveInputDir = FVector2D::ZeroVector;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State Machine")
 	UStateMachine* StateMachine;
+	
+	UPROPERTY()
+	UEnhancedInputLocalPlayerSubsystem* Subsystem;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* FirstPersonMesh;
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
-	
-	UPROPERTY()
-	UGrabbingComponent* GrabbingComponent;
 };

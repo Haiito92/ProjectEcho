@@ -108,6 +108,7 @@ void FEchoTimeline::PlayReplay(const float& PreviousKey,const float& CurrentTime
 	//Play Transform Key (Lerp between two closest Keys)
 	const FRecordTransformKey* PreviousTransformKey = GetPreviousTransformKey(CurrentTimeKey);
 	const FRecordTransformKey* NextTransformKey = GetNextTransformKey(CurrentTimeKey);
+	if (NextTransformKey == nullptr || PreviousTransformKey == nullptr) return;
 	
 	//Place Actor according to previous and next TransformKey 
 	float lerpValue = (CurrentTimeKey - PreviousTransformKey->TimeKey) / (NextTransformKey->TimeKey - PreviousTransformKey->TimeKey);
@@ -222,6 +223,18 @@ float FGlobalTimeline::GetLastTimeKey() const
 	return globalLastTimeKey;
 }
 
+float FGlobalTimeline::GetLength() const
+{
+	float length = 0;
+	for (int i = 0; i < NbSlots; ++i)
+	{
+		if (!Timelines.Contains(i)) continue;
+		float lastTimeKey = Timelines[i].GetLastTimeKey() + Timelines[i].StartTimeKey;
+		if (lastTimeKey > length) length = lastTimeKey;
+	}
+	return length;
+}
+
 void FGlobalTimeline::RegisterTimeline(const FEchoTimeline& Timeline)
 {
 	if (!HasAvailableTimelineSlot()) return;
@@ -329,36 +342,87 @@ void URecordManagerSubsystem::StopRecord()
 			IRecordHandlerInterface::Execute_StartRecording(RecordedActor);
 		}
 		RecordingTimeline.RecordTransformKey(RecordedActor, CurrentTimeKey - RecordingTimeline.StartTimeKey);
-		RecordedActor = nullptr;
-		GlobalTimeline.RegisterTimeline(RecordingTimeline);
 		OnStopRecording.Broadcast();
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
 		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Stop Recording", FColor::Turquoise, 3.f);
+	
+		//Start Player Rewind
+		StartPlayerRewind();
 	}
+}
+
+void URecordManagerSubsystem::StartPlayerRewind()
+{
+	bIsInRewind = true;
+	bIsPlayerRewinding = true;
+	RewindSpeed = RecordingTimeline.GetLastTimeKey() / RecordManagerSettings->PlayerRewindTime;
+	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Start PlayerRewind at Speed : " + FString::SanitizeFloat(RewindSpeed), FColor::Turquoise, 3.f);
+	OnStartPlayerRewinding.Broadcast();
+}
+
+void URecordManagerSubsystem::StopPlayerRewind()
+{
+	//Set Actor to Start Position
+	RecordedActor->SetActorLocation(RecordingTimeline.TransformKeys[0].Position);
+	RecordedActor->SetActorRotation(RecordingTimeline.TransformKeys[0].Rotation);
+	RecordedActor->SetActorScale3D(RecordingTimeline.TransformKeys[0].Scale);
+	if (RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass()))
+	{
+		IRecordHandlerInterface::Execute_SetControlRotation(RecordedActor, RecordingTimeline.TransformKeys[0].ControlRotation);
+	}
+	RecordedActor = nullptr;
+	
+	GlobalTimeline.RegisterTimeline(RecordingTimeline);
+	OnStopPlayerRewinding.Broadcast();
+	
+	bIsInRewind = false;
+	bIsPlayerRewinding = false;
+}
+
+bool URecordManagerSubsystem::IsRecording()
+{
+	return bIsRecording;
 }
 
 void URecordManagerSubsystem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	if (GlobalTimeline.Timelines.IsEmpty() && !bIsRecording) return;
+	if (GlobalTimeline.Timelines.IsEmpty() && !bIsRecording && !bIsPlayerRewinding) return;
 	
 	float previousTimeKey = CurrentTimeKey;
-	CurrentTimeKey+= DeltaTime;
-	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Current Time Key  " + FString::SanitizeFloat(CurrentTimeKey), FColor::Cyan, DeltaTime);
+	CurrentTimeKey += DeltaTime * (bIsInRewind? -RewindSpeed : 1);
+	CurrentTimeKey = FMath::Max(CurrentTimeKey, 0);
+	
+	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Current Time Key : " + FString::SanitizeFloat(CurrentTimeKey), FColor::Cyan, DeltaTime);
+	if (bIsInRewind) UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Rewinding at Speed : " + FString::SanitizeFloat(RewindSpeed), FColor::Cyan, DeltaTime);
 	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Current Selected Timeline : " + FString::FromInt(SelectedSlot), FColor::Cyan, DeltaTime);
 	
 	//--- Handle Replay ---
-	if (!GlobalTimeline.Timelines.IsEmpty())
+	if (!GlobalTimeline.Timelines.IsEmpty() || bIsPlayerRewinding)
 	{
 		bool bHasReachedEnd = false;
-		GlobalTimeline.Play(previousTimeKey, CurrentTimeKey, false, bHasReachedEnd);
-		
-		if (bHasReachedEnd && !bIsRecording)
+		GlobalTimeline.Play(previousTimeKey, CurrentTimeKey, bIsInRewind, bHasReachedEnd);
+		if (bIsPlayerRewinding)
 		{
-			//TODO: Implement Rewind
-			//Reset to start of Timeline
-			CurrentTimeKey = 0.f;
+			if (RecordingTimeline.StartTimeKey >= CurrentTimeKey)
+			{
+				StopPlayerRewind();
+				return;
+			}
+			PlayPlayerRewind(CurrentTimeKey - RecordingTimeline.StartTimeKey);
+		}
+		
+		if (bHasReachedEnd && !bIsRecording && !bIsInRewind)
+		{
+			//RewindSpeed = GlobalTimeline.GetLength() / RecordManagerSettings->GlobalRewindTime;
+			//bIsInRewind = true;
+			CurrentTimeKey = 0;
+		}
+		else if (bIsInRewind && CurrentTimeKey <= 0)
+		{
+			CurrentTimeKey = 0;
+			bIsInRewind = false;
 		}
 	}
 	
@@ -369,8 +433,6 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 		RecordingTimeline.RecordTransformKey(RecordedActor, LocalTimeKey);
 		RecordingTimeline.RecordActionKey(RecordedActor, LocalTimeKey);
 		
-		//TODO: Implement Action Keys
-		
 		if (LocalTimeKey >= RecordManagerSettings->MaxRecordTime)
 		{
 			//Reached MaxRecordTime, Stop Record
@@ -379,6 +441,26 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 		}
 	}
 	
+}
+
+void URecordManagerSubsystem::PlayPlayerRewind(const float& TimeKey)
+{
+	if (!IsValid(RecordedActor)) return;
+	
+	const FRecordTransformKey* PreviousTransformKey = RecordingTimeline.GetPreviousTransformKey(TimeKey);
+	const FRecordTransformKey* NextTransformKey = RecordingTimeline.GetNextTransformKey(TimeKey);
+	if (NextTransformKey != nullptr && PreviousTransformKey != nullptr)
+	{
+		//Place RecordedActor according to previous and next TransformKey
+		float lerpValue = (TimeKey - PreviousTransformKey->TimeKey) / (NextTransformKey->TimeKey - PreviousTransformKey->TimeKey);
+		RecordedActor->SetActorLocation(FMath::Lerp(PreviousTransformKey->Position, NextTransformKey->Position, lerpValue));
+		RecordedActor->SetActorRotation(FMath::Lerp(PreviousTransformKey->Rotation, NextTransformKey->Rotation, lerpValue));
+		RecordedActor->SetActorScale3D(FMath::Lerp(PreviousTransformKey->Scale, NextTransformKey->Scale, lerpValue));
+		if (RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass()))
+		{
+			IRecordHandlerInterface::Execute_SetControlRotation(RecordedActor, FMath::Lerp(PreviousTransformKey->ControlRotation, NextTransformKey->ControlRotation, lerpValue));
+		}
+	}
 }
 
 void URecordManagerSubsystem::DestroySelectedTimeline()
