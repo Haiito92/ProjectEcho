@@ -15,7 +15,7 @@ enum class ERecordedAction : uint8
 };
 
 //Key used to save the position of an element at a set timekey 
-USTRUCT(Blueprintable)
+USTRUCT(BlueprintType)
 struct FRecordTransformKey
 {
 	GENERATED_BODY()
