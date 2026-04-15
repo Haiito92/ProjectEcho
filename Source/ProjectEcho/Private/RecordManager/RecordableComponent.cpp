@@ -44,9 +44,9 @@ void URecordableComponent::RecordKey(const float& CurrentTimeKey)
 
 void URecordableComponent::ReplayKey(const float& PreviousTimeKey, const float& CurrentTimeKey)
 {
-	const FRecordTransformKey* NextTransformKey = FindClosestTransformKey(CurrentTimeKey, true);
-	const FRecordTransformKey* PreviousTransformKey = FindClosestTransformKey(CurrentTimeKey, false);
-	if (NextTransformKey != nullptr || PreviousTransformKey != nullptr)
+	const FRecordTransformKey* NextTransformKey = FindNextTransformKey(CurrentTimeKey);
+	const FRecordTransformKey* PreviousTransformKey = FindPreviousTransformKey(CurrentTimeKey);
+	if (NextTransformKey != nullptr && PreviousTransformKey != nullptr)
 	{
 		//Place Actor according to previous and next TransformKey 
 		float lerpValue = (CurrentTimeKey - PreviousTransformKey->TimeKey) / (NextTransformKey->TimeKey - PreviousTransformKey->TimeKey);
@@ -97,20 +97,13 @@ const float& URecordableComponent::GetFirstInteractedKey() const
 	return FirstInteractedKey;
 }
 
-const FRecordTransformKey* URecordableComponent::FindClosestTransformKey(const float& CurrentTimeKey, bool bFindNextOne)
+const FRecordTransformKey* URecordableComponent::FindPreviousTransformKey(const float& CurrentTimeKey)
 {
 	if (TransformKeys.IsEmpty()) return nullptr;
 	const FRecordTransformKey* key = nullptr;
 	for (const FRecordTransformKey& TransformKey : TransformKeys)
 	{
-		if (bFindNextOne)
-		{
-			if (TransformKey.TimeKey >= CurrentTimeKey)
-			{
-				return &TransformKey;
-			}
-		}
-		else if (TransformKey.TimeKey <= CurrentTimeKey)
+		if (TransformKey.TimeKey <= CurrentTimeKey)
 		{
 			key = &TransformKey;
 		}
@@ -120,5 +113,18 @@ const FRecordTransformKey* URecordableComponent::FindClosestTransformKey(const f
 		}
 	}
 	return key;
+}
+
+const FRecordTransformKey* URecordableComponent::FindNextTransformKey(const float& CurrentTimeKey)
+{
+	if (TransformKeys.IsEmpty()) return nullptr;
+	for (const FRecordTransformKey& TransformKey : TransformKeys)
+	{
+		if (TransformKey.TimeKey >= CurrentTimeKey)
+		{
+			return &TransformKey;
+		}
+	}
+	return nullptr;
 }
 

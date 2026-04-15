@@ -133,6 +133,12 @@ public:
 	
 	UFUNCTION()
 	void StopPlayerRewind();
+	
+	UFUNCTION()
+	void StartRewind();
+	
+	UFUNCTION()
+	void StopRewind();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsRecording();

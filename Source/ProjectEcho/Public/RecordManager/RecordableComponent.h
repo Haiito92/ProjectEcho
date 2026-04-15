@@ -58,7 +58,7 @@ public:
 	FOnStopRewind OnStopRewind;
 	
 	//Delegate called to warn other systems when Recordable is Interacted with
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInteracted, URecordableComponent*, self, bool, bShouldRecord);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInteracted, URecordableComponent*, SelfRecordableComponent, bool, bShouldRecord);
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FOnInteracted OnInteracted;
 	
@@ -79,7 +79,8 @@ private:
 	UPROPERTY()
 	TArray<FRecordTransformKey> TransformKeys;
 	
-	const FRecordTransformKey* FindClosestTransformKey(const float& CurrentTimeKey, bool bFindNextOne);
+	const FRecordTransformKey* FindPreviousTransformKey(const float& CurrentTimeKey);
+	const FRecordTransformKey* FindNextTransformKey(const float& CurrentTimeKey);
 	
 	bool bIsRecording;
 	
