@@ -546,6 +546,15 @@ void URecordManagerSubsystem::DestroySelectedTimeline()
 	if (GlobalTimeline.Timelines.IsEmpty())
 	{
 		CurrentTimeKey = 0.0f;
+		
+		//Reset Recordable to origin Positions
+		for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
+		{
+			RecordableComponent->StartRewind();
+			RecordableComponent->ReplayFirstKey();
+			RecordableComponent->StopRecording();
+			RecordableComponent->StopRewind();
+		}
 	}
 }
 
