@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerStart.h"
 #include "HUDs/EchoHUD.h"
 #include "Kismet/GameplayStatics.h"
+#include "LevelStreaming/StreamingLevelInfo.h"
 #include "RecordManager/RecordManagerSubsystem.h"
 #include "StateMachine/ACharacterST.h"
 #include "Tools/Debug/EchoDebug.h"
@@ -29,16 +30,25 @@ void AEchoGameMode::InitializeGame()
 {
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Initialize Game", FColor::Orange, 3.0f);
 
-	int32 StreamingLevelIndex = 0;
-	for (const ULevelStreaming* StreamingLevel : GetWorld()->GetStreamingLevels())
-	{
-		FString LevelNameString = FPaths::GetBaseFilename(StreamingLevel->GetWorldAssetPackageName());
-		LevelNameString.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Add stream level id for name: " + LevelNameString, FColor::Orange, 3.0f);
+	
+	const TArray<ULevelStreaming*>& StreamingLevels = GetWorld()->GetStreamingLevels();
 
-		FName LevelName = FName(LevelNameString);
-		StreamLevelNames.AddUnique(LevelName);
-		StreamingLevelIndex++;
+	for (int i = 0; i < StreamingLevels.Num(); i++)
+	{
+		ULevelStreaming* StreamLevel = StreamingLevels[i];
+
+		FStreamingLevelInfo StreamingLevelInfo;
+		StreamingLevelInfo.Index = i;
+		
+		StreamingLevelInfo.Path = StreamLevel->GetWorldAssetPackageName();
+
+		FString LevelNameString = FPaths::GetBaseFilename(StreamingLevelInfo.Path);
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Add stream level id for name: " + LevelNameString, FColor::Orange, 3.0f);
+		LevelNameString.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
+		
+		StreamingLevelInfo.ShortName = FName(LevelNameString);
+		
+		StreamLevelInfos.Add(StreamingLevelInfo);
 	}
 	
 	URecordManagerSubsystem* RecordManagerSubsystem = GetWorld()->GetSubsystem<URecordManagerSubsystem>();
@@ -92,37 +102,88 @@ void AEchoGameMode::EndGame()
 
 void AEchoGameMode::LoadStreamLevel(const FName& LevelName)
 {
+	FStreamingLevelInfo* LoadedStreamLevelInfo = StreamLevelInfos.FindByPredicate([&](const FStreamingLevelInfo& StreamLevelInfo)
+	{
+		return StreamLevelInfo.ShortName == LevelName; 
+	});
+	if (!LoadedStreamLevelInfo) return;
+	
 	FLatentActionInfo Info = {};
 	Info.CallbackTarget = this;
 	Info.ExecutionFunction = FName("OnStreamLevelLoaded");
 	Info.UUID = 0;
-
-	int32 Id = StreamLevelNames.IndexOfByKey(LevelName);
-	Info.Linkage = Id;
+	Info.Linkage = LoadedStreamLevelInfo->Index;
 	
 	UGameplayStatics::LoadStreamLevel(this, LevelName, true, false, Info);
+}
+
+void AEchoGameMode::UnloadStreamLevel(const FName& LevelName)
+{
+	FStreamingLevelInfo* LoadedStreamLevelInfo = StreamLevelInfos.FindByPredicate([&](const FStreamingLevelInfo& StreamLevelInfo)
+	{
+		return StreamLevelInfo.ShortName == LevelName; 
+	});
+	if (!LoadedStreamLevelInfo) return;
+	
+	FLatentActionInfo Info = {};
+	Info.CallbackTarget = this;
+	Info.ExecutionFunction = FName("OnStreamLevelUnloaded");
+	Info.UUID = 1;
+	Info.Linkage = LoadedStreamLevelInfo->Index;
+	
+	UGameplayStatics::UnloadStreamLevel(this, LevelName, Info, false);
 }
 
 void AEchoGameMode::OnStreamLevelLoaded(int32 Linkage)
 {
 	if (Linkage == INDEX_NONE) return;
 	
-	FName LoadedStreamLevelName = StreamLevelNames[Linkage];
+	const FStreamingLevelInfo& LoadedStreamLevelInfo = StreamLevelInfos[Linkage];
 
-	GetWorld()->GetStreamingLevels().FindByPredicate([&](const ULevelStreaming* StreamingLevel)
+	const TArray<ULevelStreaming*>& StreamingLevels = GetWorld()->GetStreamingLevels();
+
+	ULevelStreaming* StreamLevel = nullptr;
+	for (int i = 0; i < StreamingLevels.Num(); i++)
 	{
-		FString LevelNameString = FPaths::GetBaseFilename(StreamingLevel->GetWorldAssetPackageName());
-		LevelNameString.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
+		if (StreamingLevels[i]->GetWorldAssetPackageName() == LoadedStreamLevelInfo.Path)
+		{
+			StreamLevel = StreamingLevels[i];
+			break;
+		}
+	}
 
-		FName LevelName = FName(LevelNameString);
-		return LevelName == LoadedStreamLevelName;
-	});
+	if (!StreamLevel) return;
+
+	for (const TObjectPtr<AActor> Actor : StreamLevel->GetLoadedLevel()->Actors)
+	{
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Stream Loaded Actor Name: " + Actor->GetName(), FColor::Turquoise, 3.0f);
+	}
 }
 
 void AEchoGameMode::OnStreamLevelUnloaded(int32 Linkage)
 {
 	if (Linkage == INDEX_NONE) return;
-	
+
+	const FStreamingLevelInfo& LoadedStreamLevelInfo = StreamLevelInfos[Linkage];
+
+	const TArray<ULevelStreaming*>& StreamingLevels = GetWorld()->GetStreamingLevels();
+
+	ULevelStreaming* StreamLevel = nullptr;
+	for (int i = 0; i < StreamingLevels.Num(); i++)
+	{
+		if (StreamingLevels[i]->GetWorldAssetPackageName() == LoadedStreamLevelInfo.Path)
+		{
+			StreamLevel = StreamingLevels[i];
+			break;
+		}
+	}
+
+	if (!StreamLevel) return;
+
+	for (const TObjectPtr<AActor> Actor : StreamLevel->GetLoadedLevel()->Actors)
+	{
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Stream Unloaded Actor Name: " + Actor->GetName(), FColor::Emerald, 3.0f);
+	}
 }
 
 void AEchoGameMode::OnPlayerDeathEnd()

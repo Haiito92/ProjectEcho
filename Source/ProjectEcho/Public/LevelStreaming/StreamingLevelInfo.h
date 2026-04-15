@@ -15,6 +15,8 @@ struct  PROJECTECHO_API FStreamingLevelInfo
 	GENERATED_BODY()
 
 public:
-	FName ShortName;
 	FString Path;
+	FName ShortName;
+	int Index;
 };
+
