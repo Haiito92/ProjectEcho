@@ -6,8 +6,11 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "LevelStreamingWorldSubsystem.generated.h"
 
-struct FStreamingLevelInfo;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStreamLevelLoadedSignature, const TArray<AActor*>&, LoadedActors);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStreamLevelUnloadedSignature, const TArray<AActor*>&, UnloadedActors);
+
+struct FStreamingLevelInfo;
 /**
  * 
  */
@@ -25,6 +28,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="LevelName"))
 	void UnloadStreamLevel(const FName& LevelName);
+
+	UPROPERTY(BlueprintAssignable)
+	FStreamLevelLoadedSignature StreamLevelLoaded;
+	
+	UPROPERTY(BlueprintAssignable)
+	FStreamLevelUnloadedSignature StreamLevelUnloaded;
 	
 protected:
 	UFUNCTION()

@@ -89,12 +89,9 @@ void ULevelStreamingWorldSubsystem::UnloadStreamLevel(const FName& LevelName)
 		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Can't unload stream level: Level invalid", FColor::Red, 3.0f);
 		return;
 	}
-	
-	for (const TObjectPtr<AActor> Actor : Level->Actors)
-	{
-		UEchoDebug::Log(EEchoSystem::GameLoop, EEchoMessageType::Log, "Stream Unloaded Actor Name: " + Actor->GetName());
-	}
 
+	StreamLevelUnloaded.Broadcast(Level->Actors);
+	
 	FLatentActionInfo Info = {};
 	Info.CallbackTarget = this;
 	Info.ExecutionFunction = FName("OnStreamLevelUnloaded");
@@ -135,11 +132,8 @@ void ULevelStreamingWorldSubsystem::OnStreamLevelLoaded(int32 Linkage)
 		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "On load stream level: Level invalid", FColor::Red, 3.0f);
 		return;
 	}
-	
-	for (const TObjectPtr<AActor> Actor : Level->Actors)
-	{
-		UEchoDebug::Log(EEchoSystem::GameLoop, EEchoMessageType::Log, "Stream Loaded Actor Name: " + Actor->GetName());
-	}
+
+	StreamLevelLoaded.Broadcast(Level->Actors);
 }
 
 void ULevelStreamingWorldSubsystem::OnStreamLevelUnloaded(int32 Linkage)
