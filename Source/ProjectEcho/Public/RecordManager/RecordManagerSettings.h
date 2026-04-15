@@ -27,7 +27,11 @@ public:
 	
 	//Max Time to Record (After which Record will be stopped) in Seconds
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Record")
-	float MaxRecordTime = 5.0f;
+	float MinRecordTime = 3.0f;
+	
+	//Max Time to Record (After which Record will be stopped) in Seconds
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Record")
+	float MaxRecordTime = 10.0f;
 	
 	//Time taken for Player to rewind after finishing a record
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Rewind")

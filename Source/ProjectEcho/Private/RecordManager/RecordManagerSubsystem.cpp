@@ -329,7 +329,7 @@ void URecordManagerSubsystem::InitRecordManager(const int& NbTimelineSlot)
 
 void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor)
 {
-	if (bIsRecording || !GlobalTimeline.HasAvailableTimelineSlot() || bIsInRewind) return;
+	if (!CanStartRecord()) return;
 	if (!IsValid(InRecordedActor)) return;
 	if (EchoActorsPool.IsEmpty()) return;
 	RecordedActor = InRecordedActor;
@@ -347,9 +347,19 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor)
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Start Recording", FColor::Turquoise, 3.f);
 }
 
+bool URecordManagerSubsystem::CanStartRecord() const
+{
+	return !bIsRecording && GlobalTimeline.HasAvailableTimelineSlot() && !bIsInRewind;
+}
+
+bool URecordManagerSubsystem::CanStopRecord() const
+{
+	return bIsRecording && (CurrentTimeKey - RecordingTimeline.StartTimeKey) > RecordManagerSettings->MinRecordTime;
+}
+
 void URecordManagerSubsystem::StopRecord()
 {
-	if (bIsRecording)
+	if (CanStopRecord())
 	{
 		bIsRecording = false;
 		if (RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass()))
