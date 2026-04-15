@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EchoColorStruct.h"
 
 #include "RecordManagerSettings.generated.h"
 
@@ -40,4 +41,7 @@ public:
 	//Time taken for GlobalTimeline to rewind to Start
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Replay")
 	float GlobalRewindTime = 1.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Echo Actors")
+	TMap<int, FEchoColorStruct> EchoColors;
 };

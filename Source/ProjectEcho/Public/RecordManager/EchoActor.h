@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EchoColorStruct.h"
 
 #include "EchoActor.generated.h"
 
@@ -25,6 +26,12 @@ public:
 	UFUNCTION()
 	void SetControlRotation(const FRotator& ControlRotation);
 	
+	UFUNCTION()
+	void InitEcho(const int& index, const FEchoColorStruct& EchoColor);
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveInitEcho(FEchoColorStruct EchoColor);
+	
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveHandleActionKey(ERecordedAction Action);
@@ -38,4 +45,7 @@ protected:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRegisterRecordable, TScriptInterface<IRecordableInterface>, Recordable);
 	UPROPERTY(BlueprintAssignable)
 	FOnRegisterRecordable OnRegisterRecordable;
+	
+	UPROPERTY(BlueprintReadOnly)
+	int EchoIndex = 0;
 };
