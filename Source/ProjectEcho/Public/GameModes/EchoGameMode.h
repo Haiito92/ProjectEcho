@@ -12,13 +12,13 @@ class APlayerStart;
 /**
  * 
  */
-UCLASS(Blueprintable)
+UCLASS(Blueprintable, BlueprintType)
 class PROJECTECHO_API AEchoGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
 	virtual void BeginPlay() override;
-
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
 	void InitializeGame();
 	void StartGame();
@@ -33,11 +33,14 @@ protected:
 	
 	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive End Game")
 	void ReceiveEndGame();
-
+	
 	UFUNCTION()
 	void OnPlayerDeathEnd();
 	
+	UPROPERTY()
 	TObjectPtr<APlayerStart> EchoPlayerStart;
+	UPROPERTY()
 	TObjectPtr<ACharacterST> EchoPlayerCharacter;
+	UPROPERTY()
 	TObjectPtr<AEchoHUD> EchoHUD;
 };
