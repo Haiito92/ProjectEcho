@@ -106,7 +106,7 @@ void AEchoGameMode::LoadStreamLevel(const FName& LevelName)
 void AEchoGameMode::OnStreamLevelLoaded(int32 Linkage)
 {
 	if (Linkage == INDEX_NONE) return;
-
+	
 	FName LoadedStreamLevelName = StreamLevelNames[Linkage];
 
 	GetWorld()->GetStreamingLevels().FindByPredicate([&](const ULevelStreaming* StreamingLevel)
