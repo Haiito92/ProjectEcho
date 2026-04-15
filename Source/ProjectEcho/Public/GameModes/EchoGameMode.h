@@ -53,5 +53,5 @@ protected:
 	TObjectPtr<AEchoHUD> EchoHUD;
 
 	UPROPERTY()
-	TMap<FName, int32> StreamLevelIds;
+	TArray<FName> StreamLevelNames;
 };

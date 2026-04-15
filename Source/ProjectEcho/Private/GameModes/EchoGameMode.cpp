@@ -37,7 +37,7 @@ void AEchoGameMode::InitializeGame()
 		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Add stream level id for name: " + LevelNameString, FColor::Orange, 3.0f);
 
 		FName LevelName = FName(LevelNameString);
-		StreamLevelIds.Add(LevelName, StreamingLevelIndex);
+		StreamLevelNames.AddUnique(LevelName);
 		StreamingLevelIndex++;
 	}
 	
@@ -96,24 +96,32 @@ void AEchoGameMode::LoadStreamLevel(const FName& LevelName)
 	Info.CallbackTarget = this;
 	Info.ExecutionFunction = FName("OnStreamLevelLoaded");
 	Info.UUID = 0;
-	Info.Linkage = -1;
 
-	int32* Id = StreamLevelIds.Find(LevelName);
-	if (Id) Info.Linkage = *Id;
+	int32 Id = StreamLevelNames.IndexOfByKey(LevelName);
+	Info.Linkage = Id;
 	
 	UGameplayStatics::LoadStreamLevel(this, LevelName, true, false, Info);
 }
 
 void AEchoGameMode::OnStreamLevelLoaded(int32 Linkage)
 {
-	if (Linkage == -1) return;
+	if (Linkage == INDEX_NONE) return;
 
-	
+	FName LoadedStreamLevelName = StreamLevelNames[Linkage];
+
+	GetWorld()->GetStreamingLevels().FindByPredicate([&](const ULevelStreaming* StreamingLevel)
+	{
+		FString LevelNameString = FPaths::GetBaseFilename(StreamingLevel->GetWorldAssetPackageName());
+		LevelNameString.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
+
+		FName LevelName = FName(LevelNameString);
+		return LevelName == LoadedStreamLevelName;
+	});
 }
 
 void AEchoGameMode::OnStreamLevelUnloaded(int32 Linkage)
 {
-	if (Linkage == -1) return;
+	if (Linkage == INDEX_NONE) return;
 	
 }
 
