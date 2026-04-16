@@ -90,13 +90,15 @@ void UState::OnGrabbingStarted()
 	{
 		if (GrabbingComponent->IsGrabbing())
 		{
-			GrabbingComponent->TryRelease();
+			if (GrabbingComponent->TryRelease())
+				Character->OnValidRelease.Broadcast();
 			
 			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(ERecordedAction::TryRelease);
 		}
 		else
 		{
-			GrabbingComponent->TryGrab(Character->GetControlRotation());
+			if (GrabbingComponent->TryGrab(Character->GetControlRotation()))
+				Character->OnValidGrab.Broadcast();
 			
 			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(ERecordedAction::TryGrab);
 		}
@@ -107,7 +109,8 @@ void UState::OnThrowingStarted()
 {
 	if (CanUseGrab())
 	{
-		GrabbingComponent->TryThrow(Character->GetControlRotation());
+		if (GrabbingComponent->TryThrow(Character->GetControlRotation()))
+			Character->OnValidThrow.Broadcast();
 		
 		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(ERecordedAction::TryThrow);
 	}
