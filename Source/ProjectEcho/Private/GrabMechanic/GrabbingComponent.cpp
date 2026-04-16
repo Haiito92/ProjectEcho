@@ -65,9 +65,10 @@ bool UGrabbingComponent::TryGrab(const FRotator& ControlRotation)
 			FAttachmentTransformRules AttachmentTransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
 			GrabbedActor->AttachToComponent(this, AttachmentTransformRules);
 			IGrabbableInterface::Execute_OnGrabbed(GrabbedActor, this->GetOwner());
+			return true;
 		}
 	}
-	return true;
+	return false;
 }
 
 bool UGrabbingComponent::TryRelease()
