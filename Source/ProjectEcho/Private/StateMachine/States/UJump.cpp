@@ -2,6 +2,7 @@
 
 #include "RecordManager/EchoActor.h"
 #include "RecordManager/RecordHandlerComponent.h"
+#include "RecordManager/RecordManagerSubsystem.h"
 #include "StateMachine/ACharacterST.h"
 
 void UJump::Tick(float DeltaTime)

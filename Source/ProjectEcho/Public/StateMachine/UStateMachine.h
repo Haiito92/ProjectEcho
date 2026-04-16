@@ -1,15 +1,6 @@
 #pragma once
+#include "Data/UStateMachineSettings.h"
 #include "UStateMachine.generated.h"
-
-class UIdle;
-class UWalk;
-class URun;
-class UJump;
-class UFall;
-class UWallRun;
-class UDeath;
-class URevive;
-class URewind;
 
 
 class UInputDataConfig;
@@ -18,6 +9,7 @@ class UInputMappingContext;
 UENUM(BlueprintType)
 enum class EState : uint8
 {
+	None,
 	Idle,
 	Walk,
 	Run,
@@ -45,24 +37,6 @@ public:
 	
 	void Tick(float DeltaTime);
 	
-	UPROPERTY()
-	UIdle* Idle;
-	UPROPERTY()
-	UWalk* Walk;
-	UPROPERTY()
-	URun* Run;
-	UPROPERTY()
-	UJump* Jump;
-	UPROPERTY()
-	UFall* Fall;
-	UPROPERTY()
-	UWallRun* WallRun;
-	UPROPERTY()
-	UDeath* Death;
-	UPROPERTY()
-	URevive* Revive;
-	UPROPERTY()
-	URewind* Rewind;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeState,EState,newState);
 	UPROPERTY(BlueprintAssignable)
@@ -74,7 +48,10 @@ protected:
 	UState* CurrentState;
 	UPROPERTY()
 	UState* PreviousState;
-
+	
+	
+	UPROPERTY()
+	UStateMachineSettings* CurrentStateMachineSettings;
 	UPROPERTY()
 	TMap<EState,UState*> StateMap;
 };

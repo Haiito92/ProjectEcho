@@ -169,10 +169,6 @@ public:
 	UInputMappingContext* InputMapping;
 	
 	UPROPERTY()
-	float WalkSpeed = 600.f;
-	UPROPERTY()
-	float RunSpeed = 900.f;
-	UPROPERTY()
 	int Life = 100;
 	UPROPERTY()
 	bool IsRunInputOn = false;

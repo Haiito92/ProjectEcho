@@ -11,6 +11,7 @@ public:
 	virtual void Enter() override;
 	virtual void Exit() override;
 	
+	EState EnumState = EState::Death;
 protected:
 	virtual bool CanUseGrab() override;
 	virtual bool CanUseRecord() override;

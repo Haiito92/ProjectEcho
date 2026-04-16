@@ -13,4 +13,9 @@ public:
 	
 	UFUNCTION()
 	void OnRunningReleased(bool InRunning);
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float Speed = 900;
+	
+	EState EnumState = EState::Run;
 };

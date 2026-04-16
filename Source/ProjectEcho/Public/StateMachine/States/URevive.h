@@ -10,7 +10,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void Enter() override;
 	virtual void Exit() override;
-
+	
+	EState EnumState = EState::Revive;
+	
 protected:
 	virtual bool CanUseGrab() override;
 	virtual bool CanUseRecord() override;

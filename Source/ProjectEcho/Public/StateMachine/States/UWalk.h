@@ -10,6 +10,11 @@ public:
 	virtual void Tick(float DeltaTime) override;	
 	virtual void Enter() override;
 	virtual void Exit() override;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float Speed = 600;
+	
+	EState EnumState = EState::Walk;
 private:
 	
 	UFUNCTION()

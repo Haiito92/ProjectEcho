@@ -9,7 +9,7 @@ class UStateMachine;
 class UGrabbingComponent;
 class URecordManagerSubsystem;
 
-UCLASS()
+UCLASS(Blueprintable)
 class UState : public UObject
 {
 public:
@@ -23,7 +23,7 @@ public:
 	void InitState(UStateMachine *InStateMachine,ACharacterST* InCharacter);
 	
 	UPROPERTY()
-	EState EnumState;
+	EState EnumState = EState::None;
 	
 protected:
 	

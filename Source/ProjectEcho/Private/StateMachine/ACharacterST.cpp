@@ -119,8 +119,6 @@ void ACharacterST::InitPlayer()
 void ACharacterST::LoadData()
 {
 	Life = GetDefault<UPlayerData>()->InitLife;
-	WalkSpeed = GetDefault<UPlayerData>()->WalkSpeed;
-	RunSpeed = GetDefault<UPlayerData>()->RunSpeed;
 }
 
 void ACharacterST::AMove(const FInputActionValue& Value)

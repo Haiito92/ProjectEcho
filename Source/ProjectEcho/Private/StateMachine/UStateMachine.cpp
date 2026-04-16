@@ -1,5 +1,8 @@
 #include "StateMachine/UStateMachine.h"
+
+#include "DataAssetDeveloperSettings.h"
 #include "EchoSystem.h"
+#include "StateMachine/Data/UStateMachineSettings.h"
 #include "StateMachine/States/UDeath.h"
 
 #include "StateMachine/States/UIdle.h"
@@ -16,37 +19,25 @@
 
 void UStateMachine::InitStates(ACharacterST* InCharacter)
 {
-	Idle = NewObject<UIdle>(this);
-	Walk = NewObject<UWalk>(this);
-	Run = NewObject<URun>(this);
-	Jump = NewObject<UJump>(this);
-	Fall = NewObject<UFall>(this);
-	WallRun = NewObject<UWallRun>(this);
-	Death = NewObject<UDeath>(this);
-	Revive = NewObject<URevive>(this);
-	Rewind = NewObject<URewind>(this);
+	if (const UDataAssetDeveloperSettings* DataAssetSettings = GetDefault<UDataAssetDeveloperSettings>())
+	{
+		CurrentStateMachineSettings = DataAssetSettings->StateMachineData.LoadSynchronous();
+	}
+	TArray<EState> states;
 	
-	Idle->InitState(this,InCharacter);
-	Walk->InitState(this,InCharacter);
-	Run->InitState(this,InCharacter);
-	Jump->InitState(this,InCharacter);
-	Fall->InitState(this,InCharacter);
-	WallRun->InitState(this,InCharacter);
-	Death->InitState(this,InCharacter);
-	Revive->InitState(this,InCharacter);
-	Rewind->InitState(this,InCharacter);
-	
-	AddState(Idle,EState::Idle);
-	AddState(Walk,EState::Walk);
-	AddState(Run,EState::Run);
-	AddState(Jump,EState::Jump);
-	AddState(Fall,EState::Fall);
-	AddState(WallRun,EState::WallRun);
-	AddState(Death,EState::Death);
-	AddState(Revive,EState::Revive);
-	AddState(Rewind,EState::Rewind);
-	
-	
+	for (TSubclassOf<UState> s : CurrentStateMachineSettings->InstantiateStates)
+	{
+		UState* state = NewObject<UState>(this, s);
+		if (states.Contains(state->EnumState))
+		{
+			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine,EEchoMessageType::Error,"A State exist in time");
+			continue;
+		}
+		
+		states.Add(state->EnumState);
+		state->InitState(this, InCharacter);
+		StateMap[state->EnumState] = state;
+	}
 	StartState(EState::Idle);
 }
 
@@ -77,9 +68,8 @@ void UStateMachine::AddState(UState* newState, const EState& nameState)
 void UStateMachine::ChangeState(const EState& newState)
 {
 	if (CurrentState->EnumState == newState) return;
+	if (StateMap.Find(newState) == nullptr) return;
 	
-	//TODO : Check state exist
-	OnChangeState.Broadcast(newState);
 	if (CurrentState == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Current State is null can't change state"));
@@ -92,6 +82,8 @@ void UStateMachine::ChangeState(const EState& newState)
 	PreviousState = CurrentState;
 	CurrentState = StateMap[newState];
 	CurrentState->Enter();
+	
+	OnChangeState.Broadcast(newState);
 }
 
 void UStateMachine::Tick(float DeltaTime)
