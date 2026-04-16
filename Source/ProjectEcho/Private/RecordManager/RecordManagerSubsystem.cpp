@@ -429,6 +429,14 @@ void URecordManagerSubsystem::StartRewind()
 void URecordManagerSubsystem::StopRewind()
 {
 	bIsInRewind = false;
+	for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
+	{
+		if (!IsValid(RecordableComponent)) return;
+		if (RecordableComponent->IsRecording())
+		{
+			RecordableComponent->StopRewind(CurrentTimeKey);
+		}
+	}
 }
 
 bool URecordManagerSubsystem::IsRecording()
@@ -466,7 +474,7 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 				{
 					RecordableComponent->ReplayFirstKey();
 					RecordableComponent->StopRecording();
-					RecordableComponent->StopRewind();
+					RecordableComponent->StopRewind(CurrentTimeKey);
 				}
 			}
 		}
@@ -563,7 +571,7 @@ void URecordManagerSubsystem::DestroySelectedTimeline()
 			RecordableComponent->StartRewind();
 			RecordableComponent->ReplayFirstKey();
 			RecordableComponent->StopRecording();
-			RecordableComponent->StopRewind();
+			RecordableComponent->StopRewind(CurrentTimeKey);
 		}
 	}
 }

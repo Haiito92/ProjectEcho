@@ -93,8 +93,7 @@ private:
 	bool bHandlePhysicsOfMesh = false;
 	
 	//StaticMesh used to Handle Physics' Record
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UStaticMeshComponent> StaticMesh = nullptr;
+	TObjectPtr<UPrimitiveComponent> PhysicsComponent = nullptr;
 	
 	float FirstInteractedKey = -1;
 };

@@ -23,8 +23,11 @@ void URecordableComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
+	// Get Root Component as Primitive Component
+	if (bHandlePhysicsOfMesh)
+	{
+		PhysicsComponent = Cast<UPrimitiveComponent>(GetOwner()->GetRootComponent());
+	}
 }
 
 void URecordableComponent::RecordKey(const float& CurrentTimeKey)
@@ -41,12 +44,12 @@ void URecordableComponent::RecordKey(const float& CurrentTimeKey)
 		return A.TimeKey < B.TimeKey;
 	});
 	
-	if (bHandlePhysicsOfMesh && IsValid(StaticMesh))
+	if (bHandlePhysicsOfMesh && IsValid(PhysicsComponent))
 	{
 		FRecordPhysicsKey PhysicsKey;
 		PhysicsKey.TimeKey = CurrentTimeKey;
-		PhysicsKey.LinearVelocity = StaticMesh->GetPhysicsLinearVelocity();
-		PhysicsKey.AngularVelocity = StaticMesh->GetPhysicsAngularVelocityInDegrees();
+		PhysicsKey.LinearVelocity = PhysicsComponent->GetPhysicsLinearVelocity();
+		PhysicsKey.AngularVelocity = PhysicsComponent->GetPhysicsAngularVelocityInDegrees();
 		
 		PhysicsKeys.Add(PhysicsKey);
 		PhysicsKeys.Sort([](const FRecordPhysicsKey& A, const FRecordPhysicsKey& B)
@@ -69,12 +72,12 @@ void URecordableComponent::ReplayKey(const float& PreviousTimeKey, const float& 
 		GetOwner()->SetActorScale3D(FMath::Lerp(PreviousTransformKey->Scale, NextTransformKey->Scale, lerpValue));
 	}
 	
-	if (bHandlePhysicsOfMesh && IsValid(StaticMesh))
+	if (bHandlePhysicsOfMesh && IsValid(PhysicsComponent))
 	{
 		FRecordPhysicsKey PhysicsKey;
 		PhysicsKey.TimeKey = CurrentTimeKey;
-		PhysicsKey.LinearVelocity = StaticMesh->GetPhysicsLinearVelocity();
-		PhysicsKey.AngularVelocity = StaticMesh->GetPhysicsAngularVelocityInDegrees();
+		PhysicsKey.LinearVelocity = PhysicsComponent->GetPhysicsLinearVelocity();
+		PhysicsKey.AngularVelocity = PhysicsComponent->GetPhysicsAngularVelocityInDegrees();
 		
 		PhysicsKeys.Add(PhysicsKey);
 		PhysicsKeys.Sort([](const FRecordPhysicsKey& A, const FRecordPhysicsKey& B)
@@ -94,20 +97,22 @@ void URecordableComponent::ReplayFirstKey()
 
 void URecordableComponent::StartRewind()
 {
-	if (bHandlePhysicsOfMesh && IsValid(StaticMesh))
+	if (bHandlePhysicsOfMesh && IsValid(PhysicsComponent))
 	{
-		StaticMesh->SetSimulatePhysics(false);
-		StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		PhysicsComponent->SetSimulatePhysics(false);
+		PhysicsComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		PhysicsComponent->SetPhysicsLinearVelocity(FVector(0,0,0));
+		PhysicsComponent->SetPhysicsAngularVelocityInDegrees(FVector(0,0,0));
 	}
 	OnStartRewind.Broadcast();
 }
 
 void URecordableComponent::StopRewind(const float& CurrentTimeKey)
 {
-	if (bHandlePhysicsOfMesh && IsValid(StaticMesh))
+	if (bHandlePhysicsOfMesh && IsValid(PhysicsComponent))
 	{
-		StaticMesh->SetSimulatePhysics(true);
-		StaticMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		PhysicsComponent->SetSimulatePhysics(true);
+		PhysicsComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		if (CurrentTimeKey > FirstInteractedKey)
 		{
 			const FRecordPhysicsKey* NextPhysicsKey = FindNextPhysicsKey(CurrentTimeKey);
@@ -116,9 +121,14 @@ void URecordableComponent::StopRewind(const float& CurrentTimeKey)
 			{
 				//Place Actor according to previous and next TransformKey 
 				float lerpValue = (CurrentTimeKey - PreviousPhysicsKey->TimeKey) / (NextPhysicsKey->TimeKey - PreviousPhysicsKey->TimeKey);
-				StaticMesh->SetPhysicsLinearVelocity(FMath::Lerp(PreviousPhysicsKey->LinearVelocity, NextPhysicsKey->LinearVelocity, lerpValue));
-				StaticMesh->SetPhysicsAngularVelocity(FMath::Lerp(PreviousPhysicsKey->AngularVelocity, NextPhysicsKey->AngularVelocity, lerpValue));
+				PhysicsComponent->SetPhysicsLinearVelocity(FMath::Lerp(PreviousPhysicsKey->LinearVelocity, NextPhysicsKey->LinearVelocity, lerpValue));
+				PhysicsComponent->SetPhysicsAngularVelocityInDegrees(FMath::Lerp(PreviousPhysicsKey->AngularVelocity, NextPhysicsKey->AngularVelocity, lerpValue));
 			}
+		}
+		else
+		{
+			PhysicsComponent->SetPhysicsLinearVelocity(FVector(0,0,0));
+			PhysicsComponent->SetPhysicsAngularVelocityInDegrees(FVector(0,0,0));
 		}
 	}
 	OnStopRewind.Broadcast();
