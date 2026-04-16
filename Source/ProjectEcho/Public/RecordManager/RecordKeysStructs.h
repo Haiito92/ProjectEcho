@@ -35,3 +35,13 @@ struct FRecordActionKey
 	float TimeKey;
 	ERecordedAction Action;
 };
+
+USTRUCT(BlueprintType)
+struct FRecordPhysicsKey
+{
+	GENERATED_BODY()
+	
+	float TimeKey;
+	FVector LinearVelocity;
+	FVector AngularVelocity;
+};
