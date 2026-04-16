@@ -76,8 +76,11 @@ void URecordableComponent::StopRewind()
 
 void URecordableComponent::StartRecording(const float& CurrentTimeKey)
 {
-	bIsRecording = true;
-	FirstInteractedKey = CurrentTimeKey;
+	if (!IsRecording())
+	{
+		bIsRecording = true;
+		FirstInteractedKey = CurrentTimeKey;
+	}
 }
 
 void URecordableComponent::StopRecording()
