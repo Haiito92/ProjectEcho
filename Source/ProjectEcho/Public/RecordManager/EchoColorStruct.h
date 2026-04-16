@@ -16,4 +16,7 @@ public:
 	//Echo Material
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UMaterial> Material = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UMaterialInstance> VignetteMaterialInstance = nullptr;
 };

@@ -211,6 +211,15 @@ bool FGlobalTimeline::HasAvailableTimelineSlot() const
 	return false;
 }
 
+int FGlobalTimeline::GetFirstAvailableTimelineSlot() const
+{
+	for (int i = 0; i < NbSlots; ++i)
+	{
+		if (!Timelines.Contains(i)) return i;
+	}
+	return -1;
+}
+
 float FGlobalTimeline::GetLastTimeKey() const
 {
 	float globalLastTimeKey = 0;
@@ -235,21 +244,17 @@ float FGlobalTimeline::GetLength() const
 	return length;
 }
 
-void FGlobalTimeline::RegisterTimeline(const FEchoTimeline& Timeline, TObjectPtr<URecordManagerSettings> Settings)
+void FGlobalTimeline::RegisterTimeline(const int& TimelineIndex, const FEchoTimeline& Timeline, TObjectPtr<URecordManagerSettings> Settings)
 {
 	if (!HasAvailableTimelineSlot()) return;
-	for (int i = 0; i < NbSlots; ++i)
+	if (!Timelines.Contains(TimelineIndex))
 	{
-		if (!Timelines.Contains(i))
+		if (Settings->EchoColors.Contains(TimelineIndex))
 		{
-			if (Settings->EchoColors.Contains(i))
-			{
-				Timeline.EchoActor->InitEcho(i, Settings->EchoColors[i]);
-			}
-			Timelines.Add(i, Timeline);
-			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Registered Timeline at Slot : " + FString::FromInt(i), FColor::Turquoise, 3.f);
-			return;
+			Timeline.EchoActor->InitEcho(TimelineIndex, Settings->EchoColors[TimelineIndex]);
 		}
+		Timelines.Add(TimelineIndex, Timeline);
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Registered Timeline at Slot : " + FString::FromInt(TimelineIndex), FColor::Turquoise, 3.f);
 	}
 }
 
@@ -338,6 +343,7 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor)
 	if (EchoActorsPool.IsEmpty()) return;
 	RecordedActor = InRecordedActor;
 	bIsRecording = true;
+	CurrentRecordingTimelineIndex = GlobalTimeline.GetFirstAvailableTimelineSlot();
 	if (RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass()))
 	{
 		IRecordHandlerInterface::Execute_StartRecording(RecordedActor);
@@ -346,7 +352,7 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor)
 	RecordingTimeline.StartTimeKey = CurrentTimeKey;
 	RecordingTimeline.EchoActor = EchoActorsPool.Pop();
 	RecordingTimeline.RecordTransformKey(RecordedActor, 0);
-	OnStartRecording.Broadcast(CurrentTimeKey);
+	OnStartRecording.Broadcast(CurrentTimeKey, CurrentRecordingTimelineIndex);
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), RecordManagerSettings->TimeDilatationFactor);
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Start Recording", FColor::Turquoise, 3.f);
 }
@@ -401,7 +407,7 @@ void URecordManagerSubsystem::StopPlayerRewind()
 	}
 	RecordedActor = nullptr;
 	
-	GlobalTimeline.RegisterTimeline(RecordingTimeline, RecordManagerSettings);
+	GlobalTimeline.RegisterTimeline(CurrentRecordingTimelineIndex, RecordingTimeline, RecordManagerSettings);
 	OnStopPlayerRewinding.Broadcast();
 	
 	bIsInRewind = false;
