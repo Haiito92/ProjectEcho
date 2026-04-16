@@ -82,19 +82,19 @@ protected:
 	void CheckIsFalling() const;
 	
 	UPROPERTY()
-	URecordManagerSubsystem* RecordManagerSubsystem;
+	TObjectPtr<URecordManagerSubsystem> RecordManagerSubsystem;
 	
 	UPROPERTY()
-	UStateMachine* StateMachine;
+	TObjectPtr<UStateMachine> StateMachine;
 	
 	UPROPERTY()
 	TObjectPtr<ACharacterST> Character;
 	
 	UPROPERTY()
-	UGrabbingComponent* GrabbingComponent;
+	TObjectPtr<UGrabbingComponent> GrabbingComponent;
 	
 	UPROPERTY()
-	UInteractorComponent* InteractorComponent;
+	TObjectPtr<UInteractorComponent> InteractorComponent;
 
 	UPROPERTY()
 	TObjectPtr<URecordHandlerComponent> RecordHandlerComponent;

@@ -46,23 +46,23 @@ public:
 	void Tick(float DeltaTime);
 	
 	UPROPERTY()
-	UIdle* Idle;
+	TObjectPtr<UIdle> Idle;
 	UPROPERTY()
-	UWalk* Walk;
+	TObjectPtr<UWalk> Walk;
 	UPROPERTY()
-	URun* Run;
+	TObjectPtr<URun> Run;
 	UPROPERTY()
-	UJump* Jump;
+	TObjectPtr<UJump> Jump;
 	UPROPERTY()
-	UFall* Fall;
+	TObjectPtr<UFall> Fall;
 	UPROPERTY()
-	UWallRun* WallRun;
+	TObjectPtr<UWallRun> WallRun;
 	UPROPERTY()
-	UDeath* Death;
+	TObjectPtr<UDeath> Death;
 	UPROPERTY()
-	URevive* Revive;
+	TObjectPtr<URevive> Revive;
 	UPROPERTY()
-	URewind* Rewind;
+	TObjectPtr<URewind> Rewind;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeState,EState,newState);
 	UPROPERTY(BlueprintAssignable)
