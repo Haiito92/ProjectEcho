@@ -3,10 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RecordHandlerInterface.h"
+#include "EchoColorStruct.h"
 
 #include "EchoActor.generated.h"
 
+class IRecordableInterface;
 enum class ERecordedAction : uint8;
 
 UCLASS()
@@ -25,6 +26,12 @@ public:
 	UFUNCTION()
 	void SetControlRotation(const FRotator& ControlRotation);
 	
+	UFUNCTION()
+	void InitEcho(const int& index, const FEchoColorStruct& EchoColor);
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveInitEcho(FEchoColorStruct EchoColor);
+	
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveHandleActionKey(ERecordedAction Action);
@@ -32,4 +39,13 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveSetControlRotation(const FRotator& ControlRotation);
 	
+	UFUNCTION(BlueprintCallable)
+	void RegisterRecordable(TScriptInterface<IRecordableInterface> Recordable);
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRegisterRecordable, TScriptInterface<IRecordableInterface>, Recordable);
+	UPROPERTY(BlueprintAssignable)
+	FOnRegisterRecordable OnRegisterRecordable;
+	
+	UPROPERTY(BlueprintReadOnly)
+	int EchoIndex = 0;
 };

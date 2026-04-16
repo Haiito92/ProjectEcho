@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EchoColorStruct.h"
 
 #include "RecordManagerSettings.generated.h"
 
@@ -27,7 +28,11 @@ public:
 	
 	//Max Time to Record (After which Record will be stopped) in Seconds
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Record")
-	float MaxRecordTime = 5.0f;
+	float MinRecordTime = 3.0f;
+	
+	//Max Time to Record (After which Record will be stopped) in Seconds
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Record")
+	float MaxRecordTime = 10.0f;
 	
 	//Time taken for Player to rewind after finishing a record
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Rewind")
@@ -36,4 +41,7 @@ public:
 	//Time taken for GlobalTimeline to rewind to Start
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Replay")
 	float GlobalRewindTime = 1.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Echo Actors")
+	TMap<int, FEchoColorStruct> EchoColors;
 };

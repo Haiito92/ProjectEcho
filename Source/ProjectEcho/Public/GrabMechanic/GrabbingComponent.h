@@ -37,6 +37,10 @@ public:
 	//Returns currently Grabbed Actor, return nullptr if isn't grabbing
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	virtual AActor* GetGrabbedActor();
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWillGrabActor, AActor*, GrabActor);
+	UPROPERTY(BlueprintAssignable)
+	FOnWillGrabActor OnWillGrabActor;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

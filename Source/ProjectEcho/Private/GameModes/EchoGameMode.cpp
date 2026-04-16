@@ -7,6 +7,8 @@
 #include "GameFramework/PlayerStart.h"
 #include "HUDs/EchoHUD.h"
 #include "Kismet/GameplayStatics.h"
+#include "LevelStreaming/LevelStreamingWorldSubsystem.h"
+#include "LevelStreaming/StreamingLevelInfo.h"
 #include "RecordManager/RecordManagerSubsystem.h"
 #include "StateMachine/ACharacterST.h"
 #include "Tools/Debug/EchoDebug.h"
@@ -20,13 +22,24 @@ void AEchoGameMode::BeginPlay()
 	StartGame();
 }
 
+void AEchoGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+}
+
 void AEchoGameMode::InitializeGame()
 {
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Initialize Game", FColor::Orange, 3.0f);
-	
-	URecordManagerSubsystem* RecordManagerSubsystem = GetWorld()->GetSubsystem<URecordManagerSubsystem>();
 
-	if (RecordManagerSubsystem)
+	if (ULevelStreamingWorldSubsystem* LevelStreamingSubsystem = GetWorld()->GetSubsystem<ULevelStreamingWorldSubsystem>())
+	{
+		LevelStreamingSubsystem->InitializeLevelStreamingSubsystem();
+		
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Successfully initialized Level Streaming World System", FColor::Green, 3.0f);
+	}
+	else UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error, "Failed to initialize Level Streaming World System", FColor::Red, 3.0f);
+
+	if (URecordManagerSubsystem* RecordManagerSubsystem = GetWorld()->GetSubsystem<URecordManagerSubsystem>())
 	{
 		RecordManagerSubsystem->InitRecordManager(5);
 		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Successfully initialized Record System", FColor::Green, 3.0f);
@@ -57,7 +70,7 @@ void AEchoGameMode::InitializeGame()
 	}
 
 	EchoPlayerStart = Cast<APlayerStart>(UGameplayStatics::GetActorOfClass(this, APlayerStart::StaticClass()));
-	
+	 
 	ReceiveInitializeGame();
 }
 

@@ -143,6 +143,18 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInteract);
 	FOnRevive OnInteract;
 	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnValidGrab);
+	UPROPERTY(BlueprintAssignable)
+	FOnValidGrab OnValidGrab;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnValidThrow);
+	UPROPERTY(BlueprintAssignable)
+	FOnValidThrow OnValidThrow;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnValidRelease);
+	UPROPERTY(BlueprintAssignable)
+	FOnValidRelease OnValidRelease;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputDataConfig* InputActions;
 	UPROPERTY(EditDefaultsOnly,  Category = "Input")

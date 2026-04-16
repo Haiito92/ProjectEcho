@@ -8,17 +8,6 @@
 
 #pragma region ActionKeys Structs
 
-UENUM(BlueprintType)
-enum class ERecordedAction : uint8
-{
-	None,
-	Jump,
-	Interact,
-	TryGrab,
-	TryRelease,
-	TryThrow,
-};
-
 #pragma endregion
 // This class does not need to be modified.
 UINTERFACE()
