@@ -235,13 +235,17 @@ float FGlobalTimeline::GetLength() const
 	return length;
 }
 
-void FGlobalTimeline::RegisterTimeline(const FEchoTimeline& Timeline)
+void FGlobalTimeline::RegisterTimeline(const FEchoTimeline& Timeline, TObjectPtr<URecordManagerSettings> Settings)
 {
 	if (!HasAvailableTimelineSlot()) return;
 	for (int i = 0; i < NbSlots; ++i)
 	{
 		if (!Timelines.Contains(i))
 		{
+			if (Settings->EchoColors.Contains(i))
+			{
+				Timeline.EchoActor->InitEcho(i, Settings->EchoColors[i]);
+			}
 			Timelines.Add(i, Timeline);
 			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Registered Timeline at Slot : " + FString::FromInt(i), FColor::Turquoise, 3.f);
 			return;
@@ -397,7 +401,7 @@ void URecordManagerSubsystem::StopPlayerRewind()
 	}
 	RecordedActor = nullptr;
 	
-	GlobalTimeline.RegisterTimeline(RecordingTimeline);
+	GlobalTimeline.RegisterTimeline(RecordingTimeline, RecordManagerSettings);
 	OnStopPlayerRewinding.Broadcast();
 	
 	bIsInRewind = false;

@@ -79,7 +79,7 @@ void UStateMachine::ChangeState(const EState& newState)
 	if (CurrentState->EnumState == newState) return;
 	
 	//TODO : Check state exist
-	
+	OnChangeState.Broadcast(newState);
 	if (CurrentState == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Current State is null can't change state"));

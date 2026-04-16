@@ -87,7 +87,7 @@ struct FGlobalTimeline
 	TMap<int, FEchoTimeline> Timelines;
 	
 	void Initiate(int InNbSlots);
-	
+
 	int NbSlots = 5;
 	
 	//Play CurrentFrame for all Active Timelines, activate timelines that have not yet been activated
@@ -103,7 +103,7 @@ struct FGlobalTimeline
 	float GetLength() const;
 	
 	//Add Timeline to Global Timeline
-	void RegisterTimeline(const FEchoTimeline& Timeline);
+	void RegisterTimeline(const FEchoTimeline& Timeline, TObjectPtr<URecordManagerSettings> Settings);
 	
 	//Destroy Current Timeline 
 	void DestroyTimeline(int TimelineIndex, TArray<TObjectPtr<AEchoActor>>& OutEchoActorPool);

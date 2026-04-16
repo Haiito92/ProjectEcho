@@ -24,6 +24,12 @@ void AEchoActor::SetControlRotation(const FRotator& ControlRotation)
 	ReceiveSetControlRotation(ControlRotation);
 }
 
+void AEchoActor::InitEcho(const int& index, const FEchoColorStruct& EchoColor)
+{
+	EchoIndex = index;
+	ReceiveInitEcho(EchoColor);
+}
+
 void AEchoActor::RegisterRecordable(TScriptInterface<IRecordableInterface> Recordable)
 {
 	OnRegisterRecordable.Broadcast(Recordable);
