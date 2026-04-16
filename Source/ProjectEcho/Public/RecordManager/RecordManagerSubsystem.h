@@ -167,7 +167,7 @@ public:
 	UFUNCTION()
 	void OnRecordableInteractedWith(URecordableComponent* Self, bool bShouldRecord);
 	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStartRecording, float, CurrentTimeKey, int, TimelineIndex);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnStartRecording, float, CurrentTimeKey, int, TimelineIndex, const FEchoColorStruct&, EchoColorInformations);
 	UPROPERTY(BlueprintAssignable)
 	FOnStartRecording OnStartRecording;	
 	

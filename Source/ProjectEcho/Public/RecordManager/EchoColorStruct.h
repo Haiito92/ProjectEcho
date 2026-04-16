@@ -18,5 +18,5 @@ public:
 	TObjectPtr<UMaterial> Material = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UMaterialInstance> VignetteMaterialInstance = nullptr;
+	FColor VignetteColor = FColor::White;
 };

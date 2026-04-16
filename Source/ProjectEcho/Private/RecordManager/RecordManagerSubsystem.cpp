@@ -352,7 +352,7 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor)
 	RecordingTimeline.StartTimeKey = CurrentTimeKey;
 	RecordingTimeline.EchoActor = EchoActorsPool.Pop();
 	RecordingTimeline.RecordTransformKey(RecordedActor, 0);
-	OnStartRecording.Broadcast(CurrentTimeKey, CurrentRecordingTimelineIndex);
+	OnStartRecording.Broadcast(CurrentTimeKey, CurrentRecordingTimelineIndex, RecordManagerSettings->EchoColors[CurrentRecordingTimelineIndex]);
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), RecordManagerSettings->TimeDilatationFactor);
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Start Recording", FColor::Turquoise, 3.f);
 }
