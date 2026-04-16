@@ -16,4 +16,7 @@ public:
 	//Echo Material
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UMaterial> Material = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FColor VignetteColor = FColor::White;
 };

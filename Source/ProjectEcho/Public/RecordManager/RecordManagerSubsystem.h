@@ -96,6 +96,9 @@ struct FGlobalTimeline
 	//Whether GlobalTimeline has an available slot to start recording in it
 	bool HasAvailableTimelineSlot() const;
 	
+	//Find First Available Timeline Slot
+	int GetFirstAvailableTimelineSlot() const;
+	
 	//Find Last Time Key of the Global Timeline (Last Key of Last Timeline played)
 	float GetLastTimeKey() const;
 	
@@ -103,9 +106,9 @@ struct FGlobalTimeline
 	float GetLength() const;
 	
 	//Add Timeline to Global Timeline
-	void RegisterTimeline(const FEchoTimeline& Timeline, TObjectPtr<URecordManagerSettings> Settings);
+	void RegisterTimeline(const int& TimelineIndex, const FEchoTimeline& Timeline, TObjectPtr<URecordManagerSettings> Settings);
 	
-	//Destroy Current Timeline 
+	//Destroy Current Timeline
 	void DestroyTimeline(int TimelineIndex, TArray<TObjectPtr<AEchoActor>>& OutEchoActorPool);
 };
 
@@ -164,10 +167,12 @@ public:
 	UFUNCTION()
 	void OnRecordableInteractedWith(URecordableComponent* Self, bool bShouldRecord);
 	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStartRecording, float, CurrentTimeKey);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnStartRecording, float, CurrentTimeKey, int, TimelineIndex, const FEchoColorStruct&, EchoColorInformations);
+	UPROPERTY(BlueprintAssignable)
 	FOnStartRecording OnStartRecording;	
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopRecording);
+	UPROPERTY(BlueprintAssignable)
 	FOnStopRecording OnStopRecording;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartPlayerRewinding);
@@ -187,6 +192,9 @@ protected:
 
 	//Current Recording Timeline;
 	FEchoTimeline RecordingTimeline;
+	
+	UPROPERTY()
+	int CurrentRecordingTimelineIndex = -1;
 	
 	UPROPERTY()
 	TObjectPtr<AActor> RecordedActor = nullptr;
