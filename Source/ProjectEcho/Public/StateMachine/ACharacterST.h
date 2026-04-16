@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "KillMechanic/Killable.h"
 #include "ACharacterST.generated.h"
 
 class UInputComponent;
@@ -14,7 +15,7 @@ class UStateMachine;
 class UEnhancedInputLocalPlayerSubsystem;
 
 UCLASS()
-class PROJECTECHO_API ACharacterST : public ACharacter
+class PROJECTECHO_API ACharacterST : public ACharacter, public IKillable
 {
 	GENERATED_BODY()
 
@@ -76,8 +77,8 @@ public:
 	void PlayerTakeDamage(int value);
 	
 	UFUNCTION(BlueprintCallable)
-	void Kill();
-
+	virtual void Kill_Implementation() override;
+	
 	UFUNCTION(BlueprintCallable)
 	void DeathEnd();
 	
@@ -154,6 +155,14 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnValidRelease);
 	UPROPERTY(BlueprintAssignable)
 	FOnValidRelease OnValidRelease;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartRecord);
+	UPROPERTY(BlueprintAssignable)
+	FOnStartRecord OnStartRecord;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndRecord);
+	UPROPERTY(BlueprintAssignable)
+	FOnEndRecord OnEndRecord;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputDataConfig* InputActions;
