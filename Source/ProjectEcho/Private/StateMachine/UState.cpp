@@ -118,6 +118,7 @@ void UState::OnThrowingStarted()
 
 void UState::OnRewindingStarted()
 {
+	Character->OnEndRecord.Broadcast();
 	StateMachine->ChangeState(EState::Rewind);
 }
 
@@ -149,7 +150,11 @@ void UState::OnRecord()
 		if (RecordManagerSubsystem->IsRecording())
 			RecordManagerSubsystem->StopRecord();
 		else
+		{
+			Character->OnStartRecord.Broadcast();
 			RecordManagerSubsystem->StartRecord(Character);
+		}
+			
 	}
 }
 

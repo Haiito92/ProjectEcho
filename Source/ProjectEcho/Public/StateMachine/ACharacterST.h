@@ -155,6 +155,14 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnValidRelease OnValidRelease;
 	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartRecord);
+	UPROPERTY(BlueprintAssignable)
+	FOnStartRecord OnStartRecord;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndRecord);
+	UPROPERTY(BlueprintAssignable)
+	FOnEndRecord OnEndRecord;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputDataConfig* InputActions;
 	UPROPERTY(EditDefaultsOnly,  Category = "Input")
