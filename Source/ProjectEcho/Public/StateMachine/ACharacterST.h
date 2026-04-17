@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "KillMechanic/Killable.h"
 #include "ACharacterST.generated.h"
 
 class UInputComponent;
@@ -14,7 +15,7 @@ class UStateMachine;
 class UEnhancedInputLocalPlayerSubsystem;
 
 UCLASS()
-class PROJECTECHO_API ACharacterST : public ACharacter
+class PROJECTECHO_API ACharacterST : public ACharacter, public IKillable
 {
 	GENERATED_BODY()
 
@@ -76,8 +77,8 @@ public:
 	void PlayerTakeDamage(int value);
 	
 	UFUNCTION(BlueprintCallable)
-	void Kill();
-
+	virtual void Kill_Implementation() override;
+	
 	UFUNCTION(BlueprintCallable)
 	void DeathEnd();
 	
@@ -164,9 +165,9 @@ public:
 	FOnEndRecord OnEndRecord;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	UInputDataConfig* InputActions;
+	TObjectPtr<UInputDataConfig> InputActions;
 	UPROPERTY(EditDefaultsOnly,  Category = "Input")
-	UInputMappingContext* InputMapping;
+	TObjectPtr<UInputMappingContext> InputMapping;
 	
 	UPROPERTY()
 	int Life = 100;
@@ -178,14 +179,14 @@ public:
 	FVector2D MoveInputDir = FVector2D::ZeroVector;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State Machine")
-	UStateMachine* StateMachine;
+	TObjectPtr<UStateMachine> StateMachine;
 	
 	UPROPERTY()
 	UEnhancedInputLocalPlayerSubsystem* Subsystem;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* FirstPersonMesh;
+	TObjectPtr<USkeletalMeshComponent> FirstPersonMesh;
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* FirstPersonCameraComponent;
+	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
 };

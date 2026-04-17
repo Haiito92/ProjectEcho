@@ -211,8 +211,10 @@ void ACharacterST::PlayerTakeDamage(int value)
 		OnDeath.Broadcast();
 }
 
-void ACharacterST::Kill()
+void ACharacterST::Kill_Implementation()
 {
+	IKillable::Kill_Implementation();
+	
 	OnDeath.Broadcast();
 	Life = 0;
 }
