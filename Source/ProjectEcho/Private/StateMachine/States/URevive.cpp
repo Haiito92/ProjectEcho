@@ -3,6 +3,11 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "StateMachine/ACharacterST.h"
 
+URevive::URevive()
+{
+	EnumState = EState::Revive;
+}
+
 void URevive::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

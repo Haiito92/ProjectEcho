@@ -8,6 +8,11 @@
 #include "Tools/Debug/EchoMessageType.h"
 
 
+UDeath::UDeath()
+{
+	EnumState = EState::Death;
+}
+
 void UDeath::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

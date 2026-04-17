@@ -36,7 +36,7 @@ void UStateMachine::InitStates(ACharacterST* InCharacter)
 		
 		states.Add(state->EnumState);
 		state->InitState(this, InCharacter);
-		StateMap[state->EnumState] = state;
+		StateMap.Add(state->EnumState,state);
 	}
 	StartState(EState::Idle);
 }

@@ -7,11 +7,11 @@ class UIdle : public UState
 {
 	GENERATED_BODY()
 public:
+	UIdle();
+	
 	virtual void Tick(float DeltaTime) override;
 	virtual void Enter() override;
 	virtual void Exit() override;
-	
-	EState EnumState = EState::Idle;
 private:
 
 	virtual void OnMovePressed(FVector2D InMoveInput) override;

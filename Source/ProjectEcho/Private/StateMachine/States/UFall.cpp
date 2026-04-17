@@ -3,6 +3,11 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "StateMachine/ACharacterST.h"
 
+UFall::UFall()
+{
+	EnumState = EState::Fall;
+}
+
 void UFall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

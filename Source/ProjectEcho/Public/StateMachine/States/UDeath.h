@@ -7,11 +7,13 @@ class UDeath : public UState
 {
 	GENERATED_BODY()
 public:
+	UDeath();
+	
 	virtual void Tick(float DeltaTime) override;
 	virtual void Enter() override;
 	virtual void Exit() override;
 	
-	EState EnumState = EState::Death;
+	
 protected:
 	virtual bool CanUseGrab() override;
 	virtual bool CanUseRecord() override;

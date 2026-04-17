@@ -7,9 +7,9 @@ class URewind : public UState
 {
 	GENERATED_BODY()
 public:
+	URewind();
+	
 	virtual void Tick(float DeltaTime) override;
 	virtual void Enter() override;
 	virtual void Exit() override;
-	
-	EState EnumState = EState::Rewind;
 };

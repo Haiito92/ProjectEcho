@@ -5,6 +5,11 @@
 #include "StateMachine/UStateMachine.h"
 
 
+URun::URun()
+{
+	EnumState = EState::Run;
+}
+
 void URun::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

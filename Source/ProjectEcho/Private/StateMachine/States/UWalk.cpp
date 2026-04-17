@@ -4,6 +4,11 @@
 #include "StateMachine/ACharacterST.h"
 #include "StateMachine/UStateMachine.h"
 
+UWalk::UWalk()
+{
+	EnumState = EState::Walk;
+}
+
 void UWalk::Tick(float DeltaTime)
 {
 	UState::Tick(DeltaTime);

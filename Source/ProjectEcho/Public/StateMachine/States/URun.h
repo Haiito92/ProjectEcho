@@ -7,6 +7,8 @@ class URun : public UState
 {
 	GENERATED_BODY()
 public:
+	URun();
+	
 	virtual void Tick(float DeltaTime) override;
 	virtual void Enter() override;
 	virtual void Exit() override;
@@ -16,6 +18,4 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float Speed = 900;
-	
-	EState EnumState = EState::Run;
 };
