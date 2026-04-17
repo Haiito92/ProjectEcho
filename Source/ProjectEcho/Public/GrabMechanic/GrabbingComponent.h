@@ -46,8 +46,10 @@ protected:
 	virtual void BeginPlay() override;
 	
 	//Grabbed Object;
+	UPROPERTY()
 	TObjectPtr<AActor> GrabbedActor = nullptr;
 
 private:
+	UPROPERTY()
 	TObjectPtr<UGrabMechanicSettings> GrabMechanicSettings = nullptr;
 };

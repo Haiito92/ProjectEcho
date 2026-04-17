@@ -165,9 +165,9 @@ public:
 	FOnEndRecord OnEndRecord;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	UInputDataConfig* InputActions;
+	TObjectPtr<UInputDataConfig> InputActions;
 	UPROPERTY(EditDefaultsOnly,  Category = "Input")
-	UInputMappingContext* InputMapping;
+	TObjectPtr<UInputMappingContext> InputMapping;
 	
 	UPROPERTY()
 	float WalkSpeed = 600.f;
@@ -183,14 +183,14 @@ public:
 	FVector2D MoveInputDir = FVector2D::ZeroVector;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State Machine")
-	UStateMachine* StateMachine;
+	TObjectPtr<UStateMachine> StateMachine;
 	
 	UPROPERTY()
 	UEnhancedInputLocalPlayerSubsystem* Subsystem;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* FirstPersonMesh;
+	TObjectPtr<USkeletalMeshComponent> FirstPersonMesh;
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* FirstPersonCameraComponent;
+	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
 };

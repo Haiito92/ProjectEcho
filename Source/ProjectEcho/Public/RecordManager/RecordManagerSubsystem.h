@@ -27,6 +27,7 @@ struct FEchoTimeline
 	GENERATED_BODY()
 	
 	//Actor used to show Replay of Timeline (Echo)
+	UPROPERTY()
 	TObjectPtr<AEchoActor> EchoActor = nullptr;
 	
 	//List of TransformKeys

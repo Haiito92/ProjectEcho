@@ -60,6 +60,5 @@ private:
 	UFUNCTION(meta=(DevelopmentOnly))
 	static TMap<EEchoSystem, bool>& LazyGetToggles();
 	
-	static TObjectPtr<UDebugDataAsset> DebugDataAsset;
 	static TMap<EEchoSystem, bool> Toggles;
 };
