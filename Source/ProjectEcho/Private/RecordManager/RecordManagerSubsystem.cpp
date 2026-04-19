@@ -410,7 +410,7 @@ void URecordManagerSubsystem::StopPlayerRewind()
 	GlobalTimeline.RegisterTimeline(CurrentRecordingTimelineIndex, RecordingTimeline, RecordManagerSettings);
 	OnStopPlayerRewinding.Broadcast();
 	
-	bIsInRewind = false;
+	StopRewind();
 	bIsPlayerRewinding = false;
 }
 
@@ -419,6 +419,7 @@ void URecordManagerSubsystem::StartRewind()
 	bIsInRewind = true;
 	for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
 	{
+		if (!IsValid(RecordableComponent)) continue;
 		if (RecordableComponent->IsRecording())
 		{
 			RecordableComponent->StartRewind();
@@ -473,8 +474,8 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 				else
 				{
 					RecordableComponent->ReplayFirstKey();
-					RecordableComponent->StopRecording();
 					RecordableComponent->StopRewind(CurrentTimeKey);
+					RecordableComponent->StopRecording();
 				}
 			}
 		}
@@ -534,7 +535,6 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Reached Max Record Time", FColor::Turquoise, 3.f);
 		}
 	}
-	
 }
 
 void URecordManagerSubsystem::PlayPlayerRewind(const float& TimeKey)
@@ -570,8 +570,8 @@ void URecordManagerSubsystem::DestroySelectedTimeline()
 		{
 			RecordableComponent->StartRewind();
 			RecordableComponent->ReplayFirstKey();
-			RecordableComponent->StopRecording();
 			RecordableComponent->StopRewind(CurrentTimeKey);
+			RecordableComponent->StopRecording();
 		}
 	}
 }

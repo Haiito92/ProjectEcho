@@ -78,7 +78,11 @@ public:
 private:
 	UPROPERTY()
 	TArray<FRecordTransformKey> TransformKeys;
+	
+	UPROPERTY()
 	TArray<FRecordPhysicsKey> PhysicsKeys;
+	
+	void ClearKeysPastCurrentKey(const float& CurrentTimeKey);
 	
 	const FRecordTransformKey* FindPreviousTransformKey(const float& CurrentTimeKey);
 	const FRecordTransformKey* FindNextTransformKey(const float& CurrentTimeKey);
@@ -93,6 +97,7 @@ private:
 	bool bHandlePhysicsOfMesh = false;
 	
 	//StaticMesh used to Handle Physics' Record
+	UPROPERTY()
 	TObjectPtr<UPrimitiveComponent> PhysicsComponent = nullptr;
 	
 	float FirstInteractedKey = -1;
