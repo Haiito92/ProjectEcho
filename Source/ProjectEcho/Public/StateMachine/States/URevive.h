@@ -13,8 +13,5 @@ public:
 	virtual void Enter() override;
 	virtual void Exit() override;
 	
-protected:
-	virtual bool CanUseGrab() override;
-	virtual bool CanUseRecord() override;
-	virtual bool CanUseInteract() override;
+
 };

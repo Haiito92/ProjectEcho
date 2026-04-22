@@ -6,6 +6,7 @@
 URevive::URevive()
 {
 	EnumState = EState::Revive;
+	StateSettings = EStateSettings::None;
 }
 
 void URevive::Tick(float DeltaTime)
@@ -25,19 +26,4 @@ void URevive::Exit()
 {
 	Super::Exit();
 	Character->ActivateCharacterInput();
-}
-
-bool URevive::CanUseGrab()
-{
-	return false;
-}
-
-bool URevive::CanUseRecord()
-{
-	return false;
-}
-
-bool URevive::CanUseInteract()
-{
-	return false;
 }

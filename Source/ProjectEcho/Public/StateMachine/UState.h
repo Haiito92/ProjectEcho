@@ -9,6 +9,18 @@ class UStateMachine;
 class UGrabbingComponent;
 class URecordManagerSubsystem;
 
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+enum class EStateSettings: uint8
+{
+	None = 0,
+	CanGrab = 1 << 0,
+	CanInteract = 1 << 1,
+	CanRecord = 1 << 2,
+	All = 7
+};
+
+ENUM_CLASS_FLAGS(EStateSettings);
+
 UCLASS(Blueprintable)
 class UState : public UObject
 {
@@ -25,16 +37,19 @@ public:
 	UPROPERTY()
 	EState EnumState = EState::None;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Bitmask, BitmaskEnum = EStateSettings))
+	EStateSettings StateSettings = EStateSettings::All;
+	
 protected:
 	
 	UFUNCTION()
-	virtual bool CanUseGrab();
+	bool CanUseGrab();
 	
 	UFUNCTION()
-	virtual bool CanUseRecord();
+	bool CanUseRecord();
 	
 	UFUNCTION()
-	virtual bool CanUseInteract();
+	bool CanUseInteract();
 
 	UFUNCTION()
 	virtual void OnMovePressed(FVector2D InMoveInput);

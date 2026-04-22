@@ -11,6 +11,7 @@
 UDeath::UDeath()
 {
 	EnumState = EState::Death;
+	StateSettings = EStateSettings::None;
 }
 
 void UDeath::Tick(float DeltaTime)
@@ -29,21 +30,6 @@ void UDeath::Enter()
 void UDeath::Exit()
 {
 	Super::Exit();
-}
-
-bool UDeath::CanUseGrab()
-{
-	return false;
-}
-
-bool UDeath::CanUseRecord()
-{
-	return false;
-}
-
-bool UDeath::CanUseInteract()
-{
-	return false;
 }
 
 void UDeath::OnRevive()

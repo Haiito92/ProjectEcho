@@ -64,17 +64,17 @@ void UState::Exit()
 
 bool UState::CanUseGrab()
 {
-	return true;
+	return (StateSettings & EStateSettings::CanGrab) == EStateSettings::CanGrab;
 }
 
 bool UState::CanUseRecord()
 {
-	return true;
+	return (StateSettings & EStateSettings::CanRecord) == EStateSettings::CanRecord;
 }
 
 bool UState::CanUseInteract()
 {
-	return true;
+	return (StateSettings & EStateSettings::CanInteract) == EStateSettings::CanInteract;
 }
 
 void UState::OnMovePressed(FVector2D InMoveInput)

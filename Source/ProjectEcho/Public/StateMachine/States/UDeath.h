@@ -15,9 +15,6 @@ public:
 	
 	
 protected:
-	virtual bool CanUseGrab() override;
-	virtual bool CanUseRecord() override;
-	virtual bool CanUseInteract() override;
 	
 	virtual void OnRevive() override;
 
