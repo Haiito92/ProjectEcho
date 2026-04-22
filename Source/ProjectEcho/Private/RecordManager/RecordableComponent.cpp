@@ -86,7 +86,6 @@ void URecordableComponent::StartRewind()
 	if (bHandlePhysicsOfMesh && IsValid(PhysicsComponent))
 	{
 		PhysicsComponent->SetSimulatePhysics(false);
-		PhysicsComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		PhysicsComponent->SetPhysicsLinearVelocity(FVector(0,0,0));
 		PhysicsComponent->SetPhysicsAngularVelocityInDegrees(FVector(0,0,0));
 	}
@@ -97,7 +96,6 @@ void URecordableComponent::StopRewind(const float& CurrentTimeKey)
 {
 	if (bHandlePhysicsOfMesh && IsValid(PhysicsComponent))
 	{
-		PhysicsComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		PhysicsComponent->SetSimulatePhysics(true);
 		if (CurrentTimeKey > FirstInteractedKey)
 		{
