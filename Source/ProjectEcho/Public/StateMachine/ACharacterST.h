@@ -169,7 +169,7 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReflectInputStarted);
 	FOnReflectInputStarted OnReflectInputStarted;
 	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReflected);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnReflected, const FVector&, ReflectDirection, float, ReflectPower);
 	FOnReflected OnReflected;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnValidGrab);

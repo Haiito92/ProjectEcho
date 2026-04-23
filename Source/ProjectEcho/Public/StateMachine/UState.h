@@ -105,7 +105,7 @@ protected:
 	void OnPropulse();
 	
 	UFUNCTION()
-	void OnReflected();
+	void OnReflected(const FVector& ReflectDirection, float ReflectPower);
 	
 	UFUNCTION()
 	void OnReflectInputStarted();

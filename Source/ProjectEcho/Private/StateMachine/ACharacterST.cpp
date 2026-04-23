@@ -282,7 +282,7 @@ void ACharacterST::PrepareReflect_Implementation(AActor* ActorDoingReflect)
 
 void ACharacterST::Reflect_Implementation(const FVector& ReflectDirection, float ReflectPower)
 {
-	OnReflected.Broadcast();
+	OnReflected.Broadcast(ReflectDirection, ReflectPower);
 }
 
 void ACharacterST::FinalizeReflect_Implementation()
