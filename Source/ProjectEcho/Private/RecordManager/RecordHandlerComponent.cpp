@@ -41,7 +41,7 @@ TArray<TSharedPtr<FRecordedAction>> URecordHandlerComponent::GetToRecordActions(
 TArray<TSharedPtr<FRecordedAction>> URecordHandlerComponent::GetToRecordRewindActions()
 {
 	TArray<TSharedPtr<FRecordedAction>> CopyList = ToRecordRewindActions;
-	ToRecordActions.Empty();
+	ToRecordRewindActions.Empty();
 	return CopyList;
 }
 

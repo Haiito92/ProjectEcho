@@ -50,8 +50,6 @@ ACharacterST::ACharacterST()
 	
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 	GetCharacterMovement()->AirControl = 0.5f;
-	
-	RecordHandlerComponent = FindComponentByClass<URecordHandlerComponent>();
 }
 
 
@@ -118,6 +116,7 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 void ACharacterST::InitPlayer()
 {
+	RecordHandlerComponent = FindComponentByClass<URecordHandlerComponent>();
 	InitStateMachine();
 	LoadData();
 }

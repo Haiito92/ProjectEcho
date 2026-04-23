@@ -51,12 +51,27 @@ const float& FEchoTimeline::GetLastTimeKey() const
 bool FEchoTimeline::GetActionKeys(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind, TArray<FRecordActionKey>& OutActionKeys) const
 {
 	bool bHasAddedActionKeys = false;
-	for (const FRecordActionKey& ActionKey: bIsInRewind ? RewindActionKeys : ActionKeys)
+	if (!bIsInRewind)
 	{
-		if (ActionKey.TimeKey > PreviousKey && ActionKey.TimeKey <= CurrentTimeKey)
+		for (const FRecordActionKey& ActionKey : ActionKeys)
 		{
-			OutActionKeys.Add(ActionKey);
-			bHasAddedActionKeys = true;
+			if (ActionKey.TimeKey > PreviousKey && ActionKey.TimeKey <= CurrentTimeKey)
+			{
+				OutActionKeys.Add(ActionKey);
+				bHasAddedActionKeys = true;
+			}
+		}
+	}
+	else
+	{
+		for (const FRecordActionKey& ActionKey : RewindActionKeys)
+		{
+			if (ActionKey.TimeKey < PreviousKey && ActionKey.TimeKey >= CurrentTimeKey)
+			{
+				UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Previous Key : " + FString::SanitizeFloat(PreviousKey) + ", CurrentKey = " + FString::SanitizeFloat(CurrentTimeKey) + ", ActionKey = " + FString::SanitizeFloat(ActionKey.TimeKey), FColor::Turquoise, 1);
+				OutActionKeys.Add(ActionKey);
+				bHasAddedActionKeys = true;
+			}
 		}
 	}
 	return bHasAddedActionKeys;
