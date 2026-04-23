@@ -20,12 +20,14 @@ protected:
 	virtual void BeginPlay() override;
 	
 	UFUNCTION()
-	bool TryPropulse();
+	void Propulse();
+
 
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FVector DirectionalForce;
+
 };
