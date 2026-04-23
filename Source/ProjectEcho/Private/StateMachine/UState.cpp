@@ -46,6 +46,8 @@ void UState::Enter()
 	Character->OnReflected.AddDynamic(this, &UState::OnReflected);
 	RecordManagerSubsystem->OnStartPlayerRewinding.AddDynamic(this, &UState::OnRewindingStarted);
 	RecordManagerSubsystem->OnStopPlayerRewinding.AddDynamic(this, &UState::OnRewindingEnded);
+	
+	Character-> bCanBeReflected = (StateSettings & EStateSettings::CanBeReflected) == EStateSettings::CanBeReflected;
 }
 
 void UState::Tick(float DeltaTime)
@@ -68,6 +70,8 @@ void UState::Exit()
 	Character->OnReflected.RemoveDynamic(this, &UState::OnReflected);
 	RecordManagerSubsystem->OnStartPlayerRewinding.RemoveDynamic(this, &UState::OnRewindingStarted);
 	RecordManagerSubsystem->OnStopPlayerRewinding.RemoveDynamic(this, &UState::OnRewindingEnded);
+	
+	Character-> bCanBeReflected = false;
 }
 
 bool UState::CanUseGrab()
@@ -236,10 +240,12 @@ void UState::OnReflectInputStarted()
 	}
 }
 
-void UState::OnReflected()
+void UState::OnReflected(const FVector& ReflectDirection, float ReflectPower)
 {
-	// TODO Apply force to character
 	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine, EEchoMessageType::Log, "UState: On Reflected", FColor::Green, 3.0f);
+
+	FVector ReflectForce = ReflectDirection.GetSafeNormal() * ReflectPower;
+	Character->LaunchCharacter(ReflectForce, false, false);
 }
 
 void UState::OnRevive()
