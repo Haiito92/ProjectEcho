@@ -1,8 +1,10 @@
 #pragma once
 #include "InteractableMechanic/InteractorComponent.h"
+#include "ReflectMechanic/Reflectable.h"
 #include "StateMachine/UStateMachine.h"
 #include "UState.generated.h"
 
+class UReflectComponent;
 class URecordHandlerComponent;
 class ACharacterST;
 class UStateMachine;
@@ -18,7 +20,8 @@ enum class EStateSettings: uint8
 	CanRecord = 1 << 2,
 	CanPropulse = 1 << 3,
 	CanReflect = 1 << 4,
-	All = 31
+	CanBeReflected = 1 << 5,
+	All = 0b00111111
 };
 
 ENUM_CLASS_FLAGS(EStateSettings);
@@ -29,7 +32,7 @@ class UState : public UObject
 public:
 	GENERATED_BODY()
 	UState();
-	
+
 	virtual void Enter();
 	virtual void Tick(float DeltaTime);
 	virtual void Exit();
@@ -58,7 +61,7 @@ protected:
 	
 	UFUNCTION()
 	bool CanUseReflect();
-
+	
 	UFUNCTION()
 	virtual void OnMovePressed(FVector2D InMoveInput);
 	
@@ -102,7 +105,10 @@ protected:
 	void OnPropulse();
 	
 	UFUNCTION()
-	void OnReflect();
+	void OnReflected();
+	
+	UFUNCTION()
+	void OnReflectInputStarted();
 	
 	UFUNCTION()
 	virtual void OnRevive();
@@ -127,4 +133,7 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<URecordHandlerComponent> RecordHandlerComponent;
+	
+	UPROPERTY()
+	TObjectPtr<UReflectComponent> ReflectComponent;
 };

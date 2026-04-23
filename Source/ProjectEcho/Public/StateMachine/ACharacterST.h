@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "KillMechanic/Killable.h"
+#include "ReflectMechanic/Reflectable.h"
 #include "RecordManager/RecordHandlerInterface.h"
 #include "ACharacterST.generated.h"
 
@@ -17,7 +18,7 @@ class UStateMachine;
 class UEnhancedInputLocalPlayerSubsystem;
 
 UCLASS()
-class PROJECTECHO_API ACharacterST : public ACharacter, public IKillable, public IRecordHandlerInterface
+class PROJECTECHO_API ACharacterST : public ACharacter, public IKillable, public IReflectable, public IRecordHandlerInterface
 {
 	GENERATED_BODY()
 
@@ -102,6 +103,18 @@ public:
 	UFUNCTION()
 	void InitStateMachine();
 	
+	UFUNCTION()
+	virtual bool CanBeReflected_Implementation() override;
+	
+	UFUNCTION()
+	virtual void PrepareReflect_Implementation(AActor* ActorDoingReflect) override;
+	
+	UFUNCTION()
+	virtual void Reflect_Implementation(const FVector& ReflectDirection, float ReflectPower) override;
+	
+	UFUNCTION()
+	virtual void FinalizeReflect_Implementation() override;
+	
 	virtual TArray<TSharedPtr<FRecordedAction>> GetToRecordActions() override;
 	
 	virtual TArray<TSharedPtr<FRecordedAction>> GetToRecordRewindActions() override;
@@ -159,8 +172,11 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartPropulse);
 	FOnStartPropulse OnStartPropulse;
 	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReflect);
-	FOnReflect OnReflect;
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReflectInputStarted);
+	FOnReflectInputStarted OnReflectInputStarted;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReflected);
+	FOnReflected OnReflected;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnValidGrab);
 	UPROPERTY(BlueprintAssignable)
@@ -212,4 +228,6 @@ public:
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
+	
+	bool bCanBeReflected = false;
 };

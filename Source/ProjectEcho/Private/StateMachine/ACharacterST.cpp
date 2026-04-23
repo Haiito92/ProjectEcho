@@ -13,6 +13,7 @@
 #include "GrabMechanic/GrabbingComponent.h"
 #include "RecordManager/RecordHandlerComponent.h"
 #include "RecordManager/RecordManagerSubsystem.h"
+#include "StateMachine/UState.h"
 #include "StateMachine/Data/UInputDataConfig.h"
 #include "StateMachine/Data/UPlayerData.h"
 #include "Tools/Debug/EchoDebug.h"
@@ -216,7 +217,7 @@ void ACharacterST::APropulse()
 
 void ACharacterST::AReflect()
 {
-	OnReflect.Broadcast();
+	OnReflectInputStarted.Broadcast();
 }
 
 void ACharacterST::PlayerTakeDamage(int value)
@@ -268,6 +269,24 @@ void ACharacterST::InitStateMachine()
 {
 	StateMachine = NewObject<UStateMachine>(this);
 	StateMachine->InitStates(this);
+}
+
+bool ACharacterST::CanBeReflected_Implementation()
+{
+	return bCanBeReflected;
+}
+
+void ACharacterST::PrepareReflect_Implementation(AActor* ActorDoingReflect)
+{
+}
+
+void ACharacterST::Reflect_Implementation(const FVector& ReflectDirection, float ReflectPower)
+{
+	OnReflected.Broadcast();
+}
+
+void ACharacterST::FinalizeReflect_Implementation()
+{
 }
 
 TArray<TSharedPtr<FRecordedAction>> ACharacterST::GetToRecordActions()
