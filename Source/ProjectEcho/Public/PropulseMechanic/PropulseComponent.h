@@ -4,24 +4,28 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/SphereComponent.h"
 #include "PropulseComponent.generated.h"
 
 
 UCLASS(ClassGroup=(Custom), Blueprintable, BlueprintType, meta=(BlueprintSpawnableComponent))
-class PROJECTECHO_API UPropulseComponent : public UActorComponent
+class PROJECTECHO_API UPropulseComponent : public USphereComponent
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this component's properties
 	UPropulseComponent();
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
+	
+	UFUNCTION()
+	bool TryPropulse();
 
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
+	UPROPERTY(EditAnywhere)
+	FVector DirectionalForce;
 };

@@ -1,36 +1,34 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿#include "PropulseMechanic/PropulseComponent.h"
+
+#include "GameFramework/Character.h"
+#include "RecordManager/EchoActor.h"
 
 
-#include "PropulseMechanic/PropulseComponent.h"
-
-
-// Sets default values for this component's properties
 UPropulseComponent::UPropulseComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
 
-// Called when the game starts
 void UPropulseComponent::BeginPlay()
 {
-	Super::BeginPlay();
+	Super::BeginPlay();	
+}
 
-	// ...
-	
+bool UPropulseComponent::TryPropulse()
+{
+	if (ACharacter* character = Cast<ACharacter>(this->GetOwner()))
+	{
+		character->LaunchCharacter(DirectionalForce,false,false);
+	}
+	else if (AEchoActor* echoActor = Cast<AEchoActor>(this->GetOwner()))
+	{
+		//echoActor->Get;
+	}
 }
 
 
-// Called every frame
-void UPropulseComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                       FActorComponentTickFunction* ThisTickFunction)
+void UPropulseComponent::TickComponent(float DeltaTime, ELevelTick TickType,FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
-

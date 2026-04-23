@@ -1,7 +1,1 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "PropulseMechanic/Propulsable.h"
-
-
-// Add default functionality here for any IPropulsable functions that are not pure virtual.
+﻿#include "PropulseMechanic/Propulsable.h"
