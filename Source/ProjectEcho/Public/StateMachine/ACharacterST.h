@@ -76,6 +76,12 @@ public:
 	void AInteract();
 	
 	UFUNCTION(BlueprintCallable)
+	void APropulse();
+	
+	UFUNCTION(BlueprintCallable)
+	void AReflect();
+	
+	UFUNCTION(BlueprintCallable)
 	void PlayerTakeDamage(int value);
 	
 	UFUNCTION(BlueprintCallable)
@@ -150,6 +156,12 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInteract);
 	FOnRevive OnInteract;
 	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartPropulse);
+	FOnStartPropulse OnStartPropulse;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReflect);
+	FOnReflect OnReflect;
+	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnValidGrab);
 	UPROPERTY(BlueprintAssignable)
 	FOnValidGrab OnValidGrab;
@@ -170,15 +182,13 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnEndRecord OnEndRecord;
 	
+	
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputDataConfig> InputActions;
 	UPROPERTY(EditDefaultsOnly,  Category = "Input")
 	TObjectPtr<UInputMappingContext> InputMapping;
 	
-	UPROPERTY()
-	float WalkSpeed = 600.f;
-	UPROPERTY()
-	float RunSpeed = 900.f;
 	UPROPERTY()
 	int Life = 100;
 	UPROPERTY()

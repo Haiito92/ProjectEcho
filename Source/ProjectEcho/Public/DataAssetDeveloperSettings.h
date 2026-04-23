@@ -11,6 +11,7 @@
 class UInteractMechanicSettings;
 class UGrabMechanicSettings;
 class URecordManagerSettings;
+class UStateMachineSettings;
 /**
  * 
  */
@@ -38,4 +39,7 @@ public:
 	
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Player Settings")
 	TSoftObjectPtr<UPlayerData> PlayerData;
+	
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="States Settings")
+	TSoftObjectPtr<UStateMachineSettings> StateMachineData;
 };

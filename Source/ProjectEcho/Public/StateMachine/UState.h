@@ -9,7 +9,21 @@ class UStateMachine;
 class UGrabbingComponent;
 class URecordManagerSubsystem;
 
-UCLASS()
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+enum class EStateSettings: uint8
+{
+	None = 0,
+	CanGrab = 1 << 0,
+	CanInteract = 1 << 1,
+	CanRecord = 1 << 2,
+	CanPropulse = 1 << 3,
+	CanReflect = 1 << 4,
+	All = 31
+};
+
+ENUM_CLASS_FLAGS(EStateSettings);
+
+UCLASS(Blueprintable)
 class UState : public UObject
 {
 public:
@@ -18,23 +32,32 @@ public:
 	
 	virtual void Enter();
 	virtual void Tick(float DeltaTime);
-	virtual void Exit();	
+	virtual void Exit();
 	
 	void InitState(UStateMachine *InStateMachine,ACharacterST* InCharacter);
 	
 	UPROPERTY()
-	EState EnumState;
+	EState EnumState = EState::None;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Bitmask))
+	EStateSettings StateSettings = EStateSettings::All;
 	
 protected:
 	
 	UFUNCTION()
-	virtual bool CanUseGrab();
+	bool CanUseGrab();
 	
 	UFUNCTION()
-	virtual bool CanUseRecord();
+	bool CanUseRecord();
 	
 	UFUNCTION()
-	virtual bool CanUseInteract();
+	bool CanUseInteract();
+	
+	UFUNCTION()
+	bool CanUsePropulse();
+	
+	UFUNCTION()
+	bool CanUseReflect();
 
 	UFUNCTION()
 	virtual void OnMovePressed(FVector2D InMoveInput);
@@ -74,6 +97,12 @@ protected:
 	
 	UFUNCTION()
 	void OnInteract();
+	
+	UFUNCTION()
+	void OnPropulse();
+	
+	UFUNCTION()
+	void OnReflect();
 	
 	UFUNCTION()
 	virtual void OnRevive();

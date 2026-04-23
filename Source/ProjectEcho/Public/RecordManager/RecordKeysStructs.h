@@ -12,8 +12,10 @@ enum class ERecordedAction : uint8
 	TryGrab,
 	TryRelease,
 	TryThrow,
+	TryPropulse,
+	TryReflect,
 	ForceGrab,
-	ForceRelease,
+	ForceRelease
 };
 
 USTRUCT(BlueprintType)

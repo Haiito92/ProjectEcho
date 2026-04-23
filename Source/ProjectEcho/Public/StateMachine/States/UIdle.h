@@ -7,6 +7,8 @@ class UIdle : public UState
 {
 	GENERATED_BODY()
 public:
+	UIdle();
+	
 	virtual void Tick(float DeltaTime) override;
 	virtual void Enter() override;
 	virtual void Exit() override;

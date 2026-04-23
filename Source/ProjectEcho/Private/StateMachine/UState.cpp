@@ -39,6 +39,8 @@ void UState::Enter()
 	Character->OnDeath.AddDynamic(this, &UState::OnDeath);
 	Character->OnInteract.AddDynamic(this, &UState::OnInteract);
 	Character->OnRevive.AddDynamic(this, &UState::OnRevive);
+	Character->OnStartPropulse.AddDynamic(this, &UState::OnPropulse);
+	Character->OnReflect.AddDynamic(this, &UState::OnReflect);
 	RecordManagerSubsystem->OnStartPlayerRewinding.AddDynamic(this, &UState::OnRewindingStarted);
 	RecordManagerSubsystem->OnStopPlayerRewinding.AddDynamic(this, &UState::OnRewindingEnded);
 }
@@ -58,23 +60,35 @@ void UState::Exit()
 	Character->OnDeath.RemoveDynamic(this, &UState::OnDeath);
 	Character->OnInteract.RemoveDynamic(this, &UState::OnInteract);
 	Character->OnRevive.RemoveDynamic(this, &UState::OnRevive);
+	Character->OnStartPropulse.RemoveDynamic(this, &UState::OnPropulse);
+	Character->OnReflect.RemoveDynamic(this, &UState::OnReflect);
 	RecordManagerSubsystem->OnStartPlayerRewinding.RemoveDynamic(this, &UState::OnRewindingStarted);
 	RecordManagerSubsystem->OnStopPlayerRewinding.RemoveDynamic(this, &UState::OnRewindingEnded);
 }
 
 bool UState::CanUseGrab()
 {
-	return true;
+	return (StateSettings & EStateSettings::CanGrab) == EStateSettings::CanGrab;
 }
 
 bool UState::CanUseRecord()
 {
-	return true;
+	return (StateSettings & EStateSettings::CanRecord) == EStateSettings::CanRecord;
 }
 
 bool UState::CanUseInteract()
 {
-	return true;
+	return (StateSettings & EStateSettings::CanInteract) == EStateSettings::CanInteract;
+}
+
+bool UState::CanUsePropulse()
+{
+	return (StateSettings & EStateSettings::CanPropulse) == EStateSettings::CanPropulse;
+}
+
+bool UState::CanUseReflect()
+{
+	return (StateSettings & EStateSettings::CanReflect) == EStateSettings::CanReflect;
 }
 
 void UState::OnMovePressed(FVector2D InMoveInput)
@@ -197,6 +211,18 @@ void UState::OnInteract()
 			RecordHandlerComponent->RegisterActionInRecord(MakeShared<FRecordedAction>(FRecordedAction(ERecordedAction::Interact)));
 		}
 	}
+}
+
+void UState::OnPropulse()
+{
+	if (CanUsePropulse())
+		return;
+}
+
+void UState::OnReflect()
+{
+	if (CanUseReflect())
+		return;
 }
 
 void UState::OnRevive()
