@@ -12,6 +12,44 @@ enum class ERecordedAction : uint8
 	TryGrab,
 	TryRelease,
 	TryThrow,
+	ForceGrab,
+	ForceRelease,
+};
+
+USTRUCT(BlueprintType)
+struct FRecordedAction
+{
+	GENERATED_BODY()
+	
+	virtual ~FRecordedAction() {}
+	
+	FRecordedAction()
+	{
+	}
+
+	explicit FRecordedAction(const ERecordedAction Action)
+	{
+		this->ActionEnum = Action;
+	}
+	
+	ERecordedAction ActionEnum = ERecordedAction::None;
+};
+
+USTRUCT(BlueprintType)
+struct FRecordedForceGrabAction : public FRecordedAction
+{
+	GENERATED_BODY()
+	
+	FRecordedForceGrabAction()
+	{
+	}
+	
+	FRecordedForceGrabAction(AActor* ActorToGrab) : FRecordedAction(ERecordedAction::ForceGrab)
+	{
+		this->ActorToGrab = ActorToGrab;
+	}
+
+	TObjectPtr<AActor> ActorToGrab = nullptr;
 };
 
 //Key used to save the position of an element at a set timekey 
@@ -33,7 +71,7 @@ struct FRecordActionKey
 	GENERATED_BODY()
 	
 	float TimeKey;
-	ERecordedAction Action;
+	TSharedPtr<FRecordedAction> Action;
 };
 
 USTRUCT(BlueprintType)

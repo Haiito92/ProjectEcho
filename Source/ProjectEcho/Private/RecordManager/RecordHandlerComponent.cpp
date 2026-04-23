@@ -12,9 +12,13 @@ URecordHandlerComponent::URecordHandlerComponent()
 	// ...
 }
 
-void URecordHandlerComponent::RegisterActionInRecord(ERecordedAction Action)
+void URecordHandlerComponent::RegisterActionInRecord(TSharedPtr<FRecordedAction> Action, TSharedPtr<FRecordedAction> RewindAction)
 {
-	if (bIsRecording) ToRecordActions.Add(Action);
+	if (bIsRecording && Action != nullptr)
+	{
+		ToRecordActions.Add(Action);
+		if (RewindAction != nullptr) ToRecordRewindActions.Add(RewindAction);
+	}
 }
 
 void URecordHandlerComponent::StartRecording()
@@ -27,9 +31,16 @@ void URecordHandlerComponent::StopRecording()
 	bIsRecording = false;
 }
 
-TArray<ERecordedAction> URecordHandlerComponent::GetToRecordActions()
+TArray<TSharedPtr<FRecordedAction>> URecordHandlerComponent::GetToRecordActions()
 {
-	TArray<ERecordedAction> CopyList = ToRecordActions;
+	TArray<TSharedPtr<FRecordedAction>> CopyList = ToRecordActions;
+	ToRecordActions.Empty();
+	return CopyList;
+}
+
+TArray<TSharedPtr<FRecordedAction>> URecordHandlerComponent::GetToRecordRewindActions()
+{
+	TArray<TSharedPtr<FRecordedAction>> CopyList = ToRecordRewindActions;
 	ToRecordActions.Empty();
 	return CopyList;
 }

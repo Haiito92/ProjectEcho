@@ -25,7 +25,7 @@ void UState::InitState(UStateMachine* InStateMachine,ACharacterST* InCharacter)
 	GrabbingComponent = Character->FindComponentByClass<UGrabbingComponent>();
 	RecordManagerSubsystem = GetWorld()->GetSubsystem<URecordManagerSubsystem>();
 	InteractorComponent = Character->FindComponentByClass<UInteractorComponent>();
-	RecordHandlerComponent = Character->FindComponentByClass<URecordHandlerComponent>();
+	RecordHandlerComponent = Character->RecordHandlerComponent;
 }
 
 void UState::Enter()
@@ -90,17 +90,17 @@ void UState::OnGrabbingStarted()
 	{
 		if (GrabbingComponent->IsGrabbing())
 		{
+			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(MakeShared<FRecordedAction>(FRecordedAction(ERecordedAction::TryRelease)), MakeShared<FRecordedAction>(FRecordedForceGrabAction(GrabbingComponent->GetGrabbedActor())));
+			
 			if (GrabbingComponent->TryRelease())
 				Character->OnValidRelease.Broadcast();
-			
-			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(ERecordedAction::TryRelease);
 		}
 		else
 		{
 			if (GrabbingComponent->TryGrab(Character->GetControlRotation()))
 				Character->OnValidGrab.Broadcast();
 			
-			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(ERecordedAction::TryGrab);
+			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(MakeShared<FRecordedAction>(FRecordedAction(ERecordedAction::TryGrab)), MakeShared<FRecordedAction>(FRecordedAction(ERecordedAction::ForceRelease)));
 		}
 	}
 }
@@ -112,7 +112,7 @@ void UState::OnThrowingStarted()
 		if (GrabbingComponent->TryThrow(Character->GetControlRotation()))
 			Character->OnValidThrow.Broadcast();
 		
-		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(ERecordedAction::TryThrow);
+		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(MakeShared<FRecordedAction>(FRecordedAction(ERecordedAction::TryThrow)), MakeShared<FRecordedAction>(FRecordedForceGrabAction(GrabbingComponent->GetGrabbedActor())));
 	}
 }
 
@@ -194,7 +194,7 @@ void UState::OnInteract()
 		if (IsValid(RecordHandlerComponent))
 		{
 			UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine, EEchoMessageType::Log, "Valid Record Handler", FColor::Green, 3.0f);
-			RecordHandlerComponent->RegisterActionInRecord(ERecordedAction::Interact);
+			RecordHandlerComponent->RegisterActionInRecord(MakeShared<FRecordedAction>(FRecordedAction(ERecordedAction::Interact)));
 		}
 	}
 }

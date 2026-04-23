@@ -3,11 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RecordKeysStructs.h"
 
 #include "RecordHandlerComponent.generated.h"
-
-
-enum class ERecordedAction : uint8;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PROJECTECHO_API URecordHandlerComponent : public UActorComponent
@@ -18,8 +16,7 @@ public:
 	// Sets default values for this component's properties
 	URecordHandlerComponent();
 
-	UFUNCTION(BlueprintCallable)
-	virtual void RegisterActionInRecord(ERecordedAction Action);
+	virtual void RegisterActionInRecord(TSharedPtr<FRecordedAction> Action, TSharedPtr<FRecordedAction> RewindAction = nullptr);
 	
 	UFUNCTION(BlueprintCallable)
 	//Start Saving Actions in ToRecord List
@@ -29,14 +26,18 @@ public:
 	//Stop Saving Actions in ToRecord List and Reset List
 	virtual void StopRecording();
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure)
 	//Returns Copy of Current ToRecordList and Reset it
-	virtual TArray<ERecordedAction> GetToRecordActions();
+	virtual TArray<TSharedPtr<FRecordedAction>> GetToRecordActions();
 	
-	
+	//Returns Copy of Current ToRecordList of Rewind Actions and Reset it
+	virtual TArray<TSharedPtr<FRecordedAction>> GetToRecordRewindActions();
+
 private:
 	//Array of Actions to register in next Key Creation
-	TArray<ERecordedAction> ToRecordActions;
+	TArray<TSharedPtr<FRecordedAction>> ToRecordActions;
+	
+	//Array of Actions to register in next Key Creation
+	TArray<TSharedPtr<FRecordedAction>> ToRecordRewindActions;
 	
 	bool bIsRecording = false;
 };

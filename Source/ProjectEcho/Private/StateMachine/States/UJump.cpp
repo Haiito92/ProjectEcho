@@ -15,7 +15,7 @@ void UJump::Enter()
 {
 	Super::Enter();
 	Character->Jump();
-	if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(ERecordedAction::Jump);
+	if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(MakeShared<FRecordedAction>(FRecordedAction(ERecordedAction::Jump)));
 	
 }
 

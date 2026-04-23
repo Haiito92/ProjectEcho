@@ -48,14 +48,14 @@ const float& FEchoTimeline::GetLastTimeKey() const
 	return TransformKeys[TransformKeys.Num() - 1].TimeKey;
 }
 
-bool FEchoTimeline::GetActionKeys(const float& PreviousKey,const float& CurrentTimeKey, TArray<const FRecordActionKey*>& OutActionKeys) const
+bool FEchoTimeline::GetActionKeys(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind, TArray<FRecordActionKey>& OutActionKeys) const
 {
 	bool bHasAddedActionKeys = false;
-	for (const FRecordActionKey& ActionKey: ActionKeys)
+	for (const FRecordActionKey& ActionKey: bIsInRewind ? RewindActionKeys : ActionKeys)
 	{
 		if (ActionKey.TimeKey > PreviousKey && ActionKey.TimeKey <= CurrentTimeKey)
 		{
-			OutActionKeys.Add(&ActionKey);
+			OutActionKeys.Add(ActionKey);
 			bHasAddedActionKeys = true;
 		}
 	}
@@ -91,14 +91,27 @@ void FEchoTimeline::RecordTransformKey(AActor* RecordedActor, const float& Curre
 void FEchoTimeline::RecordActionKey(AActor* RecordedActor, const float& CurrentTimeKey)
 {
 	if (!RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass())) return;
-	TArray<ERecordedAction> ToRecordActions = IRecordHandlerInterface::Execute_GetToRecordActions(RecordedActor);
-	for (const ERecordedAction& ToRecordAction : ToRecordActions)
+	IRecordHandlerInterface* RecordHandlerInterface = Cast<IRecordHandlerInterface>(RecordedActor);
+	if (RecordHandlerInterface == nullptr) return;
+	
+	TArray<TSharedPtr<FRecordedAction>> ToRecordActions = RecordHandlerInterface->GetToRecordActions();
+	for (const TSharedPtr<FRecordedAction> ToRecordAction : ToRecordActions)
 	{
 		FRecordActionKey RecordActionKey;
 		RecordActionKey.TimeKey = CurrentTimeKey;
 		RecordActionKey.Action = ToRecordAction;
 		ActionKeys.Add(RecordActionKey);
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Recording Action : " + UEnum::GetDisplayValueAsText(ToRecordAction).ToString());
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Recording Action : " + UEnum::GetDisplayValueAsText(ToRecordAction->ActionEnum).ToString());
+	}
+	
+	TArray<TSharedPtr<FRecordedAction>> ToRecordRewindActions = RecordHandlerInterface->GetToRecordRewindActions();
+	for (const TSharedPtr<FRecordedAction> ToRecordAction : ToRecordRewindActions)
+	{
+		FRecordActionKey RecordActionKey;
+		RecordActionKey.TimeKey = CurrentTimeKey;
+		RecordActionKey.Action = ToRecordAction;
+		RewindActionKeys.Add(RecordActionKey);
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Recording Rewind Action : " + UEnum::GetDisplayValueAsText(ToRecordAction->ActionEnum).ToString());
 	}
 }
 
@@ -120,14 +133,13 @@ void FEchoTimeline::PlayReplay(const float& PreviousKey,const float& CurrentTime
 	EchoActor->SetControlRotation(FMath::Lerp(PreviousTransformKey->ControlRotation, NextTransformKey->ControlRotation, lerpValue));
 	
 	//Play Action Keys
-	TArray<const FRecordActionKey*> CurrentActionKeys;
-	if (GetActionKeys(PreviousKey, CurrentTimeKey, CurrentActionKeys))
+	TArray<FRecordActionKey> CurrentActionKeys;
+	if (GetActionKeys(PreviousKey, CurrentTimeKey, bIsInRewind, CurrentActionKeys))
 	{
-		for (const FRecordActionKey* ActionKey : CurrentActionKeys)
+		for (const FRecordActionKey& ActionKey : CurrentActionKeys)
 		{
-			if (!ActionKey) continue;
-			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Replaying Action : " + UEnum::GetDisplayValueAsText(ActionKey->Action).ToString());
-			EchoActor->HandleActionKey(ActionKey->Action);
+			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Replaying Action : " + UEnum::GetDisplayValueAsText(ActionKey.Action->ActionEnum).ToString());
+			EchoActor->HandleActionKey(ActionKey.Action->ActionEnum);
 		}
 	}
 }

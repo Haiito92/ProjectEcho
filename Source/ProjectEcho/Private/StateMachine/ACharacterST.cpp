@@ -11,6 +11,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GrabMechanic/GrabbingComponent.h"
+#include "RecordManager/RecordHandlerComponent.h"
 #include "RecordManager/RecordManagerSubsystem.h"
 #include "StateMachine/Data/UInputDataConfig.h"
 #include "StateMachine/Data/UPlayerData.h"
@@ -50,7 +51,7 @@ ACharacterST::ACharacterST()
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 	GetCharacterMovement()->AirControl = 0.5f;
 	
-	
+	RecordHandlerComponent = FindComponentByClass<URecordHandlerComponent>();
 }
 
 
@@ -255,4 +256,16 @@ void ACharacterST::InitStateMachine()
 {
 	StateMachine = NewObject<UStateMachine>(this);
 	StateMachine->InitStates(this);
+}
+
+TArray<TSharedPtr<FRecordedAction>> ACharacterST::GetToRecordActions()
+{
+	if (IsValid(RecordHandlerComponent)) return RecordHandlerComponent->GetToRecordActions();
+	return TArray<TSharedPtr<FRecordedAction>>();
+}
+
+TArray<TSharedPtr<FRecordedAction>> ACharacterST::GetToRecordRewindActions()
+{
+	if (IsValid(RecordHandlerComponent)) return RecordHandlerComponent->GetToRecordRewindActions();
+	return TArray<TSharedPtr<FRecordedAction>>();
 }

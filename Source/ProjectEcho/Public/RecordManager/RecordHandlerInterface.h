@@ -9,6 +9,7 @@
 #pragma region ActionKeys Structs
 
 #pragma endregion
+struct FRecordedAction;
 // This class does not need to be modified.
 UINTERFACE()
 class URecordHandlerInterface : public UInterface
@@ -32,8 +33,10 @@ public:
 	void StopRecording();
 	
 	//Called to get RecordedAction List
-	UFUNCTION(BlueprintNativeEvent)
-	TArray<ERecordedAction> GetToRecordActions();
+	virtual TArray<TSharedPtr<FRecordedAction>> GetToRecordActions() = 0;
+	
+	//Called to get Rewind RecordedAction List
+	virtual TArray<TSharedPtr<FRecordedAction>> GetToRecordRewindActions() = 0;
 	
 	//Called to Get Control Rotation
 	UFUNCTION(BlueprintNativeEvent)

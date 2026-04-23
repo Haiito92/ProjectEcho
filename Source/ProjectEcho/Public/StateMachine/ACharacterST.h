@@ -2,8 +2,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "KillMechanic/Killable.h"
+#include "RecordManager/RecordHandlerInterface.h"
 #include "ACharacterST.generated.h"
 
+class URecordHandlerComponent;
 class UInputComponent;
 class USkeletalMeshComponent;
 class UCameraComponent;
@@ -15,7 +17,7 @@ class UStateMachine;
 class UEnhancedInputLocalPlayerSubsystem;
 
 UCLASS()
-class PROJECTECHO_API ACharacterST : public ACharacter, public IKillable
+class PROJECTECHO_API ACharacterST : public ACharacter, public IKillable, public IRecordHandlerInterface
 {
 	GENERATED_BODY()
 
@@ -93,6 +95,10 @@ public:
 	
 	UFUNCTION()
 	void InitStateMachine();
+	
+	virtual TArray<TSharedPtr<FRecordedAction>> GetToRecordActions() override;
+	
+	virtual TArray<TSharedPtr<FRecordedAction>> GetToRecordRewindActions() override;
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
 	FMovePressed OnMovePressed;
@@ -184,6 +190,9 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State Machine")
 	TObjectPtr<UStateMachine> StateMachine;
+	
+	UPROPERTY()
+	TObjectPtr<URecordHandlerComponent> RecordHandlerComponent;
 	
 	UPROPERTY()
 	UEnhancedInputLocalPlayerSubsystem* Subsystem;
