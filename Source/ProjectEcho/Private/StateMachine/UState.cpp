@@ -231,6 +231,8 @@ void UState::OnReflectInputStarted()
 			Character->FirstPersonCameraComponent->GetComponentLocation(),
 			UKismetMathLibrary::GetForwardVector(Character->GetControlRotation())
 			);
+		
+		RecordHandlerComponent->RegisterActionInRecord(ERecordedAction::TryReflect);
 	}
 }
 
