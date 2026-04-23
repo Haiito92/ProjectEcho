@@ -12,6 +12,8 @@ enum class ERecordedAction : uint8
 	TryGrab,
 	TryRelease,
 	TryThrow,
+	TryPropulse,
+	TryReflect
 };
 
 //Key used to save the position of an element at a set timekey 
