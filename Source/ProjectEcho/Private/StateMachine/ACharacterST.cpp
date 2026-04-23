@@ -108,6 +108,11 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Input->BindAction(InputActions->ARecord, ETriggerEvent::Started, this, &ACharacterST::Record);
 	Input->BindAction(InputActions->ADestroySlot, ETriggerEvent::Started, this, &ACharacterST::DestroySlot);
 	Input->BindAction(InputActions->AInteract, ETriggerEvent::Started,this,&ACharacterST::AInteract);
+	
+	Input->BindAction(InputActions->APropulse, ETriggerEvent::Started,this,&ACharacterST::APropulse);
+	
+	Input->BindAction(InputActions->AReflect, ETriggerEvent::Started,this,&ACharacterST::AReflect);
+	
 }
 
 void ACharacterST::InitPlayer()
@@ -202,6 +207,16 @@ void ACharacterST::Record()
 void ACharacterST::AInteract()
 {
 	OnInteract.Broadcast();
+}
+
+void ACharacterST::APropulse()
+{
+	OnStartPropulse.Broadcast();
+}
+
+void ACharacterST::AReflect()
+{
+	OnReflect.Broadcast();
 }
 
 void ACharacterST::PlayerTakeDamage(int value)

@@ -74,6 +74,12 @@ public:
 	void AInteract();
 	
 	UFUNCTION(BlueprintCallable)
+	void APropulse();
+	
+	UFUNCTION(BlueprintCallable)
+	void AReflect();
+	
+	UFUNCTION(BlueprintCallable)
 	void PlayerTakeDamage(int value);
 	
 	UFUNCTION(BlueprintCallable)
@@ -144,6 +150,12 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInteract);
 	FOnRevive OnInteract;
 	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartPropulse);
+	FOnStartPropulse OnStartPropulse;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReflect);
+	FOnReflect OnReflect;
+	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnValidGrab);
 	UPROPERTY(BlueprintAssignable)
 	FOnValidGrab OnValidGrab;
@@ -163,6 +175,8 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndRecord);
 	UPROPERTY(BlueprintAssignable)
 	FOnEndRecord OnEndRecord;
+	
+	
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputDataConfig> InputActions;
