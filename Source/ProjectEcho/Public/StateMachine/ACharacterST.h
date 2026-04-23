@@ -105,7 +105,7 @@ public:
 	virtual bool CanBeReflected_Implementation() override;
 	
 	UFUNCTION()
-	virtual void PrepareReflect_Implementation() override;
+	virtual void PrepareReflect_Implementation(AActor* ActorDoingReflect) override;
 	
 	UFUNCTION()
 	virtual void Reflect_Implementation(const FVector& ReflectDirection, float ReflectPower) override;

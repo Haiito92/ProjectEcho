@@ -93,7 +93,7 @@ bool UReflectComponent::TryReflect(const FVector& CastStartLocation, const FVect
 		return false;
 	}
 	
-	IReflectable::Execute_PrepareReflect(ReflectedActor);
+	IReflectable::Execute_PrepareReflect(ReflectedActor, GetOwner());
 	
 	IReflectable::Execute_Reflect(ReflectedActor, CastDirection.GetSafeNormal(), ReflectMechanicSettings->ReflectPower);
 	

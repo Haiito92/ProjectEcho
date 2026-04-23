@@ -276,7 +276,7 @@ bool ACharacterST::CanBeReflected_Implementation()
 	return bCanBeReflected;
 }
 
-void ACharacterST::PrepareReflect_Implementation()
+void ACharacterST::PrepareReflect_Implementation(AActor* ActorDoingReflect)
 {
 }
 

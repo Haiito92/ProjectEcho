@@ -26,7 +26,7 @@ public:
 	bool CanBeReflected();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void PrepareReflect();
+	void PrepareReflect(AActor* ActorDoingReflect);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, meta=(AutoCreateRefTerm="ReflectDirection"))
 	void Reflect(const FVector& ReflectDirection, float ReflectPower);
