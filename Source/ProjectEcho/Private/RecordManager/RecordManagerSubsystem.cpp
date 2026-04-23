@@ -154,7 +154,7 @@ void FEchoTimeline::PlayReplay(const float& PreviousKey,const float& CurrentTime
 		for (const FRecordActionKey& ActionKey : CurrentActionKeys)
 		{
 			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Replaying Action : " + UEnum::GetDisplayValueAsText(ActionKey.Action->ActionEnum).ToString());
-			EchoActor->HandleActionKey(ActionKey.Action->ActionEnum);
+			EchoActor->HandleActionKey(ActionKey.Action);
 		}
 	}
 }

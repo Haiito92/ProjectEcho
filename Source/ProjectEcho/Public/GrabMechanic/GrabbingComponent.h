@@ -30,6 +30,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual bool TryThrow(const FRotator& ControlRotation);
 	
+	//Force Release currently held object
+	UFUNCTION(BLueprintCallable)
+	virtual void ForceRelease();
+	
+	//Force Release currently held object
+	UFUNCTION(BLueprintCallable)
+	virtual void ForceGrab(AActor* Actor);
+	
 	//Has Object Currently Grabbed
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	virtual bool IsGrabbing();

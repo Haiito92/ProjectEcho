@@ -7,6 +7,7 @@
 
 #include "EchoActor.generated.h"
 
+struct FRecordedAction;
 class IRecordableInterface;
 enum class ERecordedAction : uint8;
 
@@ -20,8 +21,7 @@ public:
 	AEchoActor();
 	
 public:
-	UFUNCTION()
-	void HandleActionKey(ERecordedAction Action);
+	void HandleActionKey(TSharedPtr<FRecordedAction> Action);
 	
 	UFUNCTION()
 	void SetControlRotation(const FRotator& ControlRotation);

@@ -51,6 +51,7 @@ struct FRecordedForceGrabAction : public FRecordedAction
 		this->ActorToGrab = ActorToGrab;
 	}
 
+	UPROPERTY()
 	TObjectPtr<AActor> ActorToGrab = nullptr;
 };
 
