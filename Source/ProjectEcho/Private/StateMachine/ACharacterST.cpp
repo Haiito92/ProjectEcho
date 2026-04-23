@@ -269,3 +269,10 @@ void ACharacterST::InitStateMachine()
 	StateMachine = NewObject<UStateMachine>(this);
 	StateMachine->InitStates(this);
 }
+
+void ACharacterST::PrepareReflect_Implementation()
+{
+	IReflectable::PrepareReflect_Implementation();
+	
+	OnReflect.Broadcast();
+}

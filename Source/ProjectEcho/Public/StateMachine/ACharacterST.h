@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "KillMechanic/Killable.h"
+#include "ReflectMechanic/Reflectable.h"
 #include "ACharacterST.generated.h"
 
 class UInputComponent;
@@ -15,7 +16,7 @@ class UStateMachine;
 class UEnhancedInputLocalPlayerSubsystem;
 
 UCLASS()
-class PROJECTECHO_API ACharacterST : public ACharacter, public IKillable
+class PROJECTECHO_API ACharacterST : public ACharacter, public IKillable, public IReflectable
 {
 	GENERATED_BODY()
 
@@ -99,6 +100,9 @@ public:
 	
 	UFUNCTION()
 	void InitStateMachine();
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void PrepareReflect_Implementation() override;
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
 	FMovePressed OnMovePressed;

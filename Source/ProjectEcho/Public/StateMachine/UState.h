@@ -3,6 +3,7 @@
 #include "StateMachine/UStateMachine.h"
 #include "UState.generated.h"
 
+class UReflectComponent;
 class URecordHandlerComponent;
 class ACharacterST;
 class UStateMachine;
@@ -127,4 +128,7 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<URecordHandlerComponent> RecordHandlerComponent;
+	
+	UPROPERTY()
+	TObjectPtr<UReflectComponent> ReflectComponent;
 };
