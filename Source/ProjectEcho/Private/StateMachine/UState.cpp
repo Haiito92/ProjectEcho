@@ -42,7 +42,8 @@ void UState::Enter()
 	Character->OnInteract.AddDynamic(this, &UState::OnInteract);
 	Character->OnRevive.AddDynamic(this, &UState::OnRevive);
 	Character->OnStartPropulse.AddDynamic(this, &UState::OnPropulse);
-	Character->OnReflect.AddDynamic(this, &UState::OnReflect);
+	Character->OnReflectInputStarted.AddDynamic(this, &UState::OnReflectInputStarted);
+	Character->OnReflected.AddDynamic(this, &UState::OnReflected);
 	RecordManagerSubsystem->OnStartPlayerRewinding.AddDynamic(this, &UState::OnRewindingStarted);
 	RecordManagerSubsystem->OnStopPlayerRewinding.AddDynamic(this, &UState::OnRewindingEnded);
 }
@@ -63,7 +64,8 @@ void UState::Exit()
 	Character->OnInteract.RemoveDynamic(this, &UState::OnInteract);
 	Character->OnRevive.RemoveDynamic(this, &UState::OnRevive);
 	Character->OnStartPropulse.RemoveDynamic(this, &UState::OnPropulse);
-	Character->OnReflect.RemoveDynamic(this, &UState::OnReflect);
+	Character->OnReflectInputStarted.RemoveDynamic(this, &UState::OnReflectInputStarted);
+	Character->OnReflected.RemoveDynamic(this, &UState::OnReflected);
 	RecordManagerSubsystem->OnStartPlayerRewinding.RemoveDynamic(this, &UState::OnRewindingStarted);
 	RecordManagerSubsystem->OnStopPlayerRewinding.RemoveDynamic(this, &UState::OnRewindingEnded);
 }
@@ -199,7 +201,7 @@ void UState::OnDeath()
 
 void UState::OnInteract()
 {
-	if (CanUseInteract() && !GrabbingComponent->IsGrabbing())
+	if (CanUseInteract() && !GrabbingComponent->IsGrabbing() && IsValid(InteractorComponent))
 	{
 		IInteractor::Execute_TryInteract(
 			InteractorComponent,
@@ -221,10 +223,21 @@ void UState::OnPropulse()
 		return;
 }
 
-void UState::OnReflect()
+void UState::OnReflectInputStarted()
 {
-	if (CanUseReflect())
-		return;
+	if (CanUseReflect() && IsValid(ReflectComponent))
+	{
+		ReflectComponent->TryReflect(
+			Character->FirstPersonCameraComponent->GetComponentLocation(),
+			UKismetMathLibrary::GetForwardVector(Character->GetControlRotation())
+			);
+	}
+}
+
+void UState::OnReflected()
+{
+	// TODO Apply force to character
+	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine, EEchoMessageType::Log, "UState: On Reflected", FColor::Green, 3.0f);
 }
 
 void UState::OnRevive()

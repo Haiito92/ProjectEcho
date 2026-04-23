@@ -23,5 +23,14 @@ class PROJECTECHO_API IReflectable
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool CanBeReflected();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void PrepareReflect();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, meta=(AutoCreateRefTerm="ReflectDirection"))
+	void Reflect(const FVector& ReflectDirection, float ReflectPower);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void FinalizeReflect();
 };

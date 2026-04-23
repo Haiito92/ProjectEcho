@@ -50,20 +50,23 @@ bool UReflectComponent::TryReflect(const FVector& CastStartLocation, const FVect
 	
 	FVector CastEndLocation = CastStartLocation + CastDirection.GetSafeNormal() * ReflectMechanicSettings->SphereTraceDistance;
 	
+	UEchoDebug::DrawSphere(this->GetWorld(), EEchoSystem::Reflect, CastStartLocation, ReflectMechanicSettings->SphereTraceRadius, 12, FColor::Magenta, 3.0f);
 	UEchoDebug::DrawSphere(this->GetWorld(), EEchoSystem::Reflect, CastEndLocation, ReflectMechanicSettings->SphereTraceRadius, 12, FColor::Magenta, 3.0f);
 	
 	FHitResult HitResult;
 	World->SweepSingleByChannel(
 		HitResult,
-		CastEndLocation,
+		CastStartLocation,
 		CastEndLocation,
 		FQuat::Identity,
 		ECollisionChannel::ECC_WorldDynamic,
 		FCollisionShape::MakeSphere(ReflectMechanicSettings->SphereTraceRadius),
 		QueryParams
 		);
+	
+	ReceiveTryReflect();
 
-	if (HitResult.bBlockingHit)
+	if (!HitResult.bBlockingHit)
 	{
 		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Log, "Didn't find any reflectable", FColor::White, 3.0f);
 		return false;
@@ -76,6 +79,13 @@ bool UReflectComponent::TryReflect(const FVector& CastStartLocation, const FVect
 		return false;
 	}
 	
+	if (!IReflectable::Execute_CanBeReflected(ReflectedActor))
+	{
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Warning, "Reflect Failed: Reflectable can't be reflected", FColor::Yellow, 3.0f);
+		return false;
+	}
+	
+	
 	UPrimitiveComponent* ReflectedComp = Cast<UPrimitiveComponent>(ReflectedActor->GetRootComponent());
 	if (!IsValid(ReflectedComp))
 	{
@@ -83,8 +93,13 @@ bool UReflectComponent::TryReflect(const FVector& CastStartLocation, const FVect
 		return false;
 	}
 	
-	FVector ReflectForce = CastDirection.GetSafeNormal() * ReflectMechanicSettings->ReflectPower;
-	ReflectedComp->AddImpulse(ReflectForce);
+	IReflectable::Execute_PrepareReflect(ReflectedActor);
+	
+	IReflectable::Execute_Reflect(ReflectedActor, CastDirection.GetSafeNormal(), ReflectMechanicSettings->ReflectPower);
+	
+	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Log, "Reflect successfully executed!", FColor::Green, 3.0f);
+
+	IReflectable::Execute_FinalizeReflect(ReflectedActor);
 	
 	return true;
 }

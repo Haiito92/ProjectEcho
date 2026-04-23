@@ -101,8 +101,17 @@ public:
 	UFUNCTION()
 	void InitStateMachine();
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
+	virtual bool CanBeReflected_Implementation() override;
+	
+	UFUNCTION()
 	virtual void PrepareReflect_Implementation() override;
+	
+	UFUNCTION()
+	virtual void Reflect_Implementation(const FVector& ReflectDirection, float ReflectPower) override;
+	
+	UFUNCTION()
+	virtual void FinalizeReflect_Implementation() override;
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
 	FMovePressed OnMovePressed;
@@ -157,8 +166,11 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartPropulse);
 	FOnStartPropulse OnStartPropulse;
 	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReflect);
-	FOnReflect OnReflect;
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReflectInputStarted);
+	FOnReflectInputStarted OnReflectInputStarted;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReflected);
+	FOnReflected OnReflected;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnValidGrab);
 	UPROPERTY(BlueprintAssignable)
@@ -207,4 +219,6 @@ public:
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
+	
+	bool bCanBeReflected = false;
 };

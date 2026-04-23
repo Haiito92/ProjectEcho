@@ -20,7 +20,7 @@ public:
 	
 	virtual void BeginPlay() override;
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="CastStartLocation,CastDirection"))
 	bool TryReflect(const FVector& CastStartLocation, const FVector& CastDirection);
 	
 	UFUNCTION(BlueprintImplementableEvent)

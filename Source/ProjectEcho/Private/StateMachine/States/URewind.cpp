@@ -7,7 +7,9 @@
 URewind::URewind()
 {
 	EnumState = EState::Rewind;
+	StateSettings ^= EStateSettings::CanBeReflected;
 }
+
 
 void URewind::Tick(float DeltaTime)
 {

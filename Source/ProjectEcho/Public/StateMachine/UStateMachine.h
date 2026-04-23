@@ -37,7 +37,6 @@ public:
 	
 	void Tick(float DeltaTime);
 	
-	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeState,EState,newState);
 	UPROPERTY(BlueprintAssignable)
 	FOnChangeState OnChangeState;
