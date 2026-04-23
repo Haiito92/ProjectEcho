@@ -1,7 +1,5 @@
 ﻿#include "PropulseMechanic/PropulseComponent.h"
-
 #include "GameFramework/Character.h"
-#include "RecordManager/EchoActor.h"
 
 
 UPropulseComponent::UPropulseComponent()
@@ -15,7 +13,7 @@ UPropulseComponent::UPropulseComponent()
 
 void UPropulseComponent::BeginPlay()
 {
-	Super::BeginPlay();	
+	Super::BeginPlay();
 }
 
 void UPropulseComponent::Propulse()
@@ -25,6 +23,7 @@ void UPropulseComponent::Propulse()
 	
 	for (AActor* Actor : ListActors)
 	{
+		if (Actor == GetOwner()) continue;
 		if (Actor->Implements<AActor>())
 		{
 			if (ACharacter* character = Cast<ACharacter>(Actor))

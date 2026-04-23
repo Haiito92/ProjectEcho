@@ -26,6 +26,7 @@ void UState::InitState(UStateMachine* InStateMachine,ACharacterST* InCharacter)
 	RecordManagerSubsystem = GetWorld()->GetSubsystem<URecordManagerSubsystem>();
 	InteractorComponent = Character->FindComponentByClass<UInteractorComponent>();
 	RecordHandlerComponent = Character->FindComponentByClass<URecordHandlerComponent>();
+	PropulseComponent = Character -> FindComponentByClass<UPropulseComponent>();
 }
 
 void UState::Enter()
@@ -216,7 +217,7 @@ void UState::OnInteract()
 void UState::OnPropulse()
 {
 	if (CanUsePropulse())
-		return;
+		PropulseComponent->Propulse();
 }
 
 void UState::OnReflect()

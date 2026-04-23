@@ -1,5 +1,6 @@
 #pragma once
 #include "InteractableMechanic/InteractorComponent.h"
+#include "PropulseMechanic/PropulseComponent.h"
 #include "StateMachine/UStateMachine.h"
 #include "UState.generated.h"
 
@@ -127,4 +128,7 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<URecordHandlerComponent> RecordHandlerComponent;
+	
+	UPROPERTY()
+	TObjectPtr<UPropulseComponent> PropulseComponent;
 };
