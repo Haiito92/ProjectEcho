@@ -20,9 +20,10 @@ enum class EStateSettings: uint8
 	CanInteract = 1 << 1,
 	CanRecord = 1 << 2,
 	CanPropulse = 1 << 3,
-	CanReflect = 1 << 4,
-	CanBeReflected = 1 << 5,
-	All = 0b00111111
+	CanBePropulsed = 1 << 4,
+	CanReflect = 1 << 5,
+	CanBeReflected = 1 << 6,
+	All = 0b01111111
 };
 
 ENUM_CLASS_FLAGS(EStateSettings);
@@ -103,7 +104,10 @@ protected:
 	void OnInteract();
 	
 	UFUNCTION()
-	void OnPropulse();
+	void OnPropulseInputStarted();
+	
+	UFUNCTION()
+	void OnPropulsed(const FVector& PropulseDirection, float PropulsePower);
 	
 	UFUNCTION()
 	void OnReflected(const FVector& ReflectDirection, float ReflectPower);
