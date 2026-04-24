@@ -109,24 +109,24 @@ void FEchoTimeline::RecordActionKey(AActor* RecordedActor, const float& CurrentT
 	IRecordHandlerInterface* RecordHandlerInterface = Cast<IRecordHandlerInterface>(RecordedActor);
 	if (RecordHandlerInterface == nullptr) return;
 	
-	TArray<TSharedPtr<FRecordedAction>> ToRecordActions = RecordHandlerInterface->GetToRecordActions();
-	for (const TSharedPtr<FRecordedAction> ToRecordAction : ToRecordActions)
+	TArray<FRecordedAction> ToRecordActions = RecordHandlerInterface->GetToRecordActions();
+	for (const FRecordedAction& ToRecordAction : ToRecordActions)
 	{
 		FRecordActionKey RecordActionKey;
 		RecordActionKey.TimeKey = CurrentTimeKey;
 		RecordActionKey.Action = ToRecordAction;
 		ActionKeys.Add(RecordActionKey);
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Recording Action : " + UEnum::GetDisplayValueAsText(ToRecordAction->ActionEnum).ToString());
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Recording Action : " + UEnum::GetDisplayValueAsText(ToRecordAction.ActionEnum).ToString());
 	}
 	
-	TArray<TSharedPtr<FRecordedAction>> ToRecordRewindActions = RecordHandlerInterface->GetToRecordRewindActions();
-	for (const TSharedPtr<FRecordedAction> ToRecordAction : ToRecordRewindActions)
+	TArray<FRecordedAction> ToRecordRewindActions = RecordHandlerInterface->GetToRecordRewindActions();
+	for (const FRecordedAction& ToRecordAction : ToRecordRewindActions)
 	{
 		FRecordActionKey RecordActionKey;
 		RecordActionKey.TimeKey = CurrentTimeKey;
 		RecordActionKey.Action = ToRecordAction;
 		RewindActionKeys.Add(RecordActionKey);
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Recording Rewind Action : " + UEnum::GetDisplayValueAsText(ToRecordAction->ActionEnum).ToString());
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Recording Rewind Action : " + UEnum::GetDisplayValueAsText(ToRecordAction.ActionEnum).ToString());
 	}
 }
 
@@ -153,7 +153,7 @@ void FEchoTimeline::PlayReplay(const float& PreviousKey,const float& CurrentTime
 	{
 		for (const FRecordActionKey& ActionKey : CurrentActionKeys)
 		{
-			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Replaying Action : " + UEnum::GetDisplayValueAsText(ActionKey.Action->ActionEnum).ToString());
+			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Replaying Action : " + UEnum::GetDisplayValueAsText(ActionKey.Action.ActionEnum).ToString());
 			EchoActor->HandleActionKey(ActionKey.Action);
 		}
 	}

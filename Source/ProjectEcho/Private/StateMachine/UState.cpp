@@ -112,7 +112,7 @@ void UState::OnGrabbingStarted()
 	{
 		if (GrabbingComponent->IsGrabbing())
 		{
-			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(MakeShared<FRecordedAction>(FRecordedAction(ERecordedAction::TryRelease)), MakeShared<FRecordedAction>(FRecordedForceGrabAction(GrabbingComponent->GetGrabbedActor())));
+			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::TryRelease), FRecordedAction(ERecordedAction::ForceGrab, GrabbingComponent->GetGrabbedActor()));
 			
 			if (GrabbingComponent->TryRelease())
 				Character->OnValidRelease.Broadcast();
@@ -122,7 +122,7 @@ void UState::OnGrabbingStarted()
 			if (GrabbingComponent->TryGrab(Character->GetControlRotation()))
 				Character->OnValidGrab.Broadcast();
 			
-			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(MakeShared<FRecordedAction>(FRecordedAction(ERecordedAction::TryGrab)), MakeShared<FRecordedAction>(FRecordedAction(ERecordedAction::ForceRelease)));
+			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::TryGrab), FRecordedAction(ERecordedAction::ForceRelease));
 		}
 	}
 }
@@ -131,10 +131,10 @@ void UState::OnThrowingStarted()
 {
 	if (CanUseGrab())
 	{
+		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::TryThrow), FRecordedAction(ERecordedAction::ForceGrab, GrabbingComponent->GetGrabbedActor()));
+		
 		if (GrabbingComponent->TryThrow(Character->GetControlRotation()))
 			Character->OnValidThrow.Broadcast();
-		
-		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(MakeShared<FRecordedAction>(FRecordedAction(ERecordedAction::TryThrow)), MakeShared<FRecordedAction>(FRecordedForceGrabAction(GrabbingComponent->GetGrabbedActor())));
 	}
 }
 
@@ -216,7 +216,7 @@ void UState::OnInteract()
 		if (IsValid(RecordHandlerComponent))
 		{
 			UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine, EEchoMessageType::Log, "Valid Record Handler", FColor::Green, 3.0f);
-			RecordHandlerComponent->RegisterActionInRecord(MakeShared<FRecordedAction>(FRecordedAction(ERecordedAction::Interact)));
+			RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::Interact));
 		}
 	}
 }
@@ -236,7 +236,7 @@ void UState::OnReflectInputStarted()
 			UKismetMathLibrary::GetForwardVector(Character->GetControlRotation())
 			);
 		
-		RecordHandlerComponent->RegisterActionInRecord(MakeShared<FRecordedAction>(ERecordedAction::TryReflect));
+		RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::TryReflect));
 	}
 }
 

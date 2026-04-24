@@ -34,25 +34,16 @@ struct FRecordedAction
 		this->ActionEnum = Action;
 	}
 	
+	explicit FRecordedAction(const ERecordedAction& Action, AActor* InteractedActor)
+	{
+		this->ActionEnum = Action;
+		this->InteractedActor = InteractedActor;
+	}
+	
 	ERecordedAction ActionEnum = ERecordedAction::None;
-};
-
-USTRUCT(BlueprintType)
-struct FRecordedForceGrabAction : public FRecordedAction
-{
-	GENERATED_BODY()
 	
-	FRecordedForceGrabAction()
-	{
-	}
-	
-	FRecordedForceGrabAction(AActor* ActorToGrab) : FRecordedAction(ERecordedAction::ForceGrab)
-	{
-		this->ActorToGrab = ActorToGrab;
-	}
-
-	UPROPERTY()
-	TObjectPtr<AActor> ActorToGrab = nullptr;
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<AActor> InteractedActor = nullptr;
 };
 
 //Key used to save the position of an element at a set timekey 
@@ -74,7 +65,7 @@ struct FRecordActionKey
 	GENERATED_BODY()
 	
 	float TimeKey;
-	TSharedPtr<FRecordedAction> Action;
+	FRecordedAction Action;
 };
 
 USTRUCT(BlueprintType)

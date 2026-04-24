@@ -289,14 +289,14 @@ void ACharacterST::FinalizeReflect_Implementation()
 {
 }
 
-TArray<TSharedPtr<FRecordedAction>> ACharacterST::GetToRecordActions()
+TArray<FRecordedAction> ACharacterST::GetToRecordActions()
 {
 	if (IsValid(RecordHandlerComponent)) return RecordHandlerComponent->GetToRecordActions();
-	return TArray<TSharedPtr<FRecordedAction>>();
+	return TArray<FRecordedAction>();
 }
 
-TArray<TSharedPtr<FRecordedAction>> ACharacterST::GetToRecordRewindActions()
+TArray<FRecordedAction> ACharacterST::GetToRecordRewindActions()
 {
 	if (IsValid(RecordHandlerComponent)) return RecordHandlerComponent->GetToRecordRewindActions();
-	return TArray<TSharedPtr<FRecordedAction>>();
+	return TArray<FRecordedAction>();
 }

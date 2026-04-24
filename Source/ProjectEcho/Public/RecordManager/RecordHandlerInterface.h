@@ -33,10 +33,12 @@ public:
 	void StopRecording();
 	
 	//Called to get RecordedAction List
-	virtual TArray<TSharedPtr<FRecordedAction>> GetToRecordActions() = 0;
+	UFUNCTION()
+	virtual TArray<FRecordedAction> GetToRecordActions() = 0;
 	
 	//Called to get Rewind RecordedAction List
-	virtual TArray<TSharedPtr<FRecordedAction>> GetToRecordRewindActions() = 0;
+	UFUNCTION()
+	virtual TArray<FRecordedAction> GetToRecordRewindActions() = 0;
 	
 	//Called to Get Control Rotation
 	UFUNCTION(BlueprintNativeEvent)

@@ -16,7 +16,7 @@ public:
 	// Sets default values for this component's properties
 	URecordHandlerComponent();
 
-	virtual void RegisterActionInRecord(TSharedPtr<FRecordedAction> Action, TSharedPtr<FRecordedAction> RewindAction = nullptr);
+	virtual void RegisterActionInRecord(const FRecordedAction& Action, const FRecordedAction& RewindAction = FRecordedAction());
 	
 	UFUNCTION(BlueprintCallable)
 	//Start Saving Actions in ToRecord List
@@ -27,17 +27,21 @@ public:
 	virtual void StopRecording();
 	
 	//Returns Copy of Current ToRecordList and Reset it
-	virtual TArray<TSharedPtr<FRecordedAction>> GetToRecordActions();
+	UFUNCTION()
+	virtual TArray<FRecordedAction> GetToRecordActions();
 	
 	//Returns Copy of Current ToRecordList of Rewind Actions and Reset it
-	virtual TArray<TSharedPtr<FRecordedAction>> GetToRecordRewindActions();
+	UFUNCTION()
+	virtual TArray<FRecordedAction> GetToRecordRewindActions();
 
 private:
 	//Array of Actions to register in next Key Creation
-	TArray<TSharedPtr<FRecordedAction>> ToRecordActions;
+	UPROPERTY()
+	TArray<FRecordedAction> ToRecordActions;
 	
 	//Array of Actions to register in next Key Creation
-	TArray<TSharedPtr<FRecordedAction>> ToRecordRewindActions;
+	UPROPERTY()
+	TArray<FRecordedAction> ToRecordRewindActions;
 	
 	bool bIsRecording = false;
 };

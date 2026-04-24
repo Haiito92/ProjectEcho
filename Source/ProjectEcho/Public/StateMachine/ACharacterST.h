@@ -115,9 +115,11 @@ public:
 	UFUNCTION()
 	virtual void FinalizeReflect_Implementation() override;
 	
-	virtual TArray<TSharedPtr<FRecordedAction>> GetToRecordActions() override;
+	UFUNCTION()
+	virtual TArray<FRecordedAction> GetToRecordActions() override;
 	
-	virtual TArray<TSharedPtr<FRecordedAction>> GetToRecordRewindActions() override;
+	UFUNCTION()
+	virtual TArray<FRecordedAction> GetToRecordRewindActions() override;
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
 	FMovePressed OnMovePressed;

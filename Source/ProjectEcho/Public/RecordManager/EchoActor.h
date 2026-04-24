@@ -21,7 +21,7 @@ public:
 	AEchoActor();
 	
 public:
-	void HandleActionKey(TSharedPtr<FRecordedAction> Action);
+	void HandleActionKey(const FRecordedAction& Action);
 	
 	UFUNCTION()
 	void SetControlRotation(const FRotator& ControlRotation);

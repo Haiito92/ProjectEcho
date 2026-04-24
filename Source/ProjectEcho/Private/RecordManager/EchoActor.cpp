@@ -14,22 +14,14 @@ AEchoActor::AEchoActor()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-void AEchoActor::HandleActionKey(TSharedPtr<FRecordedAction> Action)
+void AEchoActor::HandleActionKey(const FRecordedAction& Action)
 {
 	//Switch on Enum for Only Cpp Actions
-	switch (Action->ActionEnum)
+	switch (Action.ActionEnum)
 	{
 	case ERecordedAction::ForceGrab:
 		{
-			TSharedPtr<FRecordedForceGrabAction> ForceGrabAction = StaticCastSharedPtr<FRecordedForceGrabAction>(Action);
-			if (ForceGrabAction != nullptr)
-			{
-				FindComponentByClass<UGrabbingComponent>()->ForceGrab(ForceGrabAction->ActorToGrab);
-			}
-			else
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "Cant Get ForceGrab !!!");
-			}
+			FindComponentByClass<UGrabbingComponent>()->ForceGrab(Action.InteractedActor);
 			break;
 		}
 	default: 
@@ -37,7 +29,7 @@ void AEchoActor::HandleActionKey(TSharedPtr<FRecordedAction> Action)
 	}
 	
 	//Call BP Function
-	ReceiveHandleActionKey(Action->ActionEnum);
+	ReceiveHandleActionKey(Action.ActionEnum);
 }
 
 void AEchoActor::SetControlRotation(const FRotator& ControlRotation)
