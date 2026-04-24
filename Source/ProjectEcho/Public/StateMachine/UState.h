@@ -1,6 +1,7 @@
 #pragma once
 #include "InteractableMechanic/InteractorComponent.h"
 #include "ReflectMechanic/Reflectable.h"
+#include "PropulseMechanic/PropulseComponent.h"
 #include "StateMachine/UStateMachine.h"
 #include "UState.generated.h"
 
@@ -136,4 +137,7 @@ protected:
 	
 	UPROPERTY()
 	TObjectPtr<UReflectComponent> ReflectComponent;
+	
+	UPROPERTY()
+	TObjectPtr<UPropulseComponent> PropulseComponent;
 };

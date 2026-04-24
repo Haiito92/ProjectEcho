@@ -104,7 +104,7 @@ public:
 	void InitStateMachine();
 	
 	UFUNCTION()
-	virtual bool CanBeReflected_Implementation() override;
+	virtual bool CanBeReflected_Implementation() const override;
 	
 	UFUNCTION()
 	virtual void PrepareReflect_Implementation(AActor* ActorDoingReflect) override;

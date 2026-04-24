@@ -23,6 +23,7 @@ public:
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="CastStartLocation,CastDirection"))
 	bool TryReflect(const FVector& CastStartLocation, const FVector& CastDirection);
 	
+protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveTryReflect();
 	

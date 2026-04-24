@@ -27,6 +27,7 @@ void UState::InitState(UStateMachine* InStateMachine,ACharacterST* InCharacter)
 	RecordManagerSubsystem = GetWorld()->GetSubsystem<URecordManagerSubsystem>();
 	InteractorComponent = Character->FindComponentByClass<UInteractorComponent>();
 	ReflectComponent = Character->FindComponentByClass<UReflectComponent>();
+	PropulseComponent = Character -> FindComponentByClass<UPropulseComponent>();
 	RecordHandlerComponent = Character->RecordHandlerComponent;
 }
 
@@ -223,8 +224,12 @@ void UState::OnInteract()
 
 void UState::OnPropulse()
 {
-	if (CanUsePropulse())
-		return;
+	if (CanUsePropulse() && IsValid(PropulseComponent))
+	{
+		PropulseComponent->TryPropulse();
+		
+		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::TryPropulse));
+	}
 }
 
 void UState::OnReflectInputStarted()
@@ -236,7 +241,7 @@ void UState::OnReflectInputStarted()
 			UKismetMathLibrary::GetForwardVector(Character->GetControlRotation())
 			);
 		
-		RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::TryReflect));
+		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::TryReflect));
 	}
 }
 

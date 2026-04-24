@@ -271,7 +271,7 @@ void ACharacterST::InitStateMachine()
 	StateMachine->InitStates(this);
 }
 
-bool ACharacterST::CanBeReflected_Implementation()
+bool ACharacterST::CanBeReflected_Implementation() const
 {
 	return bCanBeReflected;
 }
