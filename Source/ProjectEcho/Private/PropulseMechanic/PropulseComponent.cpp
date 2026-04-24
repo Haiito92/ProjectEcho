@@ -11,7 +11,7 @@ UPropulseComponent::UPropulseComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 	SetGenerateOverlapEvents(true);
-	UPrimitiveComponent::SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	UPrimitiveComponent::SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	UPrimitiveComponent::SetCollisionResponseToAllChannels(ECR_Overlap);
 }
 
@@ -37,6 +37,8 @@ bool UPropulseComponent::TryPropulse()
 	
 	TArray<AActor*> ListActors;
 	GetOverlappingActors(ListActors);
+	
+	UEchoDebug::DrawSphere(this->GetWorld(), EEchoSystem::Propulse, GetComponentLocation(), SphereRadius, 12, FColor::Magenta, 3.0f);
 	
 	bool DidPropulseActors = false;
 	for (AActor* PropulsedActor : ListActors)
