@@ -300,3 +300,21 @@ TArray<FRecordedAction> ACharacterST::GetToRecordRewindActions()
 	if (IsValid(RecordHandlerComponent)) return RecordHandlerComponent->GetToRecordRewindActions();
 	return TArray<FRecordedAction>();
 }
+
+bool ACharacterST::CanBePropulsed_Implementation() const
+{
+	return bCanBePropulsed;
+}
+
+void ACharacterST::PreparePropulse_Implementation(AActor* PropulsingActor)
+{
+}
+
+void ACharacterST::Propulse_Implementation(const FVector& PropulseDirection, float PropulsePower)
+{
+	OnPropulsed.Broadcast(PropulseDirection, PropulsePower);
+}
+
+void ACharacterST::FinalizePropulse_Implementation()
+{
+}
