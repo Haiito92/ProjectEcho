@@ -17,4 +17,17 @@ class UPropulsable : public UInterface
 class PROJECTECHO_API IPropulsable
 {
 	GENERATED_BODY()
+	
+public:
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool CanBePropulsed() const;
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void PreparePropulse(AActor* PropulsingActor);
+	
+	UFUNCTION(blueprintNativeEvent, BlueprintCallable, meta=(AutoCreateRefTerm="PropulseDirection"))
+	void Propulse(const FVector& PropulseDirection, float PropulsePower);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void FinalizePropulse();
 };

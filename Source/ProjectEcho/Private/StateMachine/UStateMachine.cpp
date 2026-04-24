@@ -92,5 +92,3 @@ void UStateMachine::Tick(float DeltaTime)
 		return;
 	CurrentState->Tick(DeltaTime);
 }
-
-

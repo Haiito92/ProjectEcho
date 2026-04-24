@@ -7,6 +7,8 @@
 #include "ReflectComponent.generated.h"
 
 
+class UReflectMechanicSettings;
+
 UCLASS(ClassGroup=(Custom), Blueprintable, BlueprintType, meta=(BlueprintSpawnableComponent))
 class PROJECTECHO_API UReflectComponent : public UActorComponent
 {
@@ -15,13 +17,17 @@ class PROJECTECHO_API UReflectComponent : public UActorComponent
 public:
 	// Sets default values for this component's properties
 	UReflectComponent();
-
-protected:
-	// Called when the game starts
+	
 	virtual void BeginPlay() override;
-
-public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
+	
+	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="CastStartLocation,CastDirection"))
+	bool TryReflect(const FVector& CastStartLocation, const FVector& CastDirection);
+	
+protected:
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveTryReflect();
+	
+private:
+	UPROPERTY()
+	TObjectPtr<UReflectMechanicSettings> ReflectMechanicSettings;
 };

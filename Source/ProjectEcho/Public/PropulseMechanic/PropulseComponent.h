@@ -8,6 +8,8 @@
 #include "PropulseComponent.generated.h"
 
 
+class UPropulseMechanicSettings;
+
 UCLASS(ClassGroup=(Custom), Blueprintable, BlueprintType, meta=(BlueprintSpawnableComponent))
 class PROJECTECHO_API UPropulseComponent : public USphereComponent
 {
@@ -16,16 +18,16 @@ class PROJECTECHO_API UPropulseComponent : public USphereComponent
 public:
 	UPropulseComponent();
 
-protected:
 	virtual void BeginPlay() override;
-public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
 	
-	UFUNCTION()
-	void Propulse();
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	FVector DirectionalForce;
+	UFUNCTION(BlueprintCallable)
+	bool TryPropulse();
 
+protected:
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveTryPropulse();
+	
+private:
+	UPROPERTY()
+	TObjectPtr<UPropulseMechanicSettings> PropulseMechanicSettings;
 };

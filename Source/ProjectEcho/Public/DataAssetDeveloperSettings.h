@@ -8,6 +8,8 @@
 #include "Tools/Debug/DebugDataAsset.h"
 #include "DataAssetDeveloperSettings.generated.h"
 
+class UPropulseMechanicSettings;
+class UReflectMechanicSettings;
 class UInteractMechanicSettings;
 class UGrabMechanicSettings;
 class URecordManagerSettings;
@@ -36,6 +38,12 @@ public:
 	//Data Asset of Interact Mechanic Settings
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Interact Settings")
 	TSoftObjectPtr<UInteractMechanicSettings> InteractMechanicSettings;
+	
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Reflect Settings")
+	TSoftObjectPtr<UReflectMechanicSettings> ReflectMechanicSettings;
+	
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Propulse Settings")
+	TSoftObjectPtr<UPropulseMechanicSettings> PropulseMechanicSettings;
 	
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Player Settings")
 	TSoftObjectPtr<UPlayerData> PlayerData;
