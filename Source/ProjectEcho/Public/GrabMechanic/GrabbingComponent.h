@@ -34,9 +34,13 @@ public:
 	UFUNCTION(BLueprintCallable)
 	virtual void ForceRelease();
 	
-	//Force Release currently held object
+	//Force Grab given Actor (might causes issues)
 	UFUNCTION(BLueprintCallable)
 	virtual void ForceGrab(AActor* Actor);
+	
+	//Try Force Grab at Holding Position (Grabs Fakely Held Cube, used for Echoes in Rewind)
+	UFUNCTION(BLueprintCallable)
+	virtual void TryForceGrabHeldCube();
 	
 	//Has Object Currently Grabbed
 	UFUNCTION(BlueprintCallable, BlueprintPure)

@@ -16,18 +16,6 @@ AEchoActor::AEchoActor()
 
 void AEchoActor::HandleActionKey(const FRecordedAction& Action)
 {
-	//Switch on Enum for Only Cpp Actions
-	switch (Action.ActionEnum)
-	{
-	case ERecordedAction::ForceGrab:
-		{
-			FindComponentByClass<UGrabbingComponent>()->ForceGrab(Action.InteractedActor);
-			break;
-		}
-	default: 
-		break;
-	}
-	
 	//Call BP Function
 	ReceiveHandleActionKey(Action.ActionEnum);
 }

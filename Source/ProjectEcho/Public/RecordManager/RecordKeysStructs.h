@@ -34,16 +34,7 @@ struct FRecordedAction
 		this->ActionEnum = Action;
 	}
 	
-	explicit FRecordedAction(const ERecordedAction& Action, AActor* InteractedActor)
-	{
-		this->ActionEnum = Action;
-		this->InteractedActor = InteractedActor;
-	}
-	
 	ERecordedAction ActionEnum = ERecordedAction::None;
-	
-	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<AActor> InteractedActor = nullptr;
 };
 
 //Key used to save the position of an element at a set timekey 
