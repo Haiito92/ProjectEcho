@@ -12,6 +12,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "GrabMechanic/GrabbingComponent.h"
 #include "RecordManager/RecordManagerSubsystem.h"
+#include "StateMachine/UState.h"
 #include "StateMachine/Data/UInputDataConfig.h"
 #include "StateMachine/Data/UPlayerData.h"
 #include "Tools/Debug/EchoDebug.h"
@@ -108,6 +109,11 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Input->BindAction(InputActions->ARecord, ETriggerEvent::Started, this, &ACharacterST::Record);
 	Input->BindAction(InputActions->ADestroySlot, ETriggerEvent::Started, this, &ACharacterST::DestroySlot);
 	Input->BindAction(InputActions->AInteract, ETriggerEvent::Started,this,&ACharacterST::AInteract);
+	
+	Input->BindAction(InputActions->APropulse, ETriggerEvent::Started,this,&ACharacterST::APropulse);
+	
+	Input->BindAction(InputActions->AReflect, ETriggerEvent::Started,this,&ACharacterST::AReflect);
+	
 }
 
 void ACharacterST::InitPlayer()
@@ -119,8 +125,6 @@ void ACharacterST::InitPlayer()
 void ACharacterST::LoadData()
 {
 	Life = GetDefault<UPlayerData>()->InitLife;
-	WalkSpeed = GetDefault<UPlayerData>()->WalkSpeed;
-	RunSpeed = GetDefault<UPlayerData>()->RunSpeed;
 }
 
 void ACharacterST::AMove(const FInputActionValue& Value)
@@ -206,6 +210,16 @@ void ACharacterST::AInteract()
 	OnInteract.Broadcast();
 }
 
+void ACharacterST::APropulse()
+{
+	OnStartPropulse.Broadcast();
+}
+
+void ACharacterST::AReflect()
+{
+	OnReflectInputStarted.Broadcast();
+}
+
 void ACharacterST::PlayerTakeDamage(int value)
 {
 	Life = FMath::Max(Life-value,0);
@@ -255,4 +269,23 @@ void ACharacterST::InitStateMachine()
 {
 	StateMachine = NewObject<UStateMachine>(this);
 	StateMachine->InitStates(this);
+}
+
+bool ACharacterST::CanBeReflected_Implementation() const
+{
+	return bCanBeReflected;
+}
+
+void ACharacterST::PrepareReflect_Implementation(AActor* ActorDoingReflect)
+{
+}
+
+void ACharacterST::Reflect_Implementation(const FVector& ReflectDirection, float ReflectPower)
+{
+	OnReflected.Broadcast(ReflectDirection, ReflectPower);
+}
+
+void ACharacterST::FinalizeReflect_Implementation()
+{
+	
 }

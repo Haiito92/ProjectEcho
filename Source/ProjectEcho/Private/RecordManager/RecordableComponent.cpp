@@ -23,8 +23,11 @@ void URecordableComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
+	// Get Root Component as Primitive Component
+	if (bHandlePhysicsOfMesh)
+	{
+		PhysicsComponent = Cast<UPrimitiveComponent>(GetOwner()->GetRootComponent());
+	}
 }
 
 void URecordableComponent::RecordKey(const float& CurrentTimeKey)
@@ -40,6 +43,20 @@ void URecordableComponent::RecordKey(const float& CurrentTimeKey)
 	{
 		return A.TimeKey < B.TimeKey;
 	});
+	
+	if (bHandlePhysicsOfMesh && IsValid(PhysicsComponent))
+	{
+		FRecordPhysicsKey PhysicsKey;
+		PhysicsKey.TimeKey = CurrentTimeKey;
+		PhysicsKey.LinearVelocity = PhysicsComponent->GetPhysicsLinearVelocity();
+		PhysicsKey.AngularVelocity = PhysicsComponent->GetPhysicsAngularVelocityInDegrees();
+		
+		PhysicsKeys.Add(PhysicsKey);
+		PhysicsKeys.Sort([](const FRecordPhysicsKey& A, const FRecordPhysicsKey& B)
+		{
+			return A.TimeKey < B.TimeKey;
+		});
+	}
 }
 
 void URecordableComponent::ReplayKey(const float& PreviousTimeKey, const float& CurrentTimeKey)
@@ -66,18 +83,54 @@ void URecordableComponent::ReplayFirstKey()
 
 void URecordableComponent::StartRewind()
 {
+	if (bHandlePhysicsOfMesh && IsValid(PhysicsComponent))
+	{
+		PhysicsComponent->SetSimulatePhysics(false);
+		PhysicsComponent->SetPhysicsLinearVelocity(FVector(0,0,0));
+		PhysicsComponent->SetPhysicsAngularVelocityInDegrees(FVector(0,0,0));
+	}
 	OnStartRewind.Broadcast();
 }
 
-void URecordableComponent::StopRewind()
+void URecordableComponent::StopRewind(const float& CurrentTimeKey)
 {
+	if (bHandlePhysicsOfMesh && IsValid(PhysicsComponent))
+	{
+		PhysicsComponent->SetSimulatePhysics(true);
+		if (CurrentTimeKey > FirstInteractedKey)
+		{
+			const FRecordPhysicsKey* NextPhysicsKey = FindNextPhysicsKey(CurrentTimeKey);
+			const FRecordPhysicsKey* PreviousPhysicsKey = FindPreviousPhysicsKey(CurrentTimeKey);
+			if (NextPhysicsKey != nullptr && PreviousPhysicsKey != nullptr)
+			{
+				//Place Actor according to previous and next PhysicsKey 
+				float lerpValue = (CurrentTimeKey - PreviousPhysicsKey->TimeKey) / (NextPhysicsKey->TimeKey - PreviousPhysicsKey->TimeKey);
+				FVector Velocity = FMath::Lerp(PreviousPhysicsKey->LinearVelocity, NextPhysicsKey->LinearVelocity, lerpValue);
+				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "Replaying Velocity : " + Velocity.ToString());
+				PhysicsComponent->SetPhysicsLinearVelocity(Velocity);
+				PhysicsComponent->SetPhysicsAngularVelocityInDegrees(FMath::Lerp(PreviousPhysicsKey->AngularVelocity, NextPhysicsKey->AngularVelocity, lerpValue));
+			}
+		}
+		else
+		{
+			PhysicsComponent->SetPhysicsLinearVelocity(FVector(0,0,0));
+			PhysicsComponent->SetPhysicsAngularVelocityInDegrees(FVector(0,0,0));
+		}
+	}
+	if (CurrentTimeKey > FirstInteractedKey)
+	{
+		ClearKeysPastCurrentKey(CurrentTimeKey);
+	}
 	OnStopRewind.Broadcast();
 }
 
 void URecordableComponent::StartRecording(const float& CurrentTimeKey)
 {
-	bIsRecording = true;
-	FirstInteractedKey = CurrentTimeKey;
+	if (!IsRecording())
+	{
+		bIsRecording = true;
+		FirstInteractedKey = CurrentTimeKey;
+	}
 }
 
 void URecordableComponent::StopRecording()
@@ -85,6 +138,7 @@ void URecordableComponent::StopRecording()
 	bIsRecording = false;
 	FirstInteractedKey = -1;
 	TransformKeys.Empty();
+	PhysicsKeys.Empty();
 }
 
 bool URecordableComponent::IsRecording() const
@@ -95,6 +149,24 @@ bool URecordableComponent::IsRecording() const
 const float& URecordableComponent::GetFirstInteractedKey() const
 {
 	return FirstInteractedKey;
+}
+
+void URecordableComponent::ClearKeysPastCurrentKey(const float& CurrentTimeKey)
+{
+	if (!TransformKeys.IsEmpty())
+	{
+		TransformKeys.RemoveAll([&](const FRecordTransformKey& TransformKey)
+		{
+			return TransformKey.TimeKey > CurrentTimeKey;
+		});
+	}
+	if (!PhysicsKeys.IsEmpty())
+	{
+		PhysicsKeys.RemoveAll([&](const FRecordPhysicsKey& PhysicsKey)
+		{
+			return PhysicsKey.TimeKey > CurrentTimeKey;
+		});
+	}
 }
 
 const FRecordTransformKey* URecordableComponent::FindPreviousTransformKey(const float& CurrentTimeKey)
@@ -120,9 +192,40 @@ const FRecordTransformKey* URecordableComponent::FindNextTransformKey(const floa
 	if (TransformKeys.IsEmpty()) return nullptr;
 	for (const FRecordTransformKey& TransformKey : TransformKeys)
 	{
-		if (TransformKey.TimeKey >= CurrentTimeKey)
+		if (TransformKey.TimeKey > CurrentTimeKey)
 		{
 			return &TransformKey;
+		}
+	}
+	return nullptr;
+}
+
+const FRecordPhysicsKey* URecordableComponent::FindPreviousPhysicsKey(const float& CurrentTimeKey)
+{
+	if (PhysicsKeys.IsEmpty()) return nullptr;
+	const FRecordPhysicsKey* key = nullptr;
+	for (const FRecordPhysicsKey& PhysicsKey : PhysicsKeys)
+	{
+		if (PhysicsKey.TimeKey <= CurrentTimeKey)
+		{
+			key = &PhysicsKey;
+		}
+		else
+		{
+			break;
+		}
+	}
+	return key;
+}
+
+const FRecordPhysicsKey* URecordableComponent::FindNextPhysicsKey(const float& CurrentTimeKey)
+{
+	if (PhysicsKeys.IsEmpty()) return nullptr;
+	for (const FRecordPhysicsKey& PhysicsKey : PhysicsKeys)
+	{
+		if (PhysicsKey.TimeKey > CurrentTimeKey)
+		{
+			return &PhysicsKey;
 		}
 	}
 	return nullptr;

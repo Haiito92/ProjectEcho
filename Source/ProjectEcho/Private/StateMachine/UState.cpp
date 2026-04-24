@@ -8,6 +8,7 @@
 #include "RecordManager/EchoActor.h"
 #include "RecordManager/RecordHandlerComponent.h"
 #include "RecordManager/RecordManagerSubsystem.h"
+#include "ReflectMechanic/ReflectComponent.h"
 #include "StateMachine/ACharacterST.h"
 #include "Tools/Debug/EchoDebug.h"
 #include "Tools/Debug/EchoMessageType.h"
@@ -26,6 +27,8 @@ void UState::InitState(UStateMachine* InStateMachine,ACharacterST* InCharacter)
 	RecordManagerSubsystem = GetWorld()->GetSubsystem<URecordManagerSubsystem>();
 	InteractorComponent = Character->FindComponentByClass<UInteractorComponent>();
 	RecordHandlerComponent = Character->FindComponentByClass<URecordHandlerComponent>();
+	ReflectComponent = Character->FindComponentByClass<UReflectComponent>();
+	PropulseComponent = Character -> FindComponentByClass<UPropulseComponent>();
 }
 
 void UState::Enter()
@@ -39,8 +42,13 @@ void UState::Enter()
 	Character->OnDeath.AddDynamic(this, &UState::OnDeath);
 	Character->OnInteract.AddDynamic(this, &UState::OnInteract);
 	Character->OnRevive.AddDynamic(this, &UState::OnRevive);
+	Character->OnStartPropulse.AddDynamic(this, &UState::OnPropulse);
+	Character->OnReflectInputStarted.AddDynamic(this, &UState::OnReflectInputStarted);
+	Character->OnReflected.AddDynamic(this, &UState::OnReflected);
 	RecordManagerSubsystem->OnStartPlayerRewinding.AddDynamic(this, &UState::OnRewindingStarted);
 	RecordManagerSubsystem->OnStopPlayerRewinding.AddDynamic(this, &UState::OnRewindingEnded);
+	
+	Character-> bCanBeReflected = (StateSettings & EStateSettings::CanBeReflected) == EStateSettings::CanBeReflected;
 }
 
 void UState::Tick(float DeltaTime)
@@ -58,23 +66,38 @@ void UState::Exit()
 	Character->OnDeath.RemoveDynamic(this, &UState::OnDeath);
 	Character->OnInteract.RemoveDynamic(this, &UState::OnInteract);
 	Character->OnRevive.RemoveDynamic(this, &UState::OnRevive);
+	Character->OnStartPropulse.RemoveDynamic(this, &UState::OnPropulse);
+	Character->OnReflectInputStarted.RemoveDynamic(this, &UState::OnReflectInputStarted);
+	Character->OnReflected.RemoveDynamic(this, &UState::OnReflected);
 	RecordManagerSubsystem->OnStartPlayerRewinding.RemoveDynamic(this, &UState::OnRewindingStarted);
 	RecordManagerSubsystem->OnStopPlayerRewinding.RemoveDynamic(this, &UState::OnRewindingEnded);
+	
+	Character-> bCanBeReflected = false;
 }
 
 bool UState::CanUseGrab()
 {
-	return true;
+	return (StateSettings & EStateSettings::CanGrab) == EStateSettings::CanGrab;
 }
 
 bool UState::CanUseRecord()
 {
-	return true;
+	return (StateSettings & EStateSettings::CanRecord) == EStateSettings::CanRecord;
 }
 
 bool UState::CanUseInteract()
 {
-	return true;
+	return (StateSettings & EStateSettings::CanInteract) == EStateSettings::CanInteract;
+}
+
+bool UState::CanUsePropulse()
+{
+	return (StateSettings & EStateSettings::CanPropulse) == EStateSettings::CanPropulse;
+}
+
+bool UState::CanUseReflect()
+{
+	return (StateSettings & EStateSettings::CanReflect) == EStateSettings::CanReflect;
 }
 
 void UState::OnMovePressed(FVector2D InMoveInput)
@@ -183,7 +206,7 @@ void UState::OnDeath()
 
 void UState::OnInteract()
 {
-	if (CanUseInteract() && !GrabbingComponent->IsGrabbing())
+	if (CanUseInteract() && !GrabbingComponent->IsGrabbing() && IsValid(InteractorComponent))
 	{
 		IInteractor::Execute_TryInteract(
 			InteractorComponent,
@@ -197,6 +220,37 @@ void UState::OnInteract()
 			RecordHandlerComponent->RegisterActionInRecord(ERecordedAction::Interact);
 		}
 	}
+}
+
+void UState::OnPropulse()
+{
+	if (CanUsePropulse() && IsValid(PropulseComponent))
+	{
+		PropulseComponent->TryPropulse();
+		
+		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(ERecordedAction::TryPropulse);
+	}
+}
+
+void UState::OnReflectInputStarted()
+{
+	if (CanUseReflect() && IsValid(ReflectComponent))
+	{
+		ReflectComponent->TryReflect(
+			Character->FirstPersonCameraComponent->GetComponentLocation(),
+			UKismetMathLibrary::GetForwardVector(Character->GetControlRotation())
+			);
+		
+		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(ERecordedAction::TryReflect);
+	}
+}
+
+void UState::OnReflected(const FVector& ReflectDirection, float ReflectPower)
+{
+	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine, EEchoMessageType::Log, "UState: On Reflected", FColor::Green, 3.0f);
+
+	FVector ReflectForce = ReflectDirection.GetSafeNormal() * ReflectPower;
+	Character->LaunchCharacter(ReflectForce, false, false);
 }
 
 void UState::OnRevive()

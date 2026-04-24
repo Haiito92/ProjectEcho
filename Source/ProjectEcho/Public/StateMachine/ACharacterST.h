@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "KillMechanic/Killable.h"
+#include "ReflectMechanic/Reflectable.h"
 #include "ACharacterST.generated.h"
 
 class UInputComponent;
@@ -15,7 +16,7 @@ class UStateMachine;
 class UEnhancedInputLocalPlayerSubsystem;
 
 UCLASS()
-class PROJECTECHO_API ACharacterST : public ACharacter, public IKillable
+class PROJECTECHO_API ACharacterST : public ACharacter, public IKillable, public IReflectable
 {
 	GENERATED_BODY()
 
@@ -74,6 +75,12 @@ public:
 	void AInteract();
 	
 	UFUNCTION(BlueprintCallable)
+	void APropulse();
+	
+	UFUNCTION(BlueprintCallable)
+	void AReflect();
+	
+	UFUNCTION(BlueprintCallable)
 	void PlayerTakeDamage(int value);
 	
 	UFUNCTION(BlueprintCallable)
@@ -93,6 +100,18 @@ public:
 	
 	UFUNCTION()
 	void InitStateMachine();
+	
+	UFUNCTION()
+	virtual bool CanBeReflected_Implementation() const override;
+	
+	UFUNCTION()
+	virtual void PrepareReflect_Implementation(AActor* ActorDoingReflect) override;
+	
+	UFUNCTION()
+	virtual void Reflect_Implementation(const FVector& ReflectDirection, float ReflectPower) override;
+	
+	UFUNCTION()
+	virtual void FinalizeReflect_Implementation() override;
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
 	FMovePressed OnMovePressed;
@@ -144,6 +163,15 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInteract);
 	FOnRevive OnInteract;
 	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartPropulse);
+	FOnStartPropulse OnStartPropulse;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReflectInputStarted);
+	FOnReflectInputStarted OnReflectInputStarted;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnReflected, const FVector&, ReflectDirection, float, ReflectPower);
+	FOnReflected OnReflected;
+	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnValidGrab);
 	UPROPERTY(BlueprintAssignable)
 	FOnValidGrab OnValidGrab;
@@ -164,15 +192,13 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnEndRecord OnEndRecord;
 	
+	
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputDataConfig> InputActions;
 	UPROPERTY(EditDefaultsOnly,  Category = "Input")
 	TObjectPtr<UInputMappingContext> InputMapping;
 	
-	UPROPERTY()
-	float WalkSpeed = 600.f;
-	UPROPERTY()
-	float RunSpeed = 900.f;
 	UPROPERTY()
 	int Life = 100;
 	UPROPERTY()
@@ -193,4 +219,6 @@ public:
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
+	
+	bool bCanBeReflected = false;
 };

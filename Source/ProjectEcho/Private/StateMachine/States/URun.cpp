@@ -5,6 +5,11 @@
 #include "StateMachine/UStateMachine.h"
 
 
+URun::URun()
+{
+	EnumState = EState::Run;
+}
+
 void URun::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -19,7 +24,7 @@ void URun::Enter()
 	Character->OnRunningReleased.AddDynamic(this,&URun::OnRunningReleased);
 	Character->OnJumpingStarted.AddDynamic(this,&URun::OnJumpingStarted);
 	
-	Character->GetCharacterMovement()->MaxWalkSpeed = Character->RunSpeed;
+	Character->GetCharacterMovement()->MaxWalkSpeed = Speed;
 }
 
 void URun::Exit()

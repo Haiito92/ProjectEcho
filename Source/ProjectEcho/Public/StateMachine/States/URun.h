@@ -7,10 +7,15 @@ class URun : public UState
 {
 	GENERATED_BODY()
 public:
+	URun();
+	
 	virtual void Tick(float DeltaTime) override;
 	virtual void Enter() override;
 	virtual void Exit() override;
 	
 	UFUNCTION()
 	void OnRunningReleased(bool InRunning);
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float Speed = 900;
 };

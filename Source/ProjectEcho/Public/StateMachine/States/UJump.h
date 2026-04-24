@@ -7,6 +7,8 @@ class UJump : public UState
 {
 	GENERATED_BODY()
 public:
+	UJump();
+	
 	virtual void Tick(float DeltaTime) override;	
 	virtual void Enter() override;
 	virtual void Exit() override;

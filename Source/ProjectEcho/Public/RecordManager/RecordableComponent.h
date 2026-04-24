@@ -51,7 +51,7 @@ public:
 	
 	UFUNCTION()
 	//Called to Reset Actor after Rewind Mode (Has delegate for extra behaviour)
-	void StopRewind();
+	void StopRewind(const float& CurrentTimeKey);
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopRewind);
 	UPROPERTY(BlueprintAssignable)
@@ -79,10 +79,26 @@ private:
 	UPROPERTY()
 	TArray<FRecordTransformKey> TransformKeys;
 	
+	UPROPERTY()
+	TArray<FRecordPhysicsKey> PhysicsKeys;
+	
+	void ClearKeysPastCurrentKey(const float& CurrentTimeKey);
+	
 	const FRecordTransformKey* FindPreviousTransformKey(const float& CurrentTimeKey);
 	const FRecordTransformKey* FindNextTransformKey(const float& CurrentTimeKey);
 	
+	const FRecordPhysicsKey* FindPreviousPhysicsKey(const float& CurrentTimeKey);
+	const FRecordPhysicsKey* FindNextPhysicsKey(const float& CurrentTimeKey);
+	
 	bool bIsRecording;
+	
+	//Let Component Handle Physics' Record using given Mesh
+	UPROPERTY(EditDefaultsOnly)
+	bool bHandlePhysicsOfMesh = false;
+	
+	//StaticMesh used to Handle Physics' Record
+	UPROPERTY()
+	TObjectPtr<UPrimitiveComponent> PhysicsComponent = nullptr;
 	
 	float FirstInteractedKey = -1;
 };
