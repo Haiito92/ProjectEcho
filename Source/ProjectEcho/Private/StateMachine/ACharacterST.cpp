@@ -289,3 +289,21 @@ void ACharacterST::FinalizeReflect_Implementation()
 {
 	
 }
+
+bool ACharacterST::CanBePropulsed_Implementation() const
+{
+	return bCanBePropulsed;
+}
+
+void ACharacterST::PreparePropulse_Implementation(AActor* PropulsingActor)
+{
+}
+
+void ACharacterST::Propulse_Implementation(const FVector& PropulseDirection, float PropulsePower)
+{
+	OnPropulsed.Broadcast(PropulseDirection, PropulsePower);
+}
+
+void ACharacterST::FinalizePropulse_Implementation()
+{
+}
