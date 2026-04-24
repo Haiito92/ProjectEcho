@@ -81,6 +81,16 @@ void URecordableComponent::ReplayFirstKey()
 	GetOwner()->SetActorScale3D(TransformKeys[0].Scale);
 }
 
+void URecordableComponent::MarkAsCurrentlyInteracted()
+{
+	bIsInteractedWith = true;
+}
+
+void URecordableComponent::UnmarkAsCurrentlyInteracted()
+{
+	bIsInteractedWith = false;
+}
+
 void URecordableComponent::StartRewind()
 {
 	if (bHandlePhysicsOfMesh && IsValid(PhysicsComponent))
@@ -144,6 +154,11 @@ void URecordableComponent::StopRecording()
 bool URecordableComponent::IsRecording() const
 {
 	return bIsRecording;
+}
+
+bool URecordableComponent::IsCurrentlyInteractedWith() const
+{
+	return bIsInteractedWith;
 }
 
 const float& URecordableComponent::GetFirstInteractedKey() const

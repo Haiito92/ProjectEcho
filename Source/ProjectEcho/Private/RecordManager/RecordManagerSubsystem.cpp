@@ -375,6 +375,15 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor)
 	{
 		IRecordHandlerInterface::Execute_StartRecording(RecordedActor);
 	}
+
+	for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
+	{
+		if (RecordableComponent->IsCurrentlyInteractedWith() && !RecordableComponent->IsRecording())
+		{
+			RecordableComponent->StartRecording(CurrentTimeKey);
+		}
+	}
+	
 	RecordingTimeline = FEchoTimeline();
 	RecordingTimeline.StartTimeKey = CurrentTimeKey;
 	RecordingTimeline.EchoActor = EchoActorsPool.Pop();

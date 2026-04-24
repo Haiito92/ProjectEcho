@@ -16,6 +16,7 @@ public:
 	// Sets default values for this component's properties
 	URecordHandlerComponent();
 
+	UFUNCTION(BlueprintCallable)
 	virtual void RegisterActionInRecord(const FRecordedAction& Action, const FRecordedAction& RewindAction = FRecordedAction());
 	
 	UFUNCTION(BlueprintCallable)
