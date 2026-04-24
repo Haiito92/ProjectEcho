@@ -1,41 +1,68 @@
 #pragma once
 #include "InteractableMechanic/InteractorComponent.h"
+#include "ReflectMechanic/Reflectable.h"
+#include "PropulseMechanic/PropulseComponent.h"
 #include "StateMachine/UStateMachine.h"
 #include "UState.generated.h"
 
+class UReflectComponent;
 class URecordHandlerComponent;
 class ACharacterST;
 class UStateMachine;
 class UGrabbingComponent;
 class URecordManagerSubsystem;
 
-UCLASS()
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+enum class EStateSettings: uint8
+{
+	None = 0,
+	CanGrab = 1 << 0,
+	CanInteract = 1 << 1,
+	CanRecord = 1 << 2,
+	CanPropulse = 1 << 3,
+	CanReflect = 1 << 4,
+	CanBeReflected = 1 << 5,
+	All = 0b00111111
+};
+
+ENUM_CLASS_FLAGS(EStateSettings);
+
+UCLASS(Blueprintable)
 class UState : public UObject
 {
 public:
 	GENERATED_BODY()
 	UState();
-	
+
 	virtual void Enter();
 	virtual void Tick(float DeltaTime);
-	virtual void Exit();	
+	virtual void Exit();
 	
 	void InitState(UStateMachine *InStateMachine,ACharacterST* InCharacter);
 	
 	UPROPERTY()
-	EState EnumState;
+	EState EnumState = EState::None;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Bitmask))
+	EStateSettings StateSettings = EStateSettings::All;
 	
 protected:
 	
 	UFUNCTION()
-	virtual bool CanUseGrab();
+	bool CanUseGrab();
 	
 	UFUNCTION()
-	virtual bool CanUseRecord();
+	bool CanUseRecord();
 	
 	UFUNCTION()
-	virtual bool CanUseInteract();
-
+	bool CanUseInteract();
+	
+	UFUNCTION()
+	bool CanUsePropulse();
+	
+	UFUNCTION()
+	bool CanUseReflect();
+	
 	UFUNCTION()
 	virtual void OnMovePressed(FVector2D InMoveInput);
 	
@@ -76,6 +103,15 @@ protected:
 	void OnInteract();
 	
 	UFUNCTION()
+	void OnPropulse();
+	
+	UFUNCTION()
+	void OnReflected(const FVector& ReflectDirection, float ReflectPower);
+	
+	UFUNCTION()
+	void OnReflectInputStarted();
+	
+	UFUNCTION()
 	virtual void OnRevive();
 	
 	UFUNCTION()
@@ -98,4 +134,10 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<URecordHandlerComponent> RecordHandlerComponent;
+	
+	UPROPERTY()
+	TObjectPtr<UReflectComponent> ReflectComponent;
+	
+	UPROPERTY()
+	TObjectPtr<UPropulseComponent> PropulseComponent;
 };

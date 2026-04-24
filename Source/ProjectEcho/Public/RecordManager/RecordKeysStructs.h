@@ -12,6 +12,8 @@ enum class ERecordedAction : uint8
 	TryGrab,
 	TryRelease,
 	TryThrow,
+	TryPropulse,
+	TryReflect
 };
 
 //Key used to save the position of an element at a set timekey 
@@ -34,4 +36,14 @@ struct FRecordActionKey
 	
 	float TimeKey;
 	ERecordedAction Action;
+};
+
+USTRUCT(BlueprintType)
+struct FRecordPhysicsKey
+{
+	GENERATED_BODY()
+	
+	float TimeKey;
+	FVector LinearVelocity;
+	FVector AngularVelocity;
 };

@@ -17,6 +17,8 @@ enum class EEchoSystem : uint8
 	Activable,
 	Interact,
 	GameLoop,
+	Propulse,
+	Reflect,
 	Count UMETA(Hidden)
 };
 ENUM_RANGE_BY_COUNT(EEchoSystem, EEchoSystem::Count)
