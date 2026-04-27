@@ -4,7 +4,9 @@
 // Sets default values
 #include <RecordManager/EchoActor.h>
 
+#include "GrabMechanic/GrabbingComponent.h"
 #include "RecordManager/RecordableInterface.h"
+#include "RecordManager/RecordManagerSubsystem.h"
 
 AEchoActor::AEchoActor()
 {
@@ -12,10 +14,10 @@ AEchoActor::AEchoActor()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-void AEchoActor::HandleActionKey(ERecordedAction Action)
+void AEchoActor::HandleActionKey(const FRecordedAction& Action)
 {
 	//Call BP Function
-	ReceiveHandleActionKey(Action);
+	ReceiveHandleActionKey(Action.ActionEnum);
 }
 
 void AEchoActor::SetControlRotation(const FRotator& ControlRotation)

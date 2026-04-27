@@ -37,6 +37,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnObjectReleased();
 	
+	//Called when Forced Released
+	UFUNCTION(BlueprintNativeEvent)
+	void OnObjectForceReleased();
+	
+	//Called when Forced Grabbed
+	UFUNCTION(BlueprintNativeEvent)
+	void OnObjectForceGrabbed();
+	
 	//Called when Thrown
 	UFUNCTION(BlueprintNativeEvent)
 	void OnThrown(const FVector& ThrowDirection,const float& ThrowForce);

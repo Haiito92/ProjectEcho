@@ -40,6 +40,11 @@ public:
 	UFUNCTION()
 	void ReplayFirstKey();
 	
+	UFUNCTION(BlueprintCallable)
+	void MarkAsCurrentlyInteracted();
+	
+	UFUNCTION(BlueprintCallable)
+	void UnmarkAsCurrentlyInteracted();
 	
 	UFUNCTION()
 	//Called to Set Actor in Rewind Mode (Has delegate for extra behaviour)
@@ -72,6 +77,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsRecording() const;
 	
+	//Is Currently Interacted With (Can be Used to Start Record)
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool IsCurrentlyInteractedWith() const;
+	
 	UFUNCTION()
 	const float& GetFirstInteractedKey() const;
 	
@@ -90,7 +99,9 @@ private:
 	const FRecordPhysicsKey* FindPreviousPhysicsKey(const float& CurrentTimeKey);
 	const FRecordPhysicsKey* FindNextPhysicsKey(const float& CurrentTimeKey);
 	
-	bool bIsRecording;
+	bool bIsRecording = false;
+	
+	bool bIsInteractedWith = false;
 	
 	//Let Component Handle Physics' Record using given Mesh
 	UPROPERTY(EditDefaultsOnly)

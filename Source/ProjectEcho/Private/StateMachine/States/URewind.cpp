@@ -8,6 +8,7 @@ URewind::URewind()
 {
 	EnumState = EState::Rewind;
 	StateSettings ^= EStateSettings::CanBeReflected;
+	StateSettings ^= EStateSettings::CanBePropulsed;
 }
 
 
