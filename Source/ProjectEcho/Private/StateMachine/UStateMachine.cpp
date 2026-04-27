@@ -6,8 +6,7 @@
 #include "StateMachine/States/UDeath.h"
 
 #include "StateMachine/States/UIdle.h"
-#include "StateMachine/States/UWalk.h"
-#include "StateMachine/States/URun.h"
+#include "StateMachine/States/UMove.h"
 #include "StateMachine/States/UJump.h"
 #include "StateMachine/States/UFall.h"
 #include "StateMachine/States/URevive.h"

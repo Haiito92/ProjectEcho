@@ -12,4 +12,7 @@ public:
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Player Data")
 	int InitLife = 100;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Player Data")
+	int MaxVelocity = 100;
+	
 };

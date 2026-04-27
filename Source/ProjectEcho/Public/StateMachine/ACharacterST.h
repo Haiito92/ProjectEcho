@@ -44,8 +44,6 @@ public:
 	void AMoveReleased(const FInputActionValue& Value);
 	
 	UFUNCTION()
-	void ARun(const FInputActionValue& Value);
-	UFUNCTION()
 	void ARunStarted(const FInputActionValue& Value);
 	UFUNCTION()
 	void ARunReleased(const FInputActionValue& Value);
@@ -227,6 +225,8 @@ public:
 	int Life = 100;
 	UPROPERTY()
 	bool IsRunInputOn = false;
+	UPROPERTY()
+	float MaxVelocity = 900.f;
 	
 	
 	UPROPERTY()
