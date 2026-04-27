@@ -27,12 +27,17 @@ struct FEchoTimeline
 	GENERATED_BODY()
 	
 	//Actor used to show Replay of Timeline (Echo)
+	UPROPERTY()
 	TObjectPtr<AEchoActor> EchoActor = nullptr;
 	
 	//List of TransformKeys
 	TArray<FRecordTransformKey> TransformKeys;
-	//List of TransformKeys
+	
+	//List of Action Keys
 	TArray<FRecordActionKey> ActionKeys;
+	
+	//List of Rewind ActionKeys
+	TArray<FRecordActionKey> RewindActionKeys;
 	
 	//TimeKey of Start of Timeline (from Global Timeline)
 	float StartTimeKey;
@@ -50,7 +55,7 @@ struct FEchoTimeline
 	const float& GetLastTimeKey() const;
 	
 	//Get All Action Keys between two Keys in given Array, returns true if has found ActionKeys
-	bool GetActionKeys(const float& PreviousKey,const float& CurrentTimeKey, TArray<const FRecordActionKey*>& OutActionKeys) const;
+	bool GetActionKeys(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind, TArray<FRecordActionKey>& OutActionKeys) const;
 	
 	//Save Echo Actor for Replays
 	void RegisterEchoActor(AEchoActor* InEchoActor);
@@ -96,6 +101,9 @@ struct FGlobalTimeline
 	//Whether GlobalTimeline has an available slot to start recording in it
 	bool HasAvailableTimelineSlot() const;
 	
+	//Find First Available Timeline Slot
+	int GetFirstAvailableTimelineSlot() const;
+	
 	//Find Last Time Key of the Global Timeline (Last Key of Last Timeline played)
 	float GetLastTimeKey() const;
 	
@@ -103,9 +111,9 @@ struct FGlobalTimeline
 	float GetLength() const;
 	
 	//Add Timeline to Global Timeline
-	void RegisterTimeline(const FEchoTimeline& Timeline, TObjectPtr<URecordManagerSettings> Settings);
+	void RegisterTimeline(const int& TimelineIndex, const FEchoTimeline& Timeline, TObjectPtr<URecordManagerSettings> Settings);
 	
-	//Destroy Current Timeline 
+	//Destroy Current Timeline
 	void DestroyTimeline(int TimelineIndex, TArray<TObjectPtr<AEchoActor>>& OutEchoActorPool);
 };
 
@@ -164,10 +172,12 @@ public:
 	UFUNCTION()
 	void OnRecordableInteractedWith(URecordableComponent* Self, bool bShouldRecord);
 	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStartRecording, float, CurrentTimeKey);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnStartRecording, float, CurrentTimeKey, int, TimelineIndex, const FEchoColorStruct&, EchoColorInformations);
+	UPROPERTY(BlueprintAssignable)
 	FOnStartRecording OnStartRecording;	
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopRecording);
+	UPROPERTY(BlueprintAssignable)
 	FOnStopRecording OnStopRecording;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartPlayerRewinding);
@@ -187,6 +197,9 @@ protected:
 
 	//Current Recording Timeline;
 	FEchoTimeline RecordingTimeline;
+	
+	UPROPERTY()
+	int CurrentRecordingTimelineIndex = -1;
 	
 	UPROPERTY()
 	TObjectPtr<AActor> RecordedActor = nullptr;

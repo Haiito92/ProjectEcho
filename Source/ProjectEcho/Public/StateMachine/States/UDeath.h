@@ -7,14 +7,14 @@ class UDeath : public UState
 {
 	GENERATED_BODY()
 public:
+	UDeath();
+	
 	virtual void Tick(float DeltaTime) override;
 	virtual void Enter() override;
 	virtual void Exit() override;
 	
+	
 protected:
-	virtual bool CanUseGrab() override;
-	virtual bool CanUseRecord() override;
-	virtual bool CanUseInteract() override;
 	
 	virtual void OnRevive() override;
 

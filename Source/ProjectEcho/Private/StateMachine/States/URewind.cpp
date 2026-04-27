@@ -4,6 +4,14 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "StateMachine/ACharacterST.h"
 
+URewind::URewind()
+{
+	EnumState = EState::Rewind;
+	StateSettings ^= EStateSettings::CanBeReflected;
+	StateSettings ^= EStateSettings::CanBePropulsed;
+}
+
+
 void URewind::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

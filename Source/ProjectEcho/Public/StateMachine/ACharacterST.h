@@ -2,8 +2,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "KillMechanic/Killable.h"
+#include "PropulseMechanic/Propulsable.h"
+#include "ReflectMechanic/Reflectable.h"
+#include "RecordManager/RecordHandlerInterface.h"
 #include "ACharacterST.generated.h"
 
+class URecordHandlerComponent;
 class UInputComponent;
 class USkeletalMeshComponent;
 class UCameraComponent;
@@ -15,7 +19,7 @@ class UStateMachine;
 class UEnhancedInputLocalPlayerSubsystem;
 
 UCLASS()
-class PROJECTECHO_API ACharacterST : public ACharacter, public IKillable
+class PROJECTECHO_API ACharacterST : public ACharacter, public IKillable, public IReflectable, public IPropulsable, public IRecordHandlerInterface
 {
 	GENERATED_BODY()
 
@@ -74,6 +78,12 @@ public:
 	void AInteract();
 	
 	UFUNCTION(BlueprintCallable)
+	void APropulse();
+	
+	UFUNCTION(BlueprintCallable)
+	void AReflect();
+	
+	UFUNCTION(BlueprintCallable)
 	void PlayerTakeDamage(int value);
 	
 	UFUNCTION(BlueprintCallable)
@@ -93,7 +103,37 @@ public:
 	
 	UFUNCTION()
 	void InitStateMachine();
+	
+	UFUNCTION()
+	virtual bool CanBeReflected_Implementation() const override;
+	
+	UFUNCTION()
+	virtual void PrepareReflect_Implementation(AActor* ActorDoingReflect) override;
+	
+	UFUNCTION()
+	virtual void Reflect_Implementation(const FVector& ReflectDirection, float ReflectPower) override;
+	
+	UFUNCTION()
+	virtual void FinalizeReflect_Implementation() override;
+	
+	UFUNCTION()
+	virtual TArray<FRecordedAction> GetToRecordActions() override;
+	
+	UFUNCTION()
+	virtual TArray<FRecordedAction> GetToRecordRewindActions() override;
 
+	UFUNCTION()
+	virtual bool CanBePropulsed_Implementation() const override;
+	
+	UFUNCTION()
+	virtual void PreparePropulse_Implementation(AActor* PropulsingActor) override;
+	
+	UFUNCTION()
+	virtual void Propulse_Implementation(const FVector& PropulseDirection, float PropulsePower) override;
+	
+	UFUNCTION()
+	virtual void FinalizePropulse_Implementation() override;
+	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
 	FMovePressed OnMovePressed;
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveStarted, bool, isPress);
@@ -144,6 +184,18 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInteract);
 	FOnRevive OnInteract;
 	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartPropulse);
+	FOnStartPropulse OnStartPropulse;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPropulsed, const FVector&, PropulseDirection, float, PropulsePower);
+	FOnPropulsed OnPropulsed;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReflectInputStarted);
+	FOnReflectInputStarted OnReflectInputStarted;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnReflected, const FVector&, ReflectDirection, float, ReflectPower);
+	FOnReflected OnReflected;
+	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnValidGrab);
 	UPROPERTY(BlueprintAssignable)
 	FOnValidGrab OnValidGrab;
@@ -164,15 +216,13 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnEndRecord OnEndRecord;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	UInputDataConfig* InputActions;
-	UPROPERTY(EditDefaultsOnly,  Category = "Input")
-	UInputMappingContext* InputMapping;
 	
-	UPROPERTY()
-	float WalkSpeed = 600.f;
-	UPROPERTY()
-	float RunSpeed = 900.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputDataConfig> InputActions;
+	UPROPERTY(EditDefaultsOnly,  Category = "Input")
+	TObjectPtr<UInputMappingContext> InputMapping;
+	
 	UPROPERTY()
 	int Life = 100;
 	UPROPERTY()
@@ -183,14 +233,20 @@ public:
 	FVector2D MoveInputDir = FVector2D::ZeroVector;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State Machine")
-	UStateMachine* StateMachine;
+	TObjectPtr<UStateMachine> StateMachine;
+	
+	UPROPERTY()
+	TObjectPtr<URecordHandlerComponent> RecordHandlerComponent;
 	
 	UPROPERTY()
 	UEnhancedInputLocalPlayerSubsystem* Subsystem;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* FirstPersonMesh;
+	TObjectPtr<USkeletalMeshComponent> FirstPersonMesh;
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* FirstPersonCameraComponent;
+	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
+	
+	bool bCanBeReflected = false;
+	bool bCanBePropulsed = false;
 };

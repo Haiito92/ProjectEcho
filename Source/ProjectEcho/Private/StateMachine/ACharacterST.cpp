@@ -11,7 +11,9 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GrabMechanic/GrabbingComponent.h"
+#include "RecordManager/RecordHandlerComponent.h"
 #include "RecordManager/RecordManagerSubsystem.h"
+#include "StateMachine/UState.h"
 #include "StateMachine/Data/UInputDataConfig.h"
 #include "StateMachine/Data/UPlayerData.h"
 #include "Tools/Debug/EchoDebug.h"
@@ -49,8 +51,6 @@ ACharacterST::ACharacterST()
 	
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 	GetCharacterMovement()->AirControl = 0.5f;
-	
-	
 }
 
 
@@ -108,10 +108,16 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Input->BindAction(InputActions->ARecord, ETriggerEvent::Started, this, &ACharacterST::Record);
 	Input->BindAction(InputActions->ADestroySlot, ETriggerEvent::Started, this, &ACharacterST::DestroySlot);
 	Input->BindAction(InputActions->AInteract, ETriggerEvent::Started,this,&ACharacterST::AInteract);
+	
+	Input->BindAction(InputActions->APropulse, ETriggerEvent::Started,this,&ACharacterST::APropulse);
+	
+	Input->BindAction(InputActions->AReflect, ETriggerEvent::Started,this,&ACharacterST::AReflect);
+	
 }
 
 void ACharacterST::InitPlayer()
 {
+	RecordHandlerComponent = FindComponentByClass<URecordHandlerComponent>();
 	InitStateMachine();
 	LoadData();
 }
@@ -119,8 +125,6 @@ void ACharacterST::InitPlayer()
 void ACharacterST::LoadData()
 {
 	Life = GetDefault<UPlayerData>()->InitLife;
-	WalkSpeed = GetDefault<UPlayerData>()->WalkSpeed;
-	RunSpeed = GetDefault<UPlayerData>()->RunSpeed;
 }
 
 void ACharacterST::AMove(const FInputActionValue& Value)
@@ -206,6 +210,16 @@ void ACharacterST::AInteract()
 	OnInteract.Broadcast();
 }
 
+void ACharacterST::APropulse()
+{
+	OnStartPropulse.Broadcast();
+}
+
+void ACharacterST::AReflect()
+{
+	OnReflectInputStarted.Broadcast();
+}
+
 void ACharacterST::PlayerTakeDamage(int value)
 {
 	Life = FMath::Max(Life-value,0);
@@ -255,4 +269,52 @@ void ACharacterST::InitStateMachine()
 {
 	StateMachine = NewObject<UStateMachine>(this);
 	StateMachine->InitStates(this);
+}
+
+bool ACharacterST::CanBeReflected_Implementation() const
+{
+	return bCanBeReflected;
+}
+
+void ACharacterST::PrepareReflect_Implementation(AActor* ActorDoingReflect)
+{
+}
+
+void ACharacterST::Reflect_Implementation(const FVector& ReflectDirection, float ReflectPower)
+{
+	OnReflected.Broadcast(ReflectDirection, ReflectPower);
+}
+
+void ACharacterST::FinalizeReflect_Implementation()
+{
+}
+
+TArray<FRecordedAction> ACharacterST::GetToRecordActions()
+{
+	if (IsValid(RecordHandlerComponent)) return RecordHandlerComponent->GetToRecordActions();
+	return TArray<FRecordedAction>();
+}
+
+TArray<FRecordedAction> ACharacterST::GetToRecordRewindActions()
+{
+	if (IsValid(RecordHandlerComponent)) return RecordHandlerComponent->GetToRecordRewindActions();
+	return TArray<FRecordedAction>();
+}
+
+bool ACharacterST::CanBePropulsed_Implementation() const
+{
+	return bCanBePropulsed;
+}
+
+void ACharacterST::PreparePropulse_Implementation(AActor* PropulsingActor)
+{
+}
+
+void ACharacterST::Propulse_Implementation(const FVector& PropulseDirection, float PropulsePower)
+{
+	OnPropulsed.Broadcast(PropulseDirection, PropulsePower);
+}
+
+void ACharacterST::FinalizePropulse_Implementation()
+{
 }

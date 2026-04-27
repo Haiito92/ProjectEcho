@@ -170,13 +170,9 @@ const FEchoSystemDebugInfo* UEchoDebug::GetSystemDebugInfo(const EEchoSystem& Sy
 
 const UDebugDataAsset* UEchoDebug::LazyGetDebugDataAsset()
 {
-	if (DebugDataAsset == nullptr)
-	{
-		const UDataAssetDeveloperSettings* DebugSettings = GetDefault<UDataAssetDeveloperSettings>();
-		DebugDataAsset = DebugSettings->DebutDataAsset.LoadSynchronous();
-	}
+	const UDataAssetDeveloperSettings* DebugSettings = GetDefault<UDataAssetDeveloperSettings>();
 
-	return DebugDataAsset;
+	return DebugSettings->DebutDataAsset.LoadSynchronous();
 }
 
 TMap<EEchoSystem, bool>& UEchoDebug::LazyGetToggles()
@@ -192,6 +188,5 @@ TMap<EEchoSystem, bool>& UEchoDebug::LazyGetToggles()
 	return Toggles;
 }
 
-TObjectPtr<UDebugDataAsset> UEchoDebug::DebugDataAsset = nullptr;
 TMap<EEchoSystem, bool> UEchoDebug::Toggles = {};
 
