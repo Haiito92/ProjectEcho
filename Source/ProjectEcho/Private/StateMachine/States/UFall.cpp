@@ -6,6 +6,11 @@
 UFall::UFall()
 {
 	EnumState = EState::Fall;
+	if (Character != nullptr)
+	{
+		Character->GetCharacterMovement()->AirControl = AirControl;
+		Character->GetCharacterMovement()->BrakingDecelerationFalling = BrakingDecelerationFalling;
+	}
 }
 
 void UFall::Tick(float DeltaTime)
@@ -14,12 +19,7 @@ void UFall::Tick(float DeltaTime)
 	if (Character->GetCharacterMovement()->IsMovingOnGround())
 	{
 		if (Character->MoveInputDir != FVector2D::ZeroVector)
-		{
-			if (Character->IsRunInputOn)
-				StateMachine->ChangeState(EState::Run);
-			else
-				StateMachine->ChangeState(EState::Walk);
-		}
+			StateMachine->ChangeState(EState::Move);
 		else
 			StateMachine->ChangeState(EState::Idle);
 	}
