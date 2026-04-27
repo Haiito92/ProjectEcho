@@ -2,9 +2,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "KillMechanic/Killable.h"
+#include "PropulseMechanic/Propulsable.h"
 #include "ReflectMechanic/Reflectable.h"
+#include "RecordManager/RecordHandlerInterface.h"
 #include "ACharacterST.generated.h"
 
+class URecordHandlerComponent;
 class UInputComponent;
 class USkeletalMeshComponent;
 class UCameraComponent;
@@ -16,7 +19,7 @@ class UStateMachine;
 class UEnhancedInputLocalPlayerSubsystem;
 
 UCLASS()
-class PROJECTECHO_API ACharacterST : public ACharacter, public IKillable, public IReflectable
+class PROJECTECHO_API ACharacterST : public ACharacter, public IKillable, public IReflectable, public IPropulsable, public IRecordHandlerInterface
 {
 	GENERATED_BODY()
 
@@ -112,7 +115,25 @@ public:
 	
 	UFUNCTION()
 	virtual void FinalizeReflect_Implementation() override;
+	
+	UFUNCTION()
+	virtual TArray<FRecordedAction> GetToRecordActions() override;
+	
+	UFUNCTION()
+	virtual TArray<FRecordedAction> GetToRecordRewindActions() override;
 
+	UFUNCTION()
+	virtual bool CanBePropulsed_Implementation() const override;
+	
+	UFUNCTION()
+	virtual void PreparePropulse_Implementation(AActor* PropulsingActor) override;
+	
+	UFUNCTION()
+	virtual void Propulse_Implementation(const FVector& PropulseDirection, float PropulsePower) override;
+	
+	UFUNCTION()
+	virtual void FinalizePropulse_Implementation() override;
+	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
 	FMovePressed OnMovePressed;
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveStarted, bool, isPress);
@@ -166,6 +187,9 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartPropulse);
 	FOnStartPropulse OnStartPropulse;
 	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPropulsed, const FVector&, PropulseDirection, float, PropulsePower);
+	FOnPropulsed OnPropulsed;
+	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReflectInputStarted);
 	FOnReflectInputStarted OnReflectInputStarted;
 	
@@ -212,6 +236,9 @@ public:
 	TObjectPtr<UStateMachine> StateMachine;
 	
 	UPROPERTY()
+	TObjectPtr<URecordHandlerComponent> RecordHandlerComponent;
+	
+	UPROPERTY()
 	UEnhancedInputLocalPlayerSubsystem* Subsystem;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
@@ -221,4 +248,5 @@ public:
 	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
 	
 	bool bCanBeReflected = false;
+	bool bCanBePropulsed = false;
 };

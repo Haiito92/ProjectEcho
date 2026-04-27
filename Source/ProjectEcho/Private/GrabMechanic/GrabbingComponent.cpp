@@ -97,6 +97,69 @@ bool UGrabbingComponent::TryThrow(const FRotator& ControlRotation)
 	return false;
 }
 
+void UGrabbingComponent::ForceRelease()
+{
+	if (IsGrabbing())
+	{
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Grab, EEchoMessageType::Log,"Force Releasing Grabbed Actor : " + GrabbedActor->GetName(), FColor::White, 3.f);
+		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		IGrabbableInterface::Execute_OnObjectForceReleased(GrabbedActor);
+		GrabbedActor = nullptr;
+	}
+}
+
+void UGrabbingComponent::ForceGrab(AActor* Actor)
+{
+	if (!IsGrabbing())
+	{
+		if (Actor->GetClass()->ImplementsInterface(UGrabbableInterface::StaticClass()) && IGrabbableInterface::Execute_CanBeGrabbed(Actor))
+		{
+			GrabbedActor = Actor;
+			FAttachmentTransformRules AttachmentTransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
+			GrabbedActor->AttachToComponent(this, AttachmentTransformRules);
+			IGrabbableInterface::Execute_OnObjectForceGrabbed(GrabbedActor);
+		}
+	}
+}
+
+void UGrabbingComponent::TryForceGrabHeldCube()
+{
+	if (IsGrabbing()) return;
+	if (!IsValid(GrabMechanicSettings))
+	{
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Grab, EEchoMessageType::Error,"GrabSettings not found, Can't Grab !", FColor::White, 3.f);
+		return;
+	}
+	FHitResult HitResult;
+	FCollisionQueryParams TraceParams = FCollisionQueryParams::DefaultQueryParam;
+	TraceParams.bTraceComplex = true;
+	//TraceParams.bTraceAsyncScene = true;
+	TraceParams.bReturnPhysicalMaterial = false;
+	TraceParams.AddIgnoredActor(GetOwner());
+
+	GetWorld()->SweepSingleByChannel(
+		HitResult,
+		GetComponentLocation(),
+		GetComponentLocation(),
+		FQuat::Identity,
+		ECC_WorldDynamic,
+		FCollisionShape::MakeSphere(GrabMechanicSettings->SphereTraceRadius),
+		TraceParams);
+	
+	UEchoDebug::DrawSphere(GetWorld(), EEchoSystem::Grab, GetComponentLocation(), GrabMechanicSettings->SphereTraceRadius, 12, FColor::White, 3.f);
+	
+	if (HitResult.bBlockingHit)
+	{
+		if (HitResult.GetActor()->GetClass()->ImplementsInterface(UGrabbableInterface::StaticClass()) && IGrabbableInterface::Execute_CanBeGrabbed(HitResult.GetActor()))
+		{
+			GrabbedActor = HitResult.GetActor();
+			FAttachmentTransformRules AttachmentTransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
+			GrabbedActor->AttachToComponent(this, AttachmentTransformRules);
+			IGrabbableInterface::Execute_OnObjectForceGrabbed(GrabbedActor);
+		}
+	}
+}
+
 bool UGrabbingComponent::IsGrabbing()
 {
 	return IsValid(GrabbedActor);

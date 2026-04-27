@@ -11,6 +11,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GrabMechanic/GrabbingComponent.h"
+#include "RecordManager/RecordHandlerComponent.h"
 #include "RecordManager/RecordManagerSubsystem.h"
 #include "StateMachine/UState.h"
 #include "StateMachine/Data/UInputDataConfig.h"
@@ -50,8 +51,6 @@ ACharacterST::ACharacterST()
 	
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 	GetCharacterMovement()->AirControl = 0.5f;
-	
-	
 }
 
 
@@ -118,6 +117,7 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 void ACharacterST::InitPlayer()
 {
+	RecordHandlerComponent = FindComponentByClass<URecordHandlerComponent>();
 	InitStateMachine();
 	LoadData();
 }
@@ -287,5 +287,34 @@ void ACharacterST::Reflect_Implementation(const FVector& ReflectDirection, float
 
 void ACharacterST::FinalizeReflect_Implementation()
 {
-	
+}
+
+TArray<FRecordedAction> ACharacterST::GetToRecordActions()
+{
+	if (IsValid(RecordHandlerComponent)) return RecordHandlerComponent->GetToRecordActions();
+	return TArray<FRecordedAction>();
+}
+
+TArray<FRecordedAction> ACharacterST::GetToRecordRewindActions()
+{
+	if (IsValid(RecordHandlerComponent)) return RecordHandlerComponent->GetToRecordRewindActions();
+	return TArray<FRecordedAction>();
+}
+
+bool ACharacterST::CanBePropulsed_Implementation() const
+{
+	return bCanBePropulsed;
+}
+
+void ACharacterST::PreparePropulse_Implementation(AActor* PropulsingActor)
+{
+}
+
+void ACharacterST::Propulse_Implementation(const FVector& PropulseDirection, float PropulsePower)
+{
+	OnPropulsed.Broadcast(PropulseDirection, PropulsePower);
+}
+
+void ACharacterST::FinalizePropulse_Implementation()
+{
 }

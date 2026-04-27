@@ -32,8 +32,12 @@ struct FEchoTimeline
 	
 	//List of TransformKeys
 	TArray<FRecordTransformKey> TransformKeys;
-	//List of TransformKeys
+	
+	//List of Action Keys
 	TArray<FRecordActionKey> ActionKeys;
+	
+	//List of Rewind ActionKeys
+	TArray<FRecordActionKey> RewindActionKeys;
 	
 	//TimeKey of Start of Timeline (from Global Timeline)
 	float StartTimeKey;
@@ -51,7 +55,7 @@ struct FEchoTimeline
 	const float& GetLastTimeKey() const;
 	
 	//Get All Action Keys between two Keys in given Array, returns true if has found ActionKeys
-	bool GetActionKeys(const float& PreviousKey,const float& CurrentTimeKey, TArray<const FRecordActionKey*>& OutActionKeys) const;
+	bool GetActionKeys(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind, TArray<FRecordActionKey>& OutActionKeys) const;
 	
 	//Save Echo Actor for Replays
 	void RegisterEchoActor(AEchoActor* InEchoActor);
