@@ -2,6 +2,7 @@
 	"BuildId": "47537391",
 	"Modules": 
 	{
+		"LevelSelectionDropDown": "UnrealEditor-LevelSelectionDropDown.dll",
 		"ProjectEcho": "UnrealEditor-ProjectEcho.dll"
 	}
 }
