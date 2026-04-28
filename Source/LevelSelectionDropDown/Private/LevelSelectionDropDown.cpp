@@ -1,4 +1,5 @@
 ﻿#include "LevelSelectionDropDown.h"
+#include "SLevelSelectionCombo.h"
 
 #define LOCTEXT_NAMESPACE "FLevelSelectionDropDownModule"
 
@@ -22,15 +23,12 @@ void FLevelSelectionDropDownModule::RegisterMenuExtensions()
     if (!SecondaryToolbar) return;
     
     FToolMenuSection& DropDownSection = SecondaryToolbar->AddSection("LevelSelectionDropDown");
-    DropDownSection.Label = LOCTEXT("LevelSelectionDropDown", "Level Selection Section"); 
+    DropDownSection.Label = LOCTEXT("LevelSelectionDropDown", "Level Selection Section");
     
-    FToolMenuEntry ComboEntry = FToolMenuEntry::InitComboButton(
+    FToolMenuEntry ComboEntry = FToolMenuEntry::InitWidget(
         "LevelSelectionCombo",
-        FUIAction(),
-        FNewToolMenuChoice(),
-        LOCTEXT("LevelSelectionComboLabel", "Level Selection"),
-        LOCTEXT("LevelSelectionComboTip", "Choose a level to open."),
-        FSlateIcon(FAppStyle::GetAppStyleSetName(), "Icons.Settings"));
+        SNew(SLevelSelectionCombo),
+        FText::GetEmpty());
     
     DropDownSection.AddEntry(ComboEntry);
 }

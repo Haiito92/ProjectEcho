@@ -10,6 +10,6 @@ public:
     virtual void ShutdownModule() override;
     
 protected:
-    UFUNCTION()
+    
     void RegisterMenuExtensions();
 };

@@ -20,7 +20,8 @@ public class LevelSelectionDropDown : ModuleRules
                 "Engine",
                 "Slate",
                 "SlateCore",
-                "ToolMenus"
+                "ToolMenus",
+				"UnrealEd"
             }
         );
     }
