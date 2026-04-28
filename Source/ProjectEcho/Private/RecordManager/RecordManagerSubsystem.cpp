@@ -179,13 +179,15 @@ void FEchoTimeline::ActivateTimeline(bool bInIsActive)
 	if (IsValid(EchoActor))
 	{
 		bIsActive = bInIsActive;
-		EchoActor->SetActorHiddenInGame(!bInIsActive);
+		//EchoActor->SetActorHiddenInGame(!bInIsActive);
 	}
 }
 
 void FEchoTimeline::OnDestroy()
 {
 	ActivateTimeline(false);
+	EchoActor->OnTimelineDestroyed();
+	EchoActor->SetActorHiddenInGame(true);
 }
 
 #pragma endregion
@@ -293,6 +295,7 @@ void FGlobalTimeline::RegisterTimeline(const int& TimelineIndex, const FEchoTime
 	{
 		if (Settings->EchoColors.Contains(TimelineIndex))
 		{
+			Timeline.EchoActor->SetActorHiddenInGame(false);
 			Timeline.EchoActor->InitEcho(TimelineIndex, Settings->EchoColors[TimelineIndex]);
 		}
 		Timelines.Add(TimelineIndex, Timeline);
@@ -561,7 +564,7 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 				StopPlayerRewind();
 				return;
 			}
-			PlayPlayerRewind(CurrentTimeKey - RecordingTimeline.StartTimeKey);
+			PlayPlayerRewind(previousTimeKey - RecordingTimeline.StartTimeKey, CurrentTimeKey - RecordingTimeline.StartTimeKey);
 		}
 		
 		if (bHasReachedEnd && !bIsRecording && !bIsInRewind)
@@ -592,7 +595,7 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 	}
 }
 
-void URecordManagerSubsystem::PlayPlayerRewind(const float& TimeKey)
+void URecordManagerSubsystem::PlayPlayerRewind(const float& PreviousTimeKey, const float& TimeKey)
 {
 	if (!IsValid(RecordedActor)) return;
 	
@@ -608,6 +611,16 @@ void URecordManagerSubsystem::PlayPlayerRewind(const float& TimeKey)
 		if (RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass()))
 		{
 			IRecordHandlerInterface::Execute_SetControlRotation(RecordedActor, FMath::Lerp(PreviousTransformKey->ControlRotation, NextTransformKey->ControlRotation, lerpValue));
+		}
+	}
+	
+	if (RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass()))
+	{
+		TArray<FRecordActionKey> RewindActions;
+		RecordingTimeline.GetActionKeys(PreviousTimeKey, TimeKey, true, RewindActions);
+		for (const FRecordActionKey& RewindAction : RewindActions)
+		{
+			IRecordHandlerInterface::Execute_HandleRewindActionKey(RecordedActor, RewindAction.Action);
 		}
 	}
 }

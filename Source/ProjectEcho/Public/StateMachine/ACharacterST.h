@@ -7,6 +7,7 @@
 #include "RecordManager/RecordHandlerInterface.h"
 #include "ACharacterST.generated.h"
 
+class UGrabbingComponent;
 class URecordHandlerComponent;
 class UInputComponent;
 class USkeletalMeshComponent;
@@ -119,6 +120,9 @@ public:
 	
 	UFUNCTION()
 	virtual TArray<FRecordedAction> GetToRecordRewindActions() override;
+	
+	UFUNCTION()
+	virtual void HandleRewindActionKey_Implementation(const FRecordedAction& RewindAction) override;
 
 	UFUNCTION()
 	virtual bool CanBePropulsed_Implementation() const override;
@@ -237,6 +241,9 @@ public:
 	
 	UPROPERTY()
 	TObjectPtr<URecordHandlerComponent> RecordHandlerComponent;
+	
+	UPROPERTY()
+	TObjectPtr<UGrabbingComponent> GrabbingComponent;
 	
 	UPROPERTY()
 	UEnhancedInputLocalPlayerSubsystem* Subsystem;

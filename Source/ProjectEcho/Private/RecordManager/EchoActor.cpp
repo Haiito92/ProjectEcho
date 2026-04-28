@@ -32,6 +32,12 @@ void AEchoActor::InitEcho(const int& index, const FEchoColorStruct& EchoColor)
 	ReceiveInitEcho(EchoColor);
 }
 
+void AEchoActor::OnTimelineDestroyed()
+{
+	//Call BP Function
+	ReceiveOnTimelineDestroyed();
+}
+
 void AEchoActor::RegisterRecordable(TScriptInterface<IRecordableInterface> Recordable)
 {
 	OnRegisterRecordable.Broadcast(Recordable);

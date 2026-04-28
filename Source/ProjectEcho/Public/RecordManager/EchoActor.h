@@ -23,6 +23,7 @@ public:
 public:
 	void HandleActionKey(const FRecordedAction& Action);
 	
+	
 	UFUNCTION()
 	void SetControlRotation(const FRotator& ControlRotation);
 	
@@ -31,6 +32,12 @@ public:
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveInitEcho(FEchoColorStruct EchoColor);
+	
+	UFUNCTION()
+	void OnTimelineDestroyed();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveOnTimelineDestroyed();
 	
 protected:
 	UFUNCTION(BlueprintImplementableEvent)

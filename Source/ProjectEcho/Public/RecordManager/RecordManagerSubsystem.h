@@ -193,7 +193,7 @@ private:
 	virtual void Tick(float DeltaTime) override;
 	
 	//Handle Replay of Player Rewind (Placement of Actions
-	void PlayPlayerRewind(const float& TimeKey);
+	void PlayPlayerRewind(const float& PreviousTimeKey, const float& TimeKey);
 	
 protected:
 	FGlobalTimeline GlobalTimeline;

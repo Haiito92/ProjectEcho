@@ -118,6 +118,7 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 void ACharacterST::InitPlayer()
 {
 	RecordHandlerComponent = FindComponentByClass<URecordHandlerComponent>();
+	GrabbingComponent = FindComponentByClass<UGrabbingComponent>();
 	InitStateMachine();
 	LoadData();
 }
@@ -295,6 +296,20 @@ TArray<FRecordedAction> ACharacterST::GetToRecordRewindActions()
 {
 	if (IsValid(RecordHandlerComponent)) return RecordHandlerComponent->GetToRecordRewindActions();
 	return TArray<FRecordedAction>();
+}
+
+void ACharacterST::HandleRewindActionKey_Implementation(const FRecordedAction& RewindAction)
+{
+	switch (RewindAction.ActionEnum)
+	{
+	case ERecordedAction::ForceRelease:
+		if (IsValid(GrabbingComponent))
+		{
+			GrabbingComponent->ForceRelease();
+		}
+	default: 
+		break;
+	}
 }
 
 bool ACharacterST::CanBePropulsed_Implementation() const
