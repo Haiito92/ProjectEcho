@@ -11,8 +11,7 @@ enum class EState : uint8
 {
 	None,
 	Idle,
-	Walk,
-	Run,
+	Move,
 	Fall,
 	Jump,
 	WallRun,

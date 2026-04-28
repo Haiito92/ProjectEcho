@@ -1,5 +1,6 @@
 #include "StateMachine/States/UJump.h"
 
+#include "GameFramework/CharacterMovementComponent.h"
 #include "RecordManager/EchoActor.h"
 #include "RecordManager/RecordHandlerComponent.h"
 #include "RecordManager/RecordManagerSubsystem.h"
@@ -8,6 +9,8 @@
 UJump::UJump()
 {
 	EnumState = EState::Jump;
+	if (Character != nullptr)
+		Character->GetCharacterMovement()->JumpZVelocity = JumpForce;
 }
 
 void UJump::Tick(float DeltaTime)

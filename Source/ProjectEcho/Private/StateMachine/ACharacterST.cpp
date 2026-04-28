@@ -48,9 +48,6 @@ ACharacterST::ACharacterST()
 	GetMesh()->FirstPersonPrimitiveType = EFirstPersonPrimitiveType::WorldSpaceRepresentation;
 
 	GetCapsuleComponent()->SetCapsuleSize(34.0f, 96.0f);
-	
-	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
-	GetCharacterMovement()->AirControl = 0.5f;
 }
 
 
@@ -65,6 +62,13 @@ void ACharacterST::Tick(float DeltaTime)
 	if (StateMachine == nullptr)
 		return;
 	StateMachine->Tick(DeltaTime);
+	
+	FVector Vel = GetCharacterMovement()->Velocity;
+	if (Vel.Size() > MaxVelocity)
+	{
+		Vel = Vel.GetSafeNormal() * MaxVelocity;
+		GetCharacterMovement()->Velocity = Vel;
+	}
 }
 
 void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -90,10 +94,6 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Input->BindAction(InputActions->AMove, ETriggerEvent::Triggered, this, &ACharacterST::AMove);
 	Input->BindAction(InputActions->AMove, ETriggerEvent::Started, this, &ACharacterST::AMoveStarted);
 	Input->BindAction(InputActions->AMove, ETriggerEvent::Completed, this, &ACharacterST::AMoveReleased);
-	
-	Input->BindAction(InputActions->ARun, ETriggerEvent::Triggered, this, &ACharacterST::ARun);
-	Input->BindAction(InputActions->ARun, ETriggerEvent::Started, this, &ACharacterST::ARunStarted);
-	Input->BindAction(InputActions->ARun, ETriggerEvent::Completed, this, &ACharacterST::ARunReleased);
 	
 	Input->BindAction(InputActions->AJump, ETriggerEvent::Started, this, &ACharacterST::AJump);
 	
@@ -145,10 +145,6 @@ void ACharacterST::AMoveReleased(const FInputActionValue& Value)
 	OnMoveReleased.Broadcast();
 }
 
-void ACharacterST::ARun(const FInputActionValue& Value)
-{
-	OnRunning.Broadcast();
-}
 
 void ACharacterST::ARunStarted(const FInputActionValue& Value)
 {

@@ -35,6 +35,6 @@ void UIdle::Exit()
 
 void UIdle::OnMovePressed(FVector2D dir)
 {
-	StateMachine->ChangeState(EState::Walk);
+	StateMachine->ChangeState(EState::Move);
 }
 
