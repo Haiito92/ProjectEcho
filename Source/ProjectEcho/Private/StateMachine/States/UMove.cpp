@@ -2,12 +2,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "StateMachine/ACharacterST.h"
 
-UMove::UMove()
-{
-	EnumState = EState::Move;
-	if (Character != nullptr)
-		Character->GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
-}
 
 void UMove::Enter()
 {
@@ -23,4 +17,19 @@ void UMove::Exit()
 	Character->OnMovePressed.RemoveDynamic(this, &UMove::OnMovePressed);
 	Character->OnMoveReleased.RemoveDynamic(this, &UMove::OnMoveReleased);
 	Character->OnJumpingStarted.RemoveDynamic(this, &UMove::OnJumpingStarted);
+}
+
+void UMove::InitState(UStateMachine* InStateMachine, ACharacterST* InCharacter)
+{
+	Super::InitState(InStateMachine, InCharacter);
+	EnumState = EState::Move;
+	if (Character != nullptr)
+	{
+		Character->GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
+	}
+	else
+	{
+		
+		UE_LOG(LogTemp, Warning, TEXT("No character attached!"));
+	}
 }
