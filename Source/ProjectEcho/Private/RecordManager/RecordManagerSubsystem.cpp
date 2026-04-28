@@ -159,6 +159,21 @@ void FEchoTimeline::PlayReplay(const float& PreviousKey,const float& CurrentTime
 	}
 }
 
+void FEchoTimeline::PlayFirstKey(TArray<FRecordedAction> RestoreFirstStateAction)
+{
+	if (!IsValid(EchoActor)) return;
+	FRecordTransformKey RecordTransformKey = TransformKeys[0];
+	EchoActor->SetActorLocation(RecordTransformKey.Position);
+	EchoActor->SetActorRotation(RecordTransformKey.Rotation);
+	EchoActor->SetActorScale3D(RecordTransformKey.Scale);
+	EchoActor->SetControlRotation(RecordTransformKey.ControlRotation);
+
+	for (const FRecordedAction& RecordedAction : RestoreFirstStateAction)
+	{
+		EchoActor->HandleActionKey(RecordedAction);
+	}
+}
+
 void FEchoTimeline::ActivateTimeline(bool bInIsActive)
 {
 	if (IsValid(EchoActor))
@@ -363,11 +378,13 @@ void URecordManagerSubsystem::InitRecordManager(const int& NbTimelineSlot)
 	}
 }
 
-void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor)
+void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<FRecordedAction>& RestoreStateAction)
 {
 	if (!CanStartRecord()) return;
 	if (!IsValid(InRecordedActor)) return;
 	if (EchoActorsPool.IsEmpty()) return;
+		
+	RecordingTimelineStartActions = RestoreStateAction;
 	RecordedActor = InRecordedActor;
 	bIsRecording = true;
 	CurrentRecordingTimelineIndex = GlobalTimeline.GetFirstAvailableTimelineSlot();
@@ -442,12 +459,14 @@ void URecordManagerSubsystem::StopPlayerRewind()
 		IRecordHandlerInterface::Execute_SetControlRotation(RecordedActor, RecordingTimeline.TransformKeys[0].ControlRotation);
 	}
 	RecordedActor = nullptr;
-	
-	GlobalTimeline.RegisterTimeline(CurrentRecordingTimelineIndex, RecordingTimeline, RecordManagerSettings);
+
 	OnStopPlayerRewinding.Broadcast();
-	
 	StopRewind();
 	bIsPlayerRewinding = false;
+	
+	RecordingTimeline.PlayFirstKey(RecordingTimelineStartActions);
+	RecordingTimelineStartActions.Empty();
+	GlobalTimeline.RegisterTimeline(CurrentRecordingTimelineIndex, RecordingTimeline, RecordManagerSettings);
 }
 
 void URecordManagerSubsystem::StartRewind()
@@ -635,6 +654,6 @@ void URecordManagerSubsystem::OnRecordableInteractedWith(URecordableComponent* S
 	else
 	{
 		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Stopping to Record " + Self->GetOwner()->GetName(), FColor::Turquoise, 2.f);
-		Self->StopRecording();
+		Self->StopRecording(true);
 	}
 }

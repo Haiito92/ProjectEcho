@@ -74,6 +74,9 @@ struct FEchoTimeline
 	 */
 	void PlayReplay(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind);
 	
+	//Play First Key of Timeline and Play Given Actions (Used to restore a State)
+	void PlayFirstKey(TArray<FRecordedAction> RestoreFirstStateAction);
+	
 	//Turns
 	void ActivateTimeline(bool bInIsActive);
 	
@@ -131,7 +134,7 @@ public:
 	virtual void InitRecordManager(const int& NbTimelineSlot);
 	
 	UFUNCTION(BlueprintCallable)
-    void StartRecord(AActor* InRecordedActor);
+    void StartRecord(AActor* InRecordedActor, const TArray<FRecordedAction>& RestoreStateAction);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool CanStartRecord() const;
@@ -232,5 +235,9 @@ private:
 	UPROPERTY()
 	//Pool of EchoActor to display Timelines (avoid runtime Spawning)
 	TArray<TObjectPtr<AEchoActor>> EchoActorsPool;
+	
+	UPROPERTY()
+	//Actions to Perform on Player Rewind finish to set Echo in correct Start State (Force Grab Cube when needed to start Timeline while grabbing a cube)
+	TArray<FRecordedAction> RecordingTimelineStartActions;
 };
 

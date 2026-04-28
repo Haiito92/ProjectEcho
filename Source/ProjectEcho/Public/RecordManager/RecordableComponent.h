@@ -72,7 +72,7 @@ public:
 	
 	UFUNCTION()
 	//Stop Recording and Reset Keys Recorded
-	void StopRecording();
+	void StopRecording(bool bForceStopRecording = false);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsRecording() const;
@@ -102,6 +102,9 @@ private:
 	bool bIsRecording = false;
 	
 	bool bIsInteractedWith = false;
+	
+	//When true, will not simulate physics on Stop Rewind
+	bool bStartInteracted = false;
 	
 	//Let Component Handle Physics' Record using given Mesh
 	UPROPERTY(EditDefaultsOnly)

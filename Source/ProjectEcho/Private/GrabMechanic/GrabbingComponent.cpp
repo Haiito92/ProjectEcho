@@ -158,6 +158,10 @@ void UGrabbingComponent::TryForceGrabHeldCube()
 			IGrabbableInterface::Execute_OnObjectForceGrabbed(GrabbedActor);
 		}
 	}
+	else
+	{
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Grab, EEchoMessageType::Error,"Failed to Try ForceGrab Held Cube (Nothing found on SphereCast)", FColor::White, 3.f);
+	}
 }
 
 bool UGrabbingComponent::IsGrabbing()

@@ -106,9 +106,9 @@ void URecordableComponent::StopRewind(const float& CurrentTimeKey)
 {
 	if (bHandlePhysicsOfMesh && IsValid(PhysicsComponent))
 	{
-		PhysicsComponent->SetSimulatePhysics(true);
 		if (CurrentTimeKey > FirstInteractedKey)
 		{
+			if (!bIsInteractedWith) PhysicsComponent->SetSimulatePhysics(true);
 			const FRecordPhysicsKey* NextPhysicsKey = FindNextPhysicsKey(CurrentTimeKey);
 			const FRecordPhysicsKey* PreviousPhysicsKey = FindPreviousPhysicsKey(CurrentTimeKey);
 			if (NextPhysicsKey != nullptr && PreviousPhysicsKey != nullptr)
@@ -123,6 +123,7 @@ void URecordableComponent::StopRewind(const float& CurrentTimeKey)
 		}
 		else
 		{
+			if (!bStartInteracted) PhysicsComponent->SetSimulatePhysics(true);
 			PhysicsComponent->SetPhysicsLinearVelocity(FVector(0,0,0));
 			PhysicsComponent->SetPhysicsAngularVelocityInDegrees(FVector(0,0,0));
 		}
@@ -139,14 +140,19 @@ void URecordableComponent::StartRecording(const float& CurrentTimeKey)
 	if (!IsRecording())
 	{
 		bIsRecording = true;
+		bStartInteracted = bIsInteractedWith;
 		FirstInteractedKey = CurrentTimeKey;
 	}
 }
 
-void URecordableComponent::StopRecording()
+void URecordableComponent::StopRecording(bool bForceStopRecording)
 {
-	bIsRecording = false;
-	FirstInteractedKey = -1;
+	if (!bStartInteracted || bForceStopRecording)
+	{
+		bIsRecording = false;
+		bStartInteracted = false;
+		FirstInteractedKey = -1;
+	}
 	TransformKeys.Empty();
 	PhysicsKeys.Empty();
 }
