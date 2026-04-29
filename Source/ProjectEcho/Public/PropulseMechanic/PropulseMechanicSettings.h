@@ -18,4 +18,7 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Propulse")
 	float PropulsePower = 20.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Propulse")
+	float PropulseCooldown = 2.f;
 };

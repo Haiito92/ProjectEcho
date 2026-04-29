@@ -32,12 +32,21 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveInitEcho(FEchoColorStruct EchoColor);
 	
+	void HandleRewindStarted(const float& CurrentTimeKey);
+	void HandleRewindStopped(const float& CurrentTimeKey);
+	
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveHandleActionKey(ERecordedAction Action);
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveSetControlRotation(const FRotator& ControlRotation);
+	
+	UFUNCTION(BlueprintImplementableEvent, meta=(AutoCreateRefTerm="CurrentTimeKey"))
+	void ReceiveHandleRewindStarted(const float& CurrentTimeKey);
+	
+	UFUNCTION(BlueprintImplementableEvent, meta=(AutoCreateRefTerm="CurrentTimeKey"))
+	void ReceiveHandleRewindStopped(const float& CurrentTimeKey);
 	
 	UFUNCTION(BlueprintCallable)
 	void RegisterRecordable(TScriptInterface<IRecordableInterface> Recordable);

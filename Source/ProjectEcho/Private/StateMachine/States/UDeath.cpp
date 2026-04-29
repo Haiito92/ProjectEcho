@@ -8,11 +8,6 @@
 #include "Tools/Debug/EchoMessageType.h"
 
 
-UDeath::UDeath()
-{
-	EnumState = EState::Death;
-	StateSettings = EStateSettings::None;
-}
 
 void UDeath::Tick(float DeltaTime)
 {
@@ -30,6 +25,13 @@ void UDeath::Enter()
 void UDeath::Exit()
 {
 	Super::Exit();
+}
+
+void UDeath::InitState(UStateMachine* InStateMachine, ACharacterST* InCharacter)
+{
+	Super::InitState(InStateMachine, InCharacter);
+	EnumState = EState::Death;
+	StateSettings = EStateSettings::None;
 }
 
 void UDeath::OnRevive()

@@ -11,9 +11,9 @@ class PROJECTECHO_API UMove : public UState
 {
 	GENERATED_BODY()
 public:
-	UMove();
 	void Enter() override;
 	void Exit() override;
+	virtual void InitState(UStateMachine* InStateMachine, ACharacterST* InCharacter) override;
 	
 	UPROPERTY(BlueprintReadWrite,EditAnywhere)
 	float MoveSpeed = 700;

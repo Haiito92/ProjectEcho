@@ -3,8 +3,10 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "StateMachine/ACharacterST.h"
 
-UFall::UFall()
+
+void UFall::InitState(UStateMachine* InStateMachine, ACharacterST* InCharacter)
 {
+	Super::InitState(InStateMachine, InCharacter);
 	EnumState = EState::Fall;
 	if (Character != nullptr)
 	{

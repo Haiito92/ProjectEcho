@@ -1,6 +1,7 @@
 #pragma once
 #include "StateMachine/ACharacterST.h"
 
+#include "DataAssetDeveloperSettings.h"
 #include "EchoSystem.h"
 #include "StateMachine/UStateMachine.h"
 #include "Animation/AnimInstance.h"
@@ -66,6 +67,7 @@ void ACharacterST::Tick(float DeltaTime)
 	FVector Vel = GetCharacterMovement()->Velocity;
 	if (Vel.Size() > MaxVelocity)
 	{
+		UE_LOG(LogTemp,Warning, TEXT("Velocity size is greater than max velocity size"));
 		Vel = Vel.GetSafeNormal() * MaxVelocity;
 		GetCharacterMovement()->Velocity = Vel;
 	}
@@ -109,7 +111,8 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Input->BindAction(InputActions->ADestroySlot, ETriggerEvent::Started, this, &ACharacterST::DestroySlot);
 	Input->BindAction(InputActions->AInteract, ETriggerEvent::Started,this,&ACharacterST::AInteract);
 	
-	Input->BindAction(InputActions->APropulse, ETriggerEvent::Started,this,&ACharacterST::APropulse);
+	Input->BindAction(InputActions->APropulse, ETriggerEvent::Started,this,&ACharacterST::AStartPropulse);
+	Input->BindAction(InputActions->APropulse, ETriggerEvent::Completed,this,&ACharacterST::AStopPropulse);
 	
 	Input->BindAction(InputActions->AReflect, ETriggerEvent::Started,this,&ACharacterST::AReflect);
 	
@@ -124,7 +127,9 @@ void ACharacterST::InitPlayer()
 
 void ACharacterST::LoadData()
 {
-	Life = GetDefault<UPlayerData>()->InitLife;
+	UPlayerData* playerData = GetDefault<UDataAssetDeveloperSettings>()->PlayerData.LoadSynchronous();
+	Life = playerData->InitLife;
+	MaxVelocity = playerData->MaxVelocity;
 }
 
 void ACharacterST::AMove(const FInputActionValue& Value)
@@ -206,9 +211,14 @@ void ACharacterST::AInteract()
 	OnInteract.Broadcast();
 }
 
-void ACharacterST::APropulse()
+void ACharacterST::AStartPropulse()
 {
 	OnStartPropulse.Broadcast();
+}
+
+void ACharacterST::AStopPropulse()
+{
+	OnStopPropulse.Broadcast();
 }
 
 void ACharacterST::AReflect()

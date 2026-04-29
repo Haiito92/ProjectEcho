@@ -6,6 +6,4 @@ UCLASS()
 class UWallRun : public UState
 {
 	GENERATED_BODY()
-public:
-	
 };
