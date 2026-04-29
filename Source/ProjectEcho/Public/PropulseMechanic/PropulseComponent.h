@@ -31,6 +31,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool TryPropulse();
 
+	UFUNCTION(BlueprintCallable)
+	void ResetCooldownTimer();
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveTryPropulse();

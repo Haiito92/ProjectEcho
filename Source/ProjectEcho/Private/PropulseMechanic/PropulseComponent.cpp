@@ -110,3 +110,8 @@ bool UPropulseComponent::TryPropulse()
 	
 	return DidPropulseActors;
 }
+
+void UPropulseComponent::ResetCooldownTimer()
+{
+	PropulseTimer = 0.0f;
+}
