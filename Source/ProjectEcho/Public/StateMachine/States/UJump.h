@@ -7,12 +7,12 @@ class UJump : public UState
 {
 	GENERATED_BODY()
 public:
-	UJump();
 	
+	virtual void InitState(UStateMachine* InStateMachine, ACharacterST* InCharacter) override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void Enter() override;
 	virtual void Exit() override;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite,EditAnywhere)
 	int JumpForce = 10;
 };

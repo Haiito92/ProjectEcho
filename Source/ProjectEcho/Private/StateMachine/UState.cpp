@@ -43,6 +43,7 @@ void UState::Enter()
 	Character->OnInteract.AddDynamic(this, &UState::OnInteract);
 	Character->OnRevive.AddDynamic(this, &UState::OnRevive);
 	Character->OnStartPropulse.AddDynamic(this, &UState::OnPropulseInputStarted);
+	Character->OnStopPropulse.AddDynamic(this, &UState::OnPropulseInputStopped);
 	Character->OnPropulsed.AddDynamic(this, &UState::OnPropulsed);
 	Character->OnReflectInputStarted.AddDynamic(this, &UState::OnReflectInputStarted);
 	Character->OnReflected.AddDynamic(this, &UState::OnReflected);
@@ -69,6 +70,7 @@ void UState::Exit()
 	Character->OnInteract.RemoveDynamic(this, &UState::OnInteract);
 	Character->OnRevive.RemoveDynamic(this, &UState::OnRevive);
 	Character->OnStartPropulse.RemoveDynamic(this, &UState::OnPropulseInputStarted);
+	Character->OnStopPropulse.RemoveDynamic(this, &UState::OnPropulseInputStopped);
 	Character->OnPropulsed.RemoveDynamic(this, &UState::OnPropulsed);
 	Character->OnReflectInputStarted.RemoveDynamic(this, &UState::OnReflectInputStarted);
 	Character->OnReflected.RemoveDynamic(this, &UState::OnReflected);
@@ -230,9 +232,19 @@ void UState::OnPropulseInputStarted()
 {
 	if (CanUsePropulse() && IsValid(PropulseComponent))
 	{
-		PropulseComponent->TryPropulse();
+		PropulseComponent->StartPropulse();
 		
-		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::TryPropulse));
+		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::StartPropulse));
+	}
+}
+
+void UState::OnPropulseInputStopped()
+{
+	if (CanUsePropulse() && IsValid(PropulseComponent))
+	{
+		PropulseComponent->StopPropulse();
+		
+		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::StopPropulse));
 	}
 }
 
