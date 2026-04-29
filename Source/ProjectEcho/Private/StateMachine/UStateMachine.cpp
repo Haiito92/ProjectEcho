@@ -3,16 +3,7 @@
 #include "DataAssetDeveloperSettings.h"
 #include "EchoSystem.h"
 #include "StateMachine/Data/UStateMachineSettings.h"
-#include "StateMachine/States/UDeath.h"
-
 #include "StateMachine/States/UIdle.h"
-#include "StateMachine/States/UMove.h"
-#include "StateMachine/States/UJump.h"
-#include "StateMachine/States/UFall.h"
-#include "StateMachine/States/URevive.h"
-#include "StateMachine/States/URewind.h"
-#include "StateMachine/States/UWallRun.h"
-
 #include "Tools/Debug/EchoDebug.h"
 #include "Tools/Debug/EchoMessageType.h"
 
@@ -32,9 +23,8 @@ void UStateMachine::InitStates(ACharacterST* InCharacter)
 			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine,EEchoMessageType::Error,"A State exist in time");
 			continue;
 		}
-		
-		states.Add(state->EnumState);
 		state->InitState(this, InCharacter);
+		states.Add(state->EnumState);
 		StateMap.Add(state->EnumState,state);
 	}
 	StartState(EState::Idle);

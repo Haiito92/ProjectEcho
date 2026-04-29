@@ -20,9 +20,19 @@ public:
 
 	virtual void BeginPlay() override;
 	
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+	UFUNCTION(BlueprintCallable)
+	void StartPropulse();
+	
+	UFUNCTION(BlueprintCallable)
+	void StopPropulse();
+	
 	UFUNCTION(BlueprintCallable)
 	bool TryPropulse();
 
+	UFUNCTION(BlueprintCallable)
+	void ResetCooldownTimer();
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveTryPropulse();
@@ -30,4 +40,13 @@ protected:
 private:
 	UPROPERTY()
 	TObjectPtr<UPropulseMechanicSettings> PropulseMechanicSettings;
+	
+	UPROPERTY()
+	bool bIsOn;
+	
+	UPROPERTY()
+	float PropulseCooldown;
+	
+	UPROPERTY()
+	float PropulseTimer;
 };
