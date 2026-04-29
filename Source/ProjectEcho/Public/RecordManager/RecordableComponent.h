@@ -56,19 +56,25 @@ public:
 	
 	UFUNCTION()
 	//Called to Reset Actor after Rewind Mode (Has delegate for extra behaviour)
-	void StopRewind(const float& CurrentTimeKey);
+	void StopRewind(const float& CurrentTimeKey, bool bForceReset = false);
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopRewind);
 	UPROPERTY(BlueprintAssignable)
 	FOnStopRewind OnStopRewind;
 	
 	//Delegate called to warn other systems when Recordable is Interacted with
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInteracted, URecordableComponent*, SelfRecordableComponent, bool, bShouldRecord);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnInteracted, URecordableComponent*, SelfRecordableComponent, bool, bShouldRecord, int, RecordTimelineIndex);
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FOnInteracted OnInteracted;
 	
 	UFUNCTION()
-	void StartRecording(const float& CurrentTimeKey);
+	void StartRecording(const FRecordInteractionKey& FirstInteractionKey);
+	
+	UFUNCTION()
+	void RegisterInteractionKey(const FRecordInteractionKey& InteractionKey);
+	
+	UFUNCTION()
+	void HandleTimelineDestruction(const int& RecordTimelineIndex);
 	
 	UFUNCTION()
 	//Stop Recording and Reset Keys Recorded
@@ -82,7 +88,11 @@ public:
 	bool IsCurrentlyInteractedWith() const;
 	
 	UFUNCTION()
-	const float& GetFirstInteractedKey() const;
+	float GetFirstInteractedKey() const;
+	
+protected:
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsInteractedWith = false; 
 	
 private:
 	UPROPERTY()
@@ -91,7 +101,14 @@ private:
 	UPROPERTY()
 	TArray<FRecordPhysicsKey> PhysicsKeys;
 	
+	UPROPERTY()
+	TArray<FRecordInteractionKey> InteractionKeys;
+	
+	//Clear All Keys Coming after Current Key
 	void ClearKeysPastCurrentKey(const float& CurrentTimeKey);
+	
+	//Clear All Keys Coming before Current Key
+	void ClearKeysBeforeCurrentKey(const float& CurrentTimeKey);
 	
 	const FRecordTransformKey* FindPreviousTransformKey(const float& CurrentTimeKey);
 	const FRecordTransformKey* FindNextTransformKey(const float& CurrentTimeKey);
@@ -100,8 +117,6 @@ private:
 	const FRecordPhysicsKey* FindNextPhysicsKey(const float& CurrentTimeKey);
 	
 	bool bIsRecording = false;
-	
-	bool bIsInteractedWith = false;
 	
 	//When true, will not simulate physics on Stop Rewind
 	bool bStartInteracted = false;
@@ -113,6 +128,4 @@ private:
 	//StaticMesh used to Handle Physics' Record
 	UPROPERTY()
 	TObjectPtr<UPrimitiveComponent> PhysicsComponent = nullptr;
-	
-	float FirstInteractedKey = -1;
 };

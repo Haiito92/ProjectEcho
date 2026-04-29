@@ -68,3 +68,13 @@ struct FRecordPhysicsKey
 	FVector LinearVelocity;
 	FVector AngularVelocity;
 };
+
+USTRUCT(BlueprintType)
+//Key to Register an interaction with a RecorderActor
+struct FRecordInteractionKey
+{
+	GENERATED_BODY()
+	
+	float TimeKey;
+	int RecordTimelineIndex;
+};

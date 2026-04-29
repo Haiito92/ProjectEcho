@@ -400,7 +400,7 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<
 	{
 		if (RecordableComponent->IsCurrentlyInteractedWith() && !RecordableComponent->IsRecording())
 		{
-			RecordableComponent->StartRecording(CurrentTimeKey);
+			RecordableComponent->StartRecording(FRecordInteractionKey(CurrentTimeKey, 255 /*Player Index*/));
 		}
 	}
 	
@@ -629,18 +629,13 @@ void URecordManagerSubsystem::DestroySelectedTimeline()
 {
 	if (bIsInRewind) return; //Forbid Timeline Destruction during Rewind
 	GlobalTimeline.DestroyTimeline(SelectedSlot, EchoActorsPool);
+	for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
+	{
+		RecordableComponent->HandleTimelineDestruction(SelectedSlot);
+	}
 	if (GlobalTimeline.Timelines.IsEmpty())
 	{
 		CurrentTimeKey = 0.0f;
-		
-		//Reset Recordable to origin Positions
-		for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
-		{
-			RecordableComponent->StartRewind();
-			RecordableComponent->ReplayFirstKey();
-			RecordableComponent->StopRewind(CurrentTimeKey);
-			RecordableComponent->StopRecording();
-		}
 	}
 }
 
@@ -656,13 +651,21 @@ void URecordManagerSubsystem::DecrementSelectedSlot()
 	if (SelectedSlot < 0) SelectedSlot = GlobalTimeline.NbSlots - 1;
 }
 
-void URecordManagerSubsystem::OnRecordableInteractedWith(URecordableComponent* Self, bool bShouldRecord)
+void URecordManagerSubsystem::OnRecordableInteractedWith(URecordableComponent* Self, bool bShouldRecord, int RecordTimelineIndex)
 {
 	if (bShouldRecord)
 	{
-		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Starting to Record " + Self->GetOwner()->GetName(), FColor::Turquoise, 2.f);
-		Self->StartRecording(CurrentTimeKey);
-		Self->RecordKey(CurrentTimeKey);
+		if (!Self->IsRecording())
+		{
+			UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Starting to Record " + Self->GetOwner()->GetName(), FColor::Turquoise, 2.f);
+			Self->StartRecording(FRecordInteractionKey(CurrentTimeKey, RecordTimelineIndex));
+			Self->RecordKey(CurrentTimeKey);
+		}
+		else
+		{
+			UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Register Interaction Key for " + Self->GetOwner()->GetName() + " With Timeline Index : " + FString::FromInt(RecordTimelineIndex), FColor::Turquoise, 2.f);
+			Self->RegisterInteractionKey(FRecordInteractionKey(CurrentTimeKey, RecordTimelineIndex));
+		}
 	}
 	else
 	{

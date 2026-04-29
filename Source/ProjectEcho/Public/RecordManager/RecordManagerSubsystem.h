@@ -173,7 +173,7 @@ public:
     void DecrementSelectedSlot();
 	
 	UFUNCTION()
-	void OnRecordableInteractedWith(URecordableComponent* Self, bool bShouldRecord);
+	void OnRecordableInteractedWith(URecordableComponent* Self, bool bShouldRecord, int RecordTimelineIndex);
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnStartRecording, float, CurrentTimeKey, int, TimelineIndex, const FEchoColorStruct&, EchoColorInformations);
 	UPROPERTY(BlueprintAssignable)

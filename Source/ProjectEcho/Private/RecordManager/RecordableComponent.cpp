@@ -102,13 +102,13 @@ void URecordableComponent::StartRewind()
 	OnStartRewind.Broadcast();
 }
 
-void URecordableComponent::StopRewind(const float& CurrentTimeKey)
+void URecordableComponent::StopRewind(const float& CurrentTimeKey, bool bForceReset)
 {
 	if (bHandlePhysicsOfMesh && IsValid(PhysicsComponent))
 	{
-		if (CurrentTimeKey > FirstInteractedKey)
+		if (CurrentTimeKey > InteractionKeys[0].TimeKey)
 		{
-			if (!bIsInteractedWith) PhysicsComponent->SetSimulatePhysics(true);
+			if (!bIsInteractedWith || bForceReset) PhysicsComponent->SetSimulatePhysics(true);
 			const FRecordPhysicsKey* NextPhysicsKey = FindNextPhysicsKey(CurrentTimeKey);
 			const FRecordPhysicsKey* PreviousPhysicsKey = FindPreviousPhysicsKey(CurrentTimeKey);
 			if (NextPhysicsKey != nullptr && PreviousPhysicsKey != nullptr)
@@ -123,25 +123,50 @@ void URecordableComponent::StopRewind(const float& CurrentTimeKey)
 		}
 		else
 		{
-			if (!bStartInteracted) PhysicsComponent->SetSimulatePhysics(true);
+			if (!bStartInteracted || bForceReset) PhysicsComponent->SetSimulatePhysics(true);
 			PhysicsComponent->SetPhysicsLinearVelocity(FVector(0,0,0));
 			PhysicsComponent->SetPhysicsAngularVelocityInDegrees(FVector(0,0,0));
 		}
 	}
-	if (CurrentTimeKey > FirstInteractedKey)
+	if (CurrentTimeKey > InteractionKeys[0].TimeKey)
 	{
 		ClearKeysPastCurrentKey(CurrentTimeKey);
 	}
 	OnStopRewind.Broadcast();
 }
 
-void URecordableComponent::StartRecording(const float& CurrentTimeKey)
+void URecordableComponent::StartRecording(const FRecordInteractionKey& FirstInteractionKey)
 {
 	if (!IsRecording())
 	{
 		bIsRecording = true;
 		bStartInteracted = bIsInteractedWith;
-		FirstInteractedKey = CurrentTimeKey;
+		RegisterInteractionKey(FirstInteractionKey);
+	}
+}
+
+void URecordableComponent::RegisterInteractionKey(const FRecordInteractionKey& InteractionKey)
+{
+	InteractionKeys.Add(InteractionKey);
+	InteractionKeys.Sort([](const FRecordInteractionKey& A, const FRecordInteractionKey& B)
+	{
+		return A.TimeKey < B.TimeKey;
+	});
+}
+
+void URecordableComponent::HandleTimelineDestruction(const int& RecordTimelineIndex)
+{
+	InteractionKeys.RemoveAll([&](const FRecordInteractionKey& InteractionKey)
+	{
+		return InteractionKey.RecordTimelineIndex == RecordTimelineIndex;
+	});
+	if (InteractionKeys.IsEmpty())
+	{
+		StopRecording(true);
+	}
+	else
+	{
+		ClearKeysBeforeCurrentKey(InteractionKeys[0].TimeKey);
 	}
 }
 
@@ -151,7 +176,7 @@ void URecordableComponent::StopRecording(bool bForceStopRecording)
 	{
 		bIsRecording = false;
 		bStartInteracted = false;
-		FirstInteractedKey = -1;
+		InteractionKeys.Empty();
 	}
 	TransformKeys.Empty();
 	PhysicsKeys.Empty();
@@ -167,9 +192,10 @@ bool URecordableComponent::IsCurrentlyInteractedWith() const
 	return bIsInteractedWith;
 }
 
-const float& URecordableComponent::GetFirstInteractedKey() const
+float URecordableComponent::GetFirstInteractedKey() const
 {
-	return FirstInteractedKey;
+	if (InteractionKeys.IsEmpty()) return -1;
+	return InteractionKeys[0].TimeKey;
 }
 
 void URecordableComponent::ClearKeysPastCurrentKey(const float& CurrentTimeKey)
@@ -186,6 +212,38 @@ void URecordableComponent::ClearKeysPastCurrentKey(const float& CurrentTimeKey)
 		PhysicsKeys.RemoveAll([&](const FRecordPhysicsKey& PhysicsKey)
 		{
 			return PhysicsKey.TimeKey > CurrentTimeKey;
+		});
+	}
+	if (InteractionKeys.IsEmpty())
+	{
+		InteractionKeys.RemoveAll([&](const FRecordInteractionKey& InteractionKey)
+		{
+			return InteractionKey.TimeKey > CurrentTimeKey;
+		});
+	}
+}
+
+void URecordableComponent::ClearKeysBeforeCurrentKey(const float& CurrentTimeKey)
+{
+	if (!TransformKeys.IsEmpty())
+	{
+		TransformKeys.RemoveAll([&](const FRecordTransformKey& TransformKey)
+		{
+			return TransformKey.TimeKey < CurrentTimeKey;
+		});
+	}
+	if (!PhysicsKeys.IsEmpty())
+	{
+		PhysicsKeys.RemoveAll([&](const FRecordPhysicsKey& PhysicsKey)
+		{
+			return PhysicsKey.TimeKey < CurrentTimeKey;
+		});
+	}
+	if (InteractionKeys.IsEmpty())
+	{
+		InteractionKeys.RemoveAll([&](const FRecordInteractionKey& InteractionKey)
+		{
+			return InteractionKey.TimeKey < CurrentTimeKey;
 		});
 	}
 }
