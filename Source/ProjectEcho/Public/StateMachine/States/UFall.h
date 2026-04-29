@@ -6,16 +6,16 @@ class UFall : public UState
 {
 	GENERATED_BODY()
 public:
-	UFall();
+	virtual void InitState(UStateMachine* InStateMachine, ACharacterST* InCharacter) override;
 	
 	virtual void Tick(float DeltaTime) override;
 	virtual void Enter() override;
 	virtual void Exit() override;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite,EditAnywhere)
 	float BrakingDecelerationFalling = 1500.f;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite,EditAnywhere)
 	float AirControl = 0.5f;
 	
 	

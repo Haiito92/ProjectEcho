@@ -6,8 +6,10 @@
 #include "RecordManager/RecordManagerSubsystem.h"
 #include "StateMachine/ACharacterST.h"
 
-UJump::UJump()
+
+void UJump::InitState(UStateMachine* InStateMachine, ACharacterST* InCharacter)
 {
+	Super::InitState(InStateMachine, InCharacter);
 	EnumState = EState::Jump;
 	if (Character != nullptr)
 		Character->GetCharacterMovement()->JumpZVelocity = JumpForce;

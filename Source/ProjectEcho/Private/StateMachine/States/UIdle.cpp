@@ -7,11 +7,6 @@
 #include "Tools/Debug/EchoMessageType.h"
 
 
-UIdle::UIdle()
-{
-	EnumState = EState::Idle;
-}
-
 void UIdle::Tick(float DeltaTime)
 {
 	UState::Tick(DeltaTime);
@@ -31,6 +26,12 @@ void UIdle::Exit()
 	Super::Exit();
 	Character->OnMovePressed.RemoveDynamic(this,&UIdle::OnMovePressed);
 	Character->OnJumpingStarted.RemoveDynamic(this,&UIdle::OnJumpingStarted);
+}
+
+void UIdle::InitState(UStateMachine* InStateMachine, ACharacterST* InCharacter)
+{
+	Super::InitState(InStateMachine, InCharacter);
+	EnumState = EState::Idle;
 }
 
 void UIdle::OnMovePressed(FVector2D dir)
