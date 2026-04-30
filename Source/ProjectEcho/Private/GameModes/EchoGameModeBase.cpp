@@ -17,6 +17,9 @@ void AEchoGameModeBase::BeginPlay()
 	
 	InitializeUI();
 	ReceiveInitializeUI();
+	
+	StartGame();
+	ReceiveStartGame();
 }
 
 void AEchoGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -26,7 +29,6 @@ void AEchoGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void AEchoGameModeBase::InitializeGame()
 {
-	ReceiveInitializeGame();
 }
 
 void AEchoGameModeBase::InitializeUI()
@@ -43,4 +45,18 @@ void AEchoGameModeBase::InitializeUI()
 		}
 		else UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error, "Failed to initialize HUD", FColor::Red, 3.0f);
 	}
+}
+
+
+
+void AEchoGameModeBase::StartGame()
+{
+	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Start Game", FColor::Orange, 3.0f);
+
+	EchoHUD->StartHUD();
+}
+
+void AEchoGameModeBase::EndGame()
+{
+	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "End Game", FColor::Orange, 3.0f);
 }

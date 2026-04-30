@@ -12,6 +12,11 @@ void AEchoHUDBase::InitHUD()
 	InitializeWidgets();
 }
 
+void AEchoHUDBase::StartHUD()
+{
+	ReceiveStartHUD();
+}
+
 void AEchoHUDBase::InternalHUDInit()
 {
 	ReceiveInternalHUDInit();

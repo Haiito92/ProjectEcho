@@ -5,26 +5,12 @@
 
 #include "EchoSystem.h"
 #include "GameFramework/PlayerStart.h"
-#include "HUDs/EchoHUD.h"
 #include "Kismet/GameplayStatics.h"
 #include "LevelStreaming/LevelStreamingWorldSubsystem.h"
-#include "LevelStreaming/StreamingLevelInfo.h"
 #include "RecordManager/RecordManagerSubsystem.h"
 #include "StateMachine/ACharacterST.h"
 #include "Tools/Debug/EchoDebug.h"
 #include "Tools/Debug/EchoMessageType.h"
-
-void AEchoGameMode::BeginPlay()
-{
-	Super::BeginPlay();
-
-	StartGame();
-}
-
-void AEchoGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	Super::EndPlay(EndPlayReason);
-}
 
 void AEchoGameMode::InitializeGame()
 {
@@ -62,18 +48,6 @@ void AEchoGameMode::InitializeGame()
 	EchoPlayerStart = Cast<APlayerStart>(UGameplayStatics::GetActorOfClass(this, APlayerStart::StaticClass()));
 	 
 	ReceiveInitializeGame();
-}
-
-void AEchoGameMode::StartGame()
-{
-	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Start Game", FColor::Orange, 3.0f);
-	ReceiveStartGame();
-}
-
-void AEchoGameMode::EndGame()
-{
-	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "End Game", FColor::Orange, 3.0f);
-	ReceiveEndGame();
 }
 
 void AEchoGameMode::OnPlayerDeathEnd()

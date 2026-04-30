@@ -23,6 +23,8 @@ private:
 	virtual void InitializeGame();
 	virtual void InitializeUI();
 	
+	void StartGame();
+	void EndGame();
 protected:
 	
 	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive Initialize Game")
@@ -30,6 +32,12 @@ protected:
 	
 	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive Initialize UI")
 	void ReceiveInitializeUI();
+	
+	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive Start Game")
+	void ReceiveStartGame();
+	
+	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive End Game")
+	void ReceiveEndGame();
 	
 	UPROPERTY()
 	TObjectPtr<AEchoHUDBase> EchoHUD;

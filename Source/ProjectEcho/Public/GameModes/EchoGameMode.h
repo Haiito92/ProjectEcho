@@ -17,22 +17,10 @@ UCLASS(Blueprintable, BlueprintType)
 class PROJECTECHO_API AEchoGameMode : public AEchoGameModeBase
 {
 	GENERATED_BODY()
-protected:
-	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-	
 private:
 	virtual void InitializeGame() override;
-	void StartGame();
-	void EndGame();
 
 protected:
-	
-	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive Start Game")
-	void ReceiveStartGame();
-	
-	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive End Game")
-	void ReceiveEndGame();
 	
 	UFUNCTION()
 	void OnPlayerDeathEnd();
