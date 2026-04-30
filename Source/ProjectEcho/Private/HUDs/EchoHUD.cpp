@@ -5,5 +5,6 @@
 
 void AEchoHUD::InitHUD()
 {
+	ReceiveCreateWidgets();
 	ReceiveInitHUD();
 }

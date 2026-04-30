@@ -13,6 +13,8 @@ enum class ERecordedAction : uint8
 	TryRelease,
 	TryThrow,
 	TryPropulse,
+	StartPropulse,
+	StopPropulse,
 	TryReflect,
 	ForceGrab,
 	ForceRelease

@@ -3,8 +3,10 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "StateMachine/ACharacterST.h"
 
-URevive::URevive()
+
+void URevive::InitState(UStateMachine* InStateMachine, ACharacterST* InCharacter)
 {
+	Super::InitState(InStateMachine, InCharacter);
 	EnumState = EState::Revive;
 	StateSettings = EStateSettings::None;
 }

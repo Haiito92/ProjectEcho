@@ -77,7 +77,10 @@ public:
 	void AInteract();
 	
 	UFUNCTION(BlueprintCallable)
-	void APropulse();
+	void AStartPropulse();
+	
+	UFUNCTION(BlueprintCallable)
+	void AStopPropulse();
 	
 	UFUNCTION(BlueprintCallable)
 	void AReflect();
@@ -188,6 +191,9 @@ public:
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartPropulse);
 	FOnStartPropulse OnStartPropulse;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopPropulse);
+	FOnStopPropulse OnStopPropulse;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPropulsed, const FVector&, PropulseDirection, float, PropulsePower);
 	FOnPropulsed OnPropulsed;

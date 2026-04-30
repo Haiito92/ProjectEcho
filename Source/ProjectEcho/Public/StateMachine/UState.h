@@ -34,17 +34,17 @@ class UState : public UObject
 public:
 	GENERATED_BODY()
 	UState();
-
+	
 	virtual void Enter();
 	virtual void Tick(float DeltaTime);
 	virtual void Exit();
 	
-	void InitState(UStateMachine *InStateMachine,ACharacterST* InCharacter);
+	virtual void InitState(UStateMachine *InStateMachine,ACharacterST* InCharacter);
 	
 	UPROPERTY()
 	EState EnumState = EState::None;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Bitmask))
+	UPROPERTY(meta = (Bitmask))
 	EStateSettings StateSettings = EStateSettings::All;
 	
 protected:
@@ -105,6 +105,8 @@ protected:
 	
 	UFUNCTION()
 	void OnPropulseInputStarted();
+	UFUNCTION()
+	void OnPropulseInputStopped();
 	
 	UFUNCTION()
 	void OnPropulsed(const FVector& PropulseDirection, float PropulsePower);

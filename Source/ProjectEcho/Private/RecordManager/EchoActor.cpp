@@ -32,6 +32,16 @@ void AEchoActor::InitEcho(const int& index, const FEchoColorStruct& EchoColor)
 	ReceiveInitEcho(EchoColor);
 }
 
+void AEchoActor::HandleRewindStarted(const float& CurrentTimeKey)
+{
+	ReceiveHandleRewindStarted(CurrentTimeKey);
+}
+
+void AEchoActor::HandleRewindStopped(const float& CurrentTimeKey)
+{
+	ReceiveHandleRewindStopped(CurrentTimeKey);
+}
+
 void AEchoActor::OnTimelineDestroyed()
 {
 	//Call BP Function

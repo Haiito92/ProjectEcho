@@ -18,6 +18,9 @@ public:
 	void InitHUD();
 
 protected:
+	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive Create Widgets")
+	void ReceiveCreateWidgets();
+	
 	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive Init HUD")
 	void ReceiveInitHUD();
 };
