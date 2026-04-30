@@ -2,9 +2,8 @@
 
 
 #include "GameModes/EchoGameModeBase.h"
-
 #include "EchoSystem.h"
-#include "HUDs/EchoHUD.h"
+#include "HUDs/EchoHUDBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Tools/Debug/EchoDebug.h"
 #include "Tools/Debug/EchoMessageType.h"
@@ -35,7 +34,7 @@ void AEchoGameModeBase::InitializeUI()
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 	if (IsValid(PlayerController))
 	{
-		EchoHUD = Cast<AEchoHUD>(PlayerController->GetHUD());
+		EchoHUD = Cast<AEchoHUDBase>(PlayerController->GetHUD());
 
 		if (IsValid(EchoHUD))
 		{

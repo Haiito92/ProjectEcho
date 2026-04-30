@@ -6,7 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "EchoGameModeBase.generated.h"
 
-class AEchoHUD;
+class AEchoHUDBase;
 /**
  * 
  */
@@ -32,5 +32,5 @@ protected:
 	void ReceiveInitializeUI();
 	
 	UPROPERTY()
-	TObjectPtr<AEchoHUD> EchoHUD;
+	TObjectPtr<AEchoHUDBase> EchoHUD;
 };
