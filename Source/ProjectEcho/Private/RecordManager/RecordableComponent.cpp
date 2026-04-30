@@ -219,7 +219,7 @@ void URecordableComponent::ClearKeysPastCurrentKey(const float& CurrentTimeKey)
 			return PhysicsKey.TimeKey > CurrentTimeKey;
 		});
 	}
-	if (InteractionKeys.IsEmpty())
+	if (!InteractionKeys.IsEmpty())
 	{
 		InteractionKeys.RemoveAll([&](const FRecordInteractionKey& InteractionKey)
 		{
@@ -244,7 +244,7 @@ void URecordableComponent::ClearKeysBeforeCurrentKey(const float& CurrentTimeKey
 			return PhysicsKey.TimeKey < CurrentTimeKey;
 		});
 	}
-	if (InteractionKeys.IsEmpty())
+	if (!InteractionKeys.IsEmpty())
 	{
 		InteractionKeys.RemoveAll([&](const FRecordInteractionKey& InteractionKey)
 		{
