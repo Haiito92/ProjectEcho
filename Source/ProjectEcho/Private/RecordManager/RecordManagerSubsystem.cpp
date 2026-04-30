@@ -159,12 +159,27 @@ void FEchoTimeline::PlayReplay(const float& PreviousKey,const float& CurrentTime
 	}
 }
 
+void FEchoTimeline::PlayFirstKey(TArray<FRecordedAction> RestoreFirstStateAction)
+{
+	if (!IsValid(EchoActor)) return;
+	FRecordTransformKey RecordTransformKey = TransformKeys[0];
+	EchoActor->SetActorLocation(RecordTransformKey.Position);
+	EchoActor->SetActorRotation(RecordTransformKey.Rotation);
+	EchoActor->SetActorScale3D(RecordTransformKey.Scale);
+	EchoActor->SetControlRotation(RecordTransformKey.ControlRotation);
+
+	for (const FRecordedAction& RecordedAction : RestoreFirstStateAction)
+	{
+		EchoActor->HandleActionKey(RecordedAction);
+	}
+}
+
 void FEchoTimeline::ActivateTimeline(bool bInIsActive)
 {
 	if (IsValid(EchoActor))
 	{
 		bIsActive = bInIsActive;
-		EchoActor->SetActorHiddenInGame(!bInIsActive);
+		//EchoActor->SetActorHiddenInGame(!bInIsActive);
 	}
 }
 
@@ -181,6 +196,8 @@ void FEchoTimeline::HandleRewindStopped(const float& CurrentTimeKey)
 void FEchoTimeline::OnDestroy()
 {
 	ActivateTimeline(false);
+	EchoActor->OnTimelineDestroyed();
+	EchoActor->SetActorHiddenInGame(true);
 }
 
 #pragma endregion
@@ -288,6 +305,7 @@ void FGlobalTimeline::RegisterTimeline(const int& TimelineIndex, const FEchoTime
 	{
 		if (Settings->EchoColors.Contains(TimelineIndex))
 		{
+			Timeline.EchoActor->SetActorHiddenInGame(false);
 			Timeline.EchoActor->InitEcho(TimelineIndex, Settings->EchoColors[TimelineIndex]);
 		}
 		Timelines.Add(TimelineIndex, Timeline);
@@ -345,6 +363,15 @@ void FGlobalTimeline::HandleRewindStopped(const float& CurrentTimeKey)
 	}
 }
 
+int FGlobalTimeline::FindFirstAvailableTimelineIndex()
+{
+	for (int i = 0; i < NbSlots; ++i)
+	{
+		if (!Timelines.Contains(i)) return i;
+	}
+	return -1;
+}
+
 #pragma endregion
 
 TStatId URecordManagerSubsystem::GetStatId() const
@@ -389,11 +416,13 @@ void URecordManagerSubsystem::InitRecordManager(const int& NbTimelineSlot)
 	}
 }
 
-void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor)
+void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<FRecordedAction>& RestoreStateAction)
 {
 	if (!CanStartRecord()) return;
 	if (!IsValid(InRecordedActor)) return;
 	if (EchoActorsPool.IsEmpty()) return;
+		
+	RecordingTimelineStartActions = RestoreStateAction;
 	RecordedActor = InRecordedActor;
 	bIsRecording = true;
 	CurrentRecordingTimelineIndex = GlobalTimeline.GetFirstAvailableTimelineSlot();
@@ -406,7 +435,7 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor)
 	{
 		if (RecordableComponent->IsCurrentlyInteractedWith() && !RecordableComponent->IsRecording())
 		{
-			RecordableComponent->StartRecording(CurrentTimeKey);
+			RecordableComponent->StartRecording(FRecordInteractionKey(CurrentTimeKey, GlobalTimeline.FindFirstAvailableTimelineIndex()));
 		}
 	}
 	
@@ -468,12 +497,14 @@ void URecordManagerSubsystem::StopPlayerRewind()
 		IRecordHandlerInterface::Execute_SetControlRotation(RecordedActor, RecordingTimeline.TransformKeys[0].ControlRotation);
 	}
 	RecordedActor = nullptr;
-	
-	GlobalTimeline.RegisterTimeline(CurrentRecordingTimelineIndex, RecordingTimeline, RecordManagerSettings);
+
 	OnStopPlayerRewinding.Broadcast();
-	
 	StopRewind();
 	bIsPlayerRewinding = false;
+	
+	RecordingTimeline.PlayFirstKey(RecordingTimelineStartActions);
+	RecordingTimelineStartActions.Empty();
+	GlobalTimeline.RegisterTimeline(CurrentRecordingTimelineIndex, RecordingTimeline, RecordManagerSettings);
 }
 
 void URecordManagerSubsystem::StartRewind()
@@ -525,6 +556,17 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 	if (bIsInRewind) UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Rewinding at Speed : " + FString::SanitizeFloat(RewindSpeed), FColor::Cyan, DeltaTime);
 	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Current Selected Timeline : " + FString::FromInt(SelectedSlot), FColor::Cyan, DeltaTime);
 	
+	//Handle Player Rewinding
+	if (bIsPlayerRewinding)
+	{
+		if (RecordingTimeline.StartTimeKey >= CurrentTimeKey)
+		{
+			StopPlayerRewind();
+			return;
+		}
+		PlayPlayerRewind(previousTimeKey - RecordingTimeline.StartTimeKey, CurrentTimeKey - RecordingTimeline.StartTimeKey);
+	}
+	
 	//Handle Recordables
 	if (bIsInRewind)
 	{
@@ -539,9 +581,9 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 				}
 				else
 				{
-					RecordableComponent->ReplayFirstKey();
 					RecordableComponent->StopRewind(CurrentTimeKey);
-					RecordableComponent->StopRecording();
+					RecordableComponent->ReplayFirstKey();
+					if (CurrentTimeKey < RecordableComponent->GetFirstInteractedKey()) RecordableComponent->StopRecording();
 				}
 			}
 		}
@@ -559,21 +601,10 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 	}
 	
 	//--- Handle Replay ---
-	if (!GlobalTimeline.Timelines.IsEmpty() || bIsPlayerRewinding)
+	if (!GlobalTimeline.Timelines.IsEmpty())
 	{
 		bool bHasReachedEnd = false;
 		GlobalTimeline.Play(previousTimeKey, CurrentTimeKey, bIsInRewind, bHasReachedEnd);
-		
-		//Handle Player Rewinding
-		if (bIsPlayerRewinding)
-		{
-			if (RecordingTimeline.StartTimeKey >= CurrentTimeKey)
-			{
-				StopPlayerRewind();
-				return;
-			}
-			PlayPlayerRewind(CurrentTimeKey - RecordingTimeline.StartTimeKey);
-		}
 		
 		if (bHasReachedEnd && !bIsRecording && !bIsInRewind)
 		{
@@ -603,7 +634,7 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 	}
 }
 
-void URecordManagerSubsystem::PlayPlayerRewind(const float& TimeKey)
+void URecordManagerSubsystem::PlayPlayerRewind(const float& PreviousTimeKey, const float& TimeKey)
 {
 	if (!IsValid(RecordedActor)) return;
 	
@@ -621,24 +652,29 @@ void URecordManagerSubsystem::PlayPlayerRewind(const float& TimeKey)
 			IRecordHandlerInterface::Execute_SetControlRotation(RecordedActor, FMath::Lerp(PreviousTransformKey->ControlRotation, NextTransformKey->ControlRotation, lerpValue));
 		}
 	}
+	
+	if (RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass()))
+	{
+		TArray<FRecordActionKey> RewindActions;
+		RecordingTimeline.GetActionKeys(PreviousTimeKey, TimeKey, true, RewindActions);
+		for (const FRecordActionKey& RewindAction : RewindActions)
+		{
+			IRecordHandlerInterface::Execute_HandleRewindActionKey(RecordedActor, RewindAction.Action);
+		}
+	}
 }
 
 void URecordManagerSubsystem::DestroySelectedTimeline()
 {
 	if (bIsInRewind) return; //Forbid Timeline Destruction during Rewind
 	GlobalTimeline.DestroyTimeline(SelectedSlot, EchoActorsPool);
+	for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
+	{
+		RecordableComponent->HandleTimelineDestruction(SelectedSlot);
+	}
 	if (GlobalTimeline.Timelines.IsEmpty())
 	{
 		CurrentTimeKey = 0.0f;
-		
-		//Reset Recordable to origin Positions
-		for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
-		{
-			RecordableComponent->StartRewind();
-			RecordableComponent->ReplayFirstKey();
-			RecordableComponent->StopRewind(CurrentTimeKey);
-			RecordableComponent->StopRecording();
-		}
 	}
 }
 
@@ -654,17 +690,25 @@ void URecordManagerSubsystem::DecrementSelectedSlot()
 	if (SelectedSlot < 0) SelectedSlot = GlobalTimeline.NbSlots - 1;
 }
 
-void URecordManagerSubsystem::OnRecordableInteractedWith(URecordableComponent* Self, bool bShouldRecord)
+void URecordManagerSubsystem::OnRecordableInteractedWith(URecordableComponent* Self, bool bShouldRecord, int RecordTimelineIndex)
 {
 	if (bShouldRecord)
 	{
-		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Starting to Record " + Self->GetOwner()->GetName(), FColor::Turquoise, 2.f);
-		Self->StartRecording(CurrentTimeKey);
-		Self->RecordKey(CurrentTimeKey);
+		if (!Self->IsRecording())
+		{
+			UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Starting to Record " + Self->GetOwner()->GetName(), FColor::Turquoise, 2.f);
+			Self->StartRecording(FRecordInteractionKey(CurrentTimeKey, RecordTimelineIndex));
+			Self->RecordKey(CurrentTimeKey);
+		}
+		else
+		{
+			UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Register Interaction Key for " + Self->GetOwner()->GetName() + " With Timeline Index : " + FString::FromInt(RecordTimelineIndex), FColor::Turquoise, 2.f);
+			Self->RegisterInteractionKey(FRecordInteractionKey(CurrentTimeKey, RecordTimelineIndex));
+		}
 	}
 	else
 	{
 		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Stopping to Record " + Self->GetOwner()->GetName(), FColor::Turquoise, 2.f);
-		Self->StopRecording();
+		Self->StopRecording(true);
 	}
 }

@@ -74,6 +74,9 @@ struct FEchoTimeline
 	 */
 	void PlayReplay(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind);
 	
+	//Play First Key of Timeline and Play Given Actions (Used to restore a State)
+	void PlayFirstKey(TArray<FRecordedAction> RestoreFirstStateAction);
+	
 	//Turns
 	void ActivateTimeline(bool bInIsActive);
 	
@@ -127,6 +130,8 @@ struct FGlobalTimeline
 	
 	// Called by Record Manager when rewind stopped
 	void HandleRewindStopped(const float& CurrentTimeKey);
+	
+	int FindFirstAvailableTimelineIndex();
 };
 
 #pragma endregion
@@ -143,7 +148,7 @@ public:
 	virtual void InitRecordManager(const int& NbTimelineSlot);
 	
 	UFUNCTION(BlueprintCallable)
-    void StartRecord(AActor* InRecordedActor);
+    void StartRecord(AActor* InRecordedActor, const TArray<FRecordedAction>& RestoreStateAction);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool CanStartRecord() const;
@@ -182,7 +187,7 @@ public:
     void DecrementSelectedSlot();
 	
 	UFUNCTION()
-	void OnRecordableInteractedWith(URecordableComponent* Self, bool bShouldRecord);
+	void OnRecordableInteractedWith(URecordableComponent* Self, bool bShouldRecord, int RecordTimelineIndex);
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnStartRecording, float, CurrentTimeKey, int, TimelineIndex, const FEchoColorStruct&, EchoColorInformations);
 	UPROPERTY(BlueprintAssignable)
@@ -202,7 +207,7 @@ private:
 	virtual void Tick(float DeltaTime) override;
 	
 	//Handle Replay of Player Rewind (Placement of Actions
-	void PlayPlayerRewind(const float& TimeKey);
+	void PlayPlayerRewind(const float& PreviousTimeKey, const float& TimeKey);
 	
 protected:
 	FGlobalTimeline GlobalTimeline;
@@ -244,5 +249,9 @@ private:
 	UPROPERTY()
 	//Pool of EchoActor to display Timelines (avoid runtime Spawning)
 	TArray<TObjectPtr<AEchoActor>> EchoActorsPool;
+	
+	UPROPERTY()
+	//Actions to Perform on Player Rewind finish to set Echo in correct Start State (Force Grab Cube when needed to start Timeline while grabbing a cube)
+	TArray<FRecordedAction> RecordingTimelineStartActions;
 };
 

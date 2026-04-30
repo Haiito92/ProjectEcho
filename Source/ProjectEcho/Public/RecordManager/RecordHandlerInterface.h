@@ -44,7 +44,11 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	FRotator GetToRecordControlRotation();
 	
-	//Called to Set Control Rotation during a Replay
+	//Called to Set Control Rotation during a Rewind
 	UFUNCTION(BlueprintNativeEvent)
 	void SetControlRotation(FRotator NewControlRotation);
+	
+	//Called to Handle Rewinds Action (Restore State to before Record)
+	UFUNCTION(BlueprintNativeEvent)
+	void HandleRewindActionKey(const FRecordedAction& RecordedAction);
 };

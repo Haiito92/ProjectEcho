@@ -42,6 +42,12 @@ void AEchoActor::HandleRewindStopped(const float& CurrentTimeKey)
 	ReceiveHandleRewindStopped(CurrentTimeKey);
 }
 
+void AEchoActor::OnTimelineDestroyed()
+{
+	//Call BP Function
+	ReceiveOnTimelineDestroyed();
+}
+
 void AEchoActor::RegisterRecordable(TScriptInterface<IRecordableInterface> Recordable)
 {
 	OnRegisterRecordable.Broadcast(Recordable);
