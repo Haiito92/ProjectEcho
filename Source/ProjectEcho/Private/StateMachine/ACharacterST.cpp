@@ -129,6 +129,9 @@ void ACharacterST::LoadData()
 	UPlayerData* playerData = GetDefault<UDataAssetDeveloperSettings>()->PlayerData.LoadSynchronous();
 	Life = playerData->InitLife;
 	MaxVelocity = playerData->MaxVelocity;
+	GetCharacterMovement()->MaxAcceleration = playerData->MoveAcceleration;
+	GetCharacterMovement()->AirControlBoostVelocityThreshold = playerData->AirPrecision;
+	GetCharacterMovement()->GravityScale = playerData->GravityScale;
 }
 
 void ACharacterST::AMove(const FInputActionValue& Value)
