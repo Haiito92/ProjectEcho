@@ -118,9 +118,6 @@ private:
 	
 	bool bIsRecording = false;
 	
-	//When true, will not simulate physics on Stop Rewind
-	bool bStartInteracted = false;
-	
 	//Let Component Handle Physics' Record using given Mesh
 	UPROPERTY(EditDefaultsOnly)
 	bool bHandlePhysicsOfMesh = false;

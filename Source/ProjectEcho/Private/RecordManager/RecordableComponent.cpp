@@ -123,7 +123,7 @@ void URecordableComponent::StopRewind(const float& CurrentTimeKey, bool bForceRe
 		}
 		else
 		{
-			if (!bStartInteracted || bForceReset) PhysicsComponent->SetSimulatePhysics(true);
+			if (!bIsInteractedWith || bForceReset) PhysicsComponent->SetSimulatePhysics(true);
 			PhysicsComponent->SetPhysicsLinearVelocity(FVector(0,0,0));
 			PhysicsComponent->SetPhysicsAngularVelocityInDegrees(FVector(0,0,0));
 		}
@@ -140,7 +140,6 @@ void URecordableComponent::StartRecording(const FRecordInteractionKey& FirstInte
 	if (!IsRecording())
 	{
 		bIsRecording = true;
-		bStartInteracted = bIsInteractedWith;
 		RegisterInteractionKey(FirstInteractionKey);
 	}
 }
@@ -172,11 +171,17 @@ void URecordableComponent::HandleTimelineDestruction(const int& RecordTimelineIn
 
 void URecordableComponent::StopRecording(bool bForceStopRecording)
 {
-	if (!bStartInteracted || bForceStopRecording)
+	if (!bIsInteractedWith || bForceStopRecording)
 	{
 		bIsRecording = false;
-		bStartInteracted = false;
 		InteractionKeys.Empty();
+	}
+	if (InteractionKeys.Num() > 1)
+	{
+		for (int i = 1; i < InteractionKeys.Num() - 2; i++)
+		{
+			InteractionKeys.RemoveAt(i);
+		}
 	}
 	TransformKeys.Empty();
 	PhysicsKeys.Empty();

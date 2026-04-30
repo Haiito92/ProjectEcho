@@ -118,6 +118,8 @@ struct FGlobalTimeline
 	
 	//Destroy Current Timeline
 	void DestroyTimeline(int TimelineIndex, TArray<TObjectPtr<AEchoActor>>& OutEchoActorPool);
+	
+	int FindFirstAvailableTimelineIndex();
 };
 
 #pragma endregion

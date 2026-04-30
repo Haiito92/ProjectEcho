@@ -337,6 +337,15 @@ void FGlobalTimeline::DestroyTimeline(int SelectedSlot, TArray<TObjectPtr<AEchoA
 	}
 }
 
+int FGlobalTimeline::FindFirstAvailableTimelineIndex()
+{
+	for (int i = 0; i < NbSlots; ++i)
+	{
+		if (!Timelines.Contains(i)) return i;
+	}
+	return -1;
+}
+
 #pragma endregion
 
 TStatId URecordManagerSubsystem::GetStatId() const
@@ -400,7 +409,7 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<
 	{
 		if (RecordableComponent->IsCurrentlyInteractedWith() && !RecordableComponent->IsRecording())
 		{
-			RecordableComponent->StartRecording(FRecordInteractionKey(CurrentTimeKey, 255 /*Player Index*/));
+			RecordableComponent->StartRecording(FRecordInteractionKey(CurrentTimeKey, GlobalTimeline.FindFirstAvailableTimelineIndex()));
 		}
 	}
 	
@@ -517,6 +526,17 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 	if (bIsInRewind) UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Rewinding at Speed : " + FString::SanitizeFloat(RewindSpeed), FColor::Cyan, DeltaTime);
 	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Current Selected Timeline : " + FString::FromInt(SelectedSlot), FColor::Cyan, DeltaTime);
 	
+	//Handle Player Rewinding
+	if (bIsPlayerRewinding)
+	{
+		if (RecordingTimeline.StartTimeKey >= CurrentTimeKey)
+		{
+			StopPlayerRewind();
+			return;
+		}
+		PlayPlayerRewind(previousTimeKey - RecordingTimeline.StartTimeKey, CurrentTimeKey - RecordingTimeline.StartTimeKey);
+	}
+	
 	//Handle Recordables
 	if (bIsInRewind)
 	{
@@ -531,9 +551,9 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 				}
 				else
 				{
-					RecordableComponent->ReplayFirstKey();
 					RecordableComponent->StopRewind(CurrentTimeKey);
-					RecordableComponent->StopRecording();
+					RecordableComponent->ReplayFirstKey();
+					if (CurrentTimeKey < RecordableComponent->GetFirstInteractedKey()) RecordableComponent->StopRecording();
 				}
 			}
 		}
@@ -551,21 +571,10 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 	}
 	
 	//--- Handle Replay ---
-	if (!GlobalTimeline.Timelines.IsEmpty() || bIsPlayerRewinding)
+	if (!GlobalTimeline.Timelines.IsEmpty())
 	{
 		bool bHasReachedEnd = false;
 		GlobalTimeline.Play(previousTimeKey, CurrentTimeKey, bIsInRewind, bHasReachedEnd);
-		
-		//Handle Player Rewinding
-		if (bIsPlayerRewinding)
-		{
-			if (RecordingTimeline.StartTimeKey >= CurrentTimeKey)
-			{
-				StopPlayerRewind();
-				return;
-			}
-			PlayPlayerRewind(previousTimeKey - RecordingTimeline.StartTimeKey, CurrentTimeKey - RecordingTimeline.StartTimeKey);
-		}
 		
 		if (bHasReachedEnd && !bIsRecording && !bIsInRewind)
 		{
