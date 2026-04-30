@@ -18,7 +18,6 @@ void AEchoGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InitializeGame();
 	StartGame();
 }
 
@@ -58,15 +57,6 @@ void AEchoGameMode::InitializeGame()
 			EchoPlayerCharacter->OnDeathEnd.AddDynamic(this, &AEchoGameMode::OnPlayerDeathEnd);
 		}
 		else UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error, "Failed to initialize Player Character", FColor::Red, 3.0f);
-
-		EchoHUD = Cast<AEchoHUD>(PlayerController->GetHUD());
-
-		if (IsValid(EchoHUD))
-		{
-			EchoHUD->InitHUD();
-			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Successfully initialized HUD", FColor::Green, 3.0f);
-		}
-		else UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error, "Failed to initialize HUD", FColor::Red, 3.0f);
 	}
 
 	EchoPlayerStart = Cast<APlayerStart>(UGameplayStatics::GetActorOfClass(this, APlayerStart::StaticClass()));
