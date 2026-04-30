@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "RecordKeysStructs.h"
 #include "RecordManagerSettings.h"
+#include "UIRecordStructs.h"
 #include "GameFramework/Actor.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "UObject/ObjectPtr.h"
@@ -130,8 +131,6 @@ struct FGlobalTimeline
 	
 	// Called by Record Manager when rewind stopped
 	void HandleRewindStopped(const float& CurrentTimeKey);
-	
-	int FindFirstAvailableTimelineIndex();
 };
 
 #pragma endregion
@@ -186,6 +185,10 @@ public:
     UFUNCTION(BlueprintCallable)
     void DecrementSelectedSlot();
 	
+	//Select Precise Selected Slot Value, if Slot doesn't exit, value won't change
+	UFUNCTION(BlueprintCallable)
+	void SelectSlot(int Index);
+	
 	UFUNCTION()
 	void OnRecordableInteractedWith(URecordableComponent* Self, bool bShouldRecord, int RecordTimelineIndex);
 	
@@ -202,6 +205,56 @@ public:
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopPlayerRewinding);
 	FOnStopPlayerRewinding OnStopPlayerRewinding;
+	
+	//--- UI Events ---
+	
+	//Called When New Timeline Created (gives Timeline Index reference)
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimelineCreated, int, CreatedTimelineIndex);
+	UPROPERTY(BlueprintAssignable);
+	FOnTimelineCreated OnTimelineCreated;
+	
+	//Called When New Timeline Destroyed (gives Timeline Index reference)
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimelineDestroyed, int, DestroyedTimelineIndex);
+	UPROPERTY(BlueprintAssignable);
+	FOnTimelineDestroyed OnTimelineDestroyed;
+	
+	//Called When Timeline is Modified, Moved around (gives Timeline Index reference)
+	// --- Not Yet Implemented ---
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimelineModified, int, ModifiedTimelineIndex);
+	UPROPERTY(BlueprintAssignable)
+	FOnTimelineModified OnTimelineModified;
+	
+	//Called On Tick after Timeline Replay Update (gives previous TimeKey and New (Current) TimeKey)
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTimelineReplayUpdate, int, PreviousTimeKey, int, CurrentTimeKey);
+	UPROPERTY(BlueprintAssignable)
+	FOnTimelineReplayUpdate OnTimelineReplayUpdate;
+	
+	//Called On Timeline Selected Index Changed (gives Selected Timeline Index)
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimelineSelected, int, SelectedTimelineIndex);
+	UPROPERTY(BlueprintAssignable)
+	FOnTimelineSelected OnTimelineSelected;
+	
+	//UI Getter Events
+	
+	//Get Global Timeline Informations
+	UFUNCTION(BlueprintCallable)
+	FGlobalTimelineUIInfo GetGlobalTimelineUIInformation();
+	
+	//Get Specific Timeline Informations 
+	UFUNCTION(BlueprintCallable)
+	FTimelineUIInfo GetTimelineUIInfo(int Index);
+	
+	//Get Current Time Key
+	UFUNCTION(BlueprintCallable)
+	const float& GetCurrentTimeKey() const;
+	
+	//Get Selected Timeline Slot
+	UFUNCTION(BlueprintCallable)
+	int GetSelectedTimelineSlot() const;
+	
+	//Get Global Timeline Length
+	UFUNCTION(BlueprintCallable)
+	float GetGlobalTimelineLength();
 	
 private:
 	virtual void Tick(float DeltaTime) override;
