@@ -111,7 +111,8 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Input->BindAction(InputActions->ADestroySlot, ETriggerEvent::Started, this, &ACharacterST::DestroySlot);
 	Input->BindAction(InputActions->AInteract, ETriggerEvent::Started,this,&ACharacterST::AInteract);
 	
-	Input->BindAction(InputActions->APropulse, ETriggerEvent::Started,this,&ACharacterST::APropulse);
+	Input->BindAction(InputActions->APropulse, ETriggerEvent::Started,this,&ACharacterST::AStartPropulse);
+	Input->BindAction(InputActions->APropulse, ETriggerEvent::Completed,this,&ACharacterST::AStopPropulse);
 	
 	Input->BindAction(InputActions->AReflect, ETriggerEvent::Started,this,&ACharacterST::AReflect);
 	
@@ -213,9 +214,14 @@ void ACharacterST::AInteract()
 	OnInteract.Broadcast();
 }
 
-void ACharacterST::APropulse()
+void ACharacterST::AStartPropulse()
 {
 	OnStartPropulse.Broadcast();
+}
+
+void ACharacterST::AStopPropulse()
+{
+	OnStopPropulse.Broadcast();
 }
 
 void ACharacterST::AReflect()

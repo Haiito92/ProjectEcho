@@ -168,6 +168,16 @@ void FEchoTimeline::ActivateTimeline(bool bInIsActive)
 	}
 }
 
+void FEchoTimeline::HandleRewindStarted(const float& CurrentTimeKey)
+{
+	EchoActor->HandleRewindStarted(CurrentTimeKey);
+}
+
+void FEchoTimeline::HandleRewindStopped(const float& CurrentTimeKey)
+{
+	EchoActor->HandleRewindStopped(CurrentTimeKey);
+}
+
 void FEchoTimeline::OnDestroy()
 {
 	ActivateTimeline(false);
@@ -319,6 +329,22 @@ void FGlobalTimeline::DestroyTimeline(int SelectedSlot, TArray<TObjectPtr<AEchoA
 	}
 }
 
+void FGlobalTimeline::HandleRewindStarted(const float& CurrentTimeKey)
+{
+	for (TTuple<int, FEchoTimeline>& TimelineTuple: Timelines)
+	{
+		TimelineTuple.Get<1>().HandleRewindStarted(CurrentTimeKey);
+	}
+}
+
+void FGlobalTimeline::HandleRewindStopped(const float& CurrentTimeKey)
+{
+	for (TTuple<int, FEchoTimeline>& TimelineTuple: Timelines)
+	{
+		TimelineTuple.Get<1>().HandleRewindStopped(CurrentTimeKey);
+	}
+}
+
 #pragma endregion
 
 TStatId URecordManagerSubsystem::GetStatId() const
@@ -461,6 +487,8 @@ void URecordManagerSubsystem::StartRewind()
 			RecordableComponent->StartRewind();
 		}
 	}
+	
+	GlobalTimeline.HandleRewindStarted(CurrentTimeKey);
 }
 
 void URecordManagerSubsystem::StopRewind()
@@ -474,6 +502,8 @@ void URecordManagerSubsystem::StopRewind()
 			RecordableComponent->StopRewind(CurrentTimeKey);
 		}
 	}
+	
+	GlobalTimeline.HandleRewindStopped(CurrentTimeKey);
 }
 
 bool URecordManagerSubsystem::IsRecording()

@@ -77,6 +77,12 @@ struct FEchoTimeline
 	//Turns
 	void ActivateTimeline(bool bInIsActive);
 	
+	//Called by global timeline when rewind started
+	void HandleRewindStarted(const float& CurrentTimeKey);
+	
+	//Called by global timeline when rewind is finished
+	void HandleRewindStopped(const float& CurrentTimeKey);
+	
 	//Called when Timeline is being Destroyed
 	void OnDestroy();
 };
@@ -115,6 +121,12 @@ struct FGlobalTimeline
 	
 	//Destroy Current Timeline
 	void DestroyTimeline(int TimelineIndex, TArray<TObjectPtr<AEchoActor>>& OutEchoActorPool);
+	
+	// Called by Record Manager when rewind started
+	void HandleRewindStarted(const float& CurrentTimeKey);
+	
+	// Called by Record Manager when rewind stopped
+	void HandleRewindStopped(const float& CurrentTimeKey);
 };
 
 #pragma endregion

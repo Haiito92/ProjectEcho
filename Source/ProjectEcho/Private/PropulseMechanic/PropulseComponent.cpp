@@ -9,10 +9,11 @@
 
 UPropulseComponent::UPropulseComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 	SetGenerateOverlapEvents(true);
 	UPrimitiveComponent::SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	UPrimitiveComponent::SetCollisionResponseToAllChannels(ECR_Overlap);
+	
 }
 
 
@@ -23,6 +24,38 @@ void UPropulseComponent::BeginPlay()
 	const UDataAssetDeveloperSettings* DataAssetDevSettings = GetDefault<UDataAssetDeveloperSettings>();
 	
 	PropulseMechanicSettings = DataAssetDevSettings->PropulseMechanicSettings.LoadSynchronous();
+	
+	PropulseCooldown = 3.0f;
+	if (PropulseMechanicSettings) PropulseCooldown = PropulseMechanicSettings->PropulseCooldown;
+	PropulseTimer = 0.0f;
+}
+
+void UPropulseComponent::TickComponent(float DeltaTime, enum ELevelTick TickType,
+	FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
+	if (!bIsOn) return;
+	
+	PropulseTimer = FMath::Max(PropulseTimer - DeltaTime, 0.0f);
+	
+	if (PropulseTimer <= 0.0f)
+	{
+		if (TryPropulse())
+		{
+			PropulseTimer = PropulseCooldown;
+		}
+	}
+}
+
+void UPropulseComponent::StartPropulse()
+{
+	bIsOn = true;
+}
+
+void UPropulseComponent::StopPropulse()
+{
+	bIsOn = false;
 }
 
 bool UPropulseComponent::TryPropulse()
@@ -76,4 +109,9 @@ bool UPropulseComponent::TryPropulse()
 	}
 	
 	return DidPropulseActors;
+}
+
+void UPropulseComponent::ResetCooldownTimer()
+{
+	PropulseTimer = 0.0f;
 }
