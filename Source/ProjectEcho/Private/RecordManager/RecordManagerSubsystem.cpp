@@ -363,15 +363,6 @@ void FGlobalTimeline::HandleRewindStopped(const float& CurrentTimeKey)
 	}
 }
 
-int FGlobalTimeline::FindFirstAvailableTimelineIndex()
-{
-	for (int i = 0; i < NbSlots; ++i)
-	{
-		if (!Timelines.Contains(i)) return i;
-	}
-	return -1;
-}
-
 #pragma endregion
 
 TStatId URecordManagerSubsystem::GetStatId() const
@@ -435,7 +426,7 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<
 	{
 		if (RecordableComponent->IsCurrentlyInteractedWith() && !RecordableComponent->IsRecording())
 		{
-			RecordableComponent->StartRecording(FRecordInteractionKey(CurrentTimeKey, GlobalTimeline.FindFirstAvailableTimelineIndex()));
+			RecordableComponent->StartRecording(FRecordInteractionKey(CurrentTimeKey, CurrentRecordingTimelineIndex));
 		}
 	}
 	
@@ -505,6 +496,7 @@ void URecordManagerSubsystem::StopPlayerRewind()
 	RecordingTimeline.PlayFirstKey(RecordingTimelineStartActions);
 	RecordingTimelineStartActions.Empty();
 	GlobalTimeline.RegisterTimeline(CurrentRecordingTimelineIndex, RecordingTimeline, RecordManagerSettings);
+	OnTimelineCreated.Broadcast(CurrentRecordingTimelineIndex);
 }
 
 void URecordManagerSubsystem::StartRewind()
@@ -540,6 +532,63 @@ void URecordManagerSubsystem::StopRewind()
 bool URecordManagerSubsystem::IsRecording()
 {
 	return bIsRecording;
+}
+
+FGlobalTimelineUIInfo URecordManagerSubsystem::GetGlobalTimelineUIInformation()
+{
+	FGlobalTimelineUIInfo Info;
+	Info.CurrentTimeKey = CurrentTimeKey;
+	Info.SelectedTimelineIndex = SelectedSlot;
+	Info.Length = GlobalTimeline.GetLength();
+	Info.NbSlots = GlobalTimeline.NbSlots;
+	Info.Timelines.Empty();
+	for (int i = 0; i < GlobalTimeline.NbSlots; ++i)
+	{
+		if (GlobalTimeline.Timelines.Contains(i))
+		{
+			Info.Timelines.Add(GetTimelineUIInfo(i));
+		}
+	}
+	Info.Timelines.Sort([&](const FTimelineUIInfo& A,const FTimelineUIInfo& B)
+	{
+		return A.Index < B.Index;
+	});
+	return Info;
+}
+
+FTimelineUIInfo URecordManagerSubsystem::GetTimelineUIInfo(int Index)
+{
+	FTimelineUIInfo Info;
+	if (GlobalTimeline.Timelines.Contains(Index))
+	{
+		const FEchoTimeline& Timeline = GlobalTimeline.Timelines[Index];
+		Info.StartTimeKey = Timeline.StartTimeKey;
+		Info.Length = Timeline.GetLastTimeKey();
+		Info.Index = Index;
+		Info.ActionKeys.Empty();
+		Info.EchoColorStruct = RecordManagerSettings->EchoColors[Index];
+		for (const FRecordActionKey& ActionKey : Timeline.ActionKeys)
+		{
+			FUIActionKey ActionInfo = FUIActionKey(ActionKey.TimeKey, ActionKey.Action.ActionEnum);
+			Info.ActionKeys.Add(ActionInfo);
+		}
+	}
+	return Info;
+}
+
+const float& URecordManagerSubsystem::GetCurrentTimeKey() const
+{
+	return CurrentTimeKey;
+}
+
+int URecordManagerSubsystem::GetSelectedTimelineSlot() const
+{
+	return SelectedSlot;
+}
+
+float URecordManagerSubsystem::GetGlobalTimelineLength()
+{
+	return GlobalTimeline.GetLength();
 }
 
 void URecordManagerSubsystem::Tick(float DeltaTime)
@@ -632,6 +681,8 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Reached Max Record Time", FColor::Turquoise, 3.f);
 		}
 	}
+	
+	OnTimelineReplayUpdate.Broadcast(previousTimeKey, CurrentTimeKey);
 }
 
 void URecordManagerSubsystem::PlayPlayerRewind(const float& PreviousTimeKey, const float& TimeKey)
@@ -667,6 +718,7 @@ void URecordManagerSubsystem::PlayPlayerRewind(const float& PreviousTimeKey, con
 void URecordManagerSubsystem::DestroySelectedTimeline()
 {
 	if (bIsInRewind) return; //Forbid Timeline Destruction during Rewind
+	if (!GlobalTimeline.Timelines.Contains(SelectedSlot)) return;
 	GlobalTimeline.DestroyTimeline(SelectedSlot, EchoActorsPool);
 	for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
 	{
@@ -676,18 +728,30 @@ void URecordManagerSubsystem::DestroySelectedTimeline()
 	{
 		CurrentTimeKey = 0.0f;
 	}
+	OnTimelineDestroyed.Broadcast(SelectedSlot);
 }
 
 void URecordManagerSubsystem::IncrementSelectedSlot()
 {
 	SelectedSlot++;
 	if (SelectedSlot >= GlobalTimeline.NbSlots) SelectedSlot = 0;
+	OnTimelineSelected.Broadcast(SelectedSlot);
 }
 
 void URecordManagerSubsystem::DecrementSelectedSlot()
 {
 	SelectedSlot--;
 	if (SelectedSlot < 0) SelectedSlot = GlobalTimeline.NbSlots - 1;
+	OnTimelineSelected.Broadcast(SelectedSlot);
+}
+
+void URecordManagerSubsystem::SelectSlot(int Index)
+{
+	if (Index > 0 && Index < GlobalTimeline.NbSlots - 1)
+	{
+		SelectedSlot = Index;
+		OnTimelineSelected.Broadcast(SelectedSlot);
+	}
 }
 
 void URecordManagerSubsystem::OnRecordableInteractedWith(URecordableComponent* Self, bool bShouldRecord, int RecordTimelineIndex)
