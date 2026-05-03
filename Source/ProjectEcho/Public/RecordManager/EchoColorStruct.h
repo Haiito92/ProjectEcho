@@ -17,6 +17,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UMaterial> Material = nullptr;
 	
+	//Post Process Index
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FColor VignetteColor = FColor::White;
+	int PostProcessIndex;
 };
