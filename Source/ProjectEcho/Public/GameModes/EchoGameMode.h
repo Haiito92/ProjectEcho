@@ -17,11 +17,9 @@ UCLASS(Blueprintable, BlueprintType)
 class PROJECTECHO_API AEchoGameMode : public AEchoGameModeBase
 {
 	GENERATED_BODY()
-private:
+protected:
 	virtual void InitializeGame() override;
 
-protected:
-	
 	UFUNCTION()
 	void OnPlayerDeathEnd();
 	

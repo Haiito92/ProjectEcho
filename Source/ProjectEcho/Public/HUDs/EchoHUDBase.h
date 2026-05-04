@@ -18,6 +18,11 @@ public:
 	void InitHUD();
 	void StartHUD();
 	
+	UFUNCTION(BlueprintCallable)
+	virtual void PauseHUD();
+	UFUNCTION(BlueprintCallable)
+	virtual void ResumeHUD();
+	
 private:
 	virtual void InternalHUDInit();
 	virtual void CreateWidgets();
@@ -35,4 +40,10 @@ protected:
 	
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="Receive Start HUD"))
 	void ReceiveStartHUD();
+	
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="Receive Pause HUD"))
+	void ReceivePauseHUD();
+	
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="Receive Resume HUD"))
+	void ReceiveResumeHUD();
 };

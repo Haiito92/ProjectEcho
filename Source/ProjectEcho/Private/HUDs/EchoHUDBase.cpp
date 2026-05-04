@@ -17,6 +17,16 @@ void AEchoHUDBase::StartHUD()
 	ReceiveStartHUD();
 }
 
+void AEchoHUDBase::PauseHUD()
+{
+	ReceivePauseHUD();
+}
+
+void AEchoHUDBase::ResumeHUD()
+{
+	ReceiveResumeHUD();
+}
+
 void AEchoHUDBase::InternalHUDInit()
 {
 	ReceiveInternalHUDInit();

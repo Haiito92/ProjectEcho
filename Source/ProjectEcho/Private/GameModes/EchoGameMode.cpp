@@ -14,6 +14,8 @@
 
 void AEchoGameMode::InitializeGame()
 {
+	Super::InitializeGame();
+	
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Initialize Game", FColor::Orange, 3.0f);
 
 	if (ULevelStreamingWorldSubsystem* LevelStreamingSubsystem = GetWorld()->GetSubsystem<ULevelStreamingWorldSubsystem>())
@@ -43,11 +45,11 @@ void AEchoGameMode::InitializeGame()
 			EchoPlayerCharacter->OnDeathEnd.AddDynamic(this, &AEchoGameMode::OnPlayerDeathEnd);
 		}
 		else UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error, "Failed to initialize Player Character", FColor::Red, 3.0f);
+	
+		
 	}
 
 	EchoPlayerStart = Cast<APlayerStart>(UGameplayStatics::GetActorOfClass(this, APlayerStart::StaticClass()));
-	 
-	ReceiveInitializeGame();
 }
 
 void AEchoGameMode::OnPlayerDeathEnd()
