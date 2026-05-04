@@ -13,4 +13,17 @@ UCLASS()
 class PROJECTECHO_API UEchoGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
+	
+protected:
+	UFUNCTION(BlueprintCallable)
+	void LoadMainMenuLevel();
+	
+	UFUNCTION(BlueprintCallable)
+	void LoadGameLevel();
+	
+	UPROPERTY(EditAnywhere)
+	FName MainMenuLevelName;
+	
+	UPROPERTY(EditAnywhere)
+	FName GameLevelName;
 };
