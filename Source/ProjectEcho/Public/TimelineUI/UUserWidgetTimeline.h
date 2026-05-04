@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "RecordManager/RecordManagerSubsystem.h"
 #include "UUserWidgetTimeline.generated.h"
 
 USTRUCT(BlueprintType)
@@ -23,6 +24,8 @@ class PROJECTECHO_API UUserWidgetTimeline : public UUserWidget
 public:
 	UPROPERTY(BlueprintReadWrite,EditAnywhere)
 	TArray<FTimelineData> TimelineUI;
+private:
+	URecordManagerSubsystem* RecordManagerSubsystem;
 };
 	
 	
