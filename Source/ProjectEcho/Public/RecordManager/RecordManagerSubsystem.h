@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "RecordKeysStructs.h"
 #include "RecordManagerSettings.h"
+#include "UIRecordStructs.h"
 #include "GameFramework/Actor.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "UObject/ObjectPtr.h"
@@ -73,6 +74,9 @@ struct FEchoTimeline
 	 * - Execute Actions that occured between previousTimeKey and currentTimeKey
 	 */
 	void PlayReplay(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind);
+	
+	//Play First Key of Timeline and Play Given Actions (Used to restore a State)
+	void PlayFirstKey(TArray<FRecordedAction> RestoreFirstStateAction);
 	
 	//Turns
 	void ActivateTimeline(bool bInIsActive);
@@ -143,7 +147,7 @@ public:
 	virtual void InitRecordManager(const int& NbTimelineSlot);
 	
 	UFUNCTION(BlueprintCallable)
-    void StartRecord(AActor* InRecordedActor);
+    void StartRecord(AActor* InRecordedActor, const TArray<FRecordedAction>& RestoreStateAction);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool CanStartRecord() const;
@@ -181,8 +185,12 @@ public:
     UFUNCTION(BlueprintCallable)
     void DecrementSelectedSlot();
 	
+	//Select Precise Selected Slot Value, if Slot doesn't exit, value won't change
+	UFUNCTION(BlueprintCallable)
+	void SelectSlot(int Index);
+	
 	UFUNCTION()
-	void OnRecordableInteractedWith(URecordableComponent* Self, bool bShouldRecord);
+	void OnRecordableInteractedWith(URecordableComponent* Self, bool bShouldRecord, int RecordTimelineIndex);
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnStartRecording, float, CurrentTimeKey, int, TimelineIndex, const FEchoColorStruct&, EchoColorInformations);
 	UPROPERTY(BlueprintAssignable)
@@ -198,11 +206,61 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopPlayerRewinding);
 	FOnStopPlayerRewinding OnStopPlayerRewinding;
 	
+	//--- UI Events ---
+	
+	//Called When New Timeline Created (gives Timeline Index reference)
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimelineCreated, int, CreatedTimelineIndex);
+	UPROPERTY(BlueprintAssignable);
+	FOnTimelineCreated OnTimelineCreated;
+	
+	//Called When New Timeline Destroyed (gives Timeline Index reference)
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimelineDestroyed, int, DestroyedTimelineIndex);
+	UPROPERTY(BlueprintAssignable);
+	FOnTimelineDestroyed OnTimelineDestroyed;
+	
+	//Called When Timeline is Modified, Moved around (gives Timeline Index reference)
+	// --- Not Yet Implemented ---
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimelineModified, int, ModifiedTimelineIndex);
+	UPROPERTY(BlueprintAssignable)
+	FOnTimelineModified OnTimelineModified;
+	
+	//Called On Tick after Timeline Replay Update (gives previous TimeKey and New (Current) TimeKey)
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTimelineReplayUpdate, int, PreviousTimeKey, int, CurrentTimeKey);
+	UPROPERTY(BlueprintAssignable)
+	FOnTimelineReplayUpdate OnTimelineReplayUpdate;
+	
+	//Called On Timeline Selected Index Changed (gives Selected Timeline Index)
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimelineSelected, int, SelectedTimelineIndex);
+	UPROPERTY(BlueprintAssignable)
+	FOnTimelineSelected OnTimelineSelected;
+	
+	//UI Getter Events
+	
+	//Get Global Timeline Informations
+	UFUNCTION(BlueprintCallable)
+	FGlobalTimelineUIInfo GetGlobalTimelineUIInformation();
+	
+	//Get Specific Timeline Informations 
+	UFUNCTION(BlueprintCallable)
+	FTimelineUIInfo GetTimelineUIInfo(int Index);
+	
+	//Get Current Time Key
+	UFUNCTION(BlueprintCallable)
+	const float& GetCurrentTimeKey() const;
+	
+	//Get Selected Timeline Slot
+	UFUNCTION(BlueprintCallable)
+	int GetSelectedTimelineSlot() const;
+	
+	//Get Global Timeline Length
+	UFUNCTION(BlueprintCallable)
+	float GetGlobalTimelineLength();
+	
 private:
 	virtual void Tick(float DeltaTime) override;
 	
 	//Handle Replay of Player Rewind (Placement of Actions
-	void PlayPlayerRewind(const float& TimeKey);
+	void PlayPlayerRewind(const float& PreviousTimeKey, const float& TimeKey);
 	
 protected:
 	FGlobalTimeline GlobalTimeline;
@@ -244,5 +302,9 @@ private:
 	UPROPERTY()
 	//Pool of EchoActor to display Timelines (avoid runtime Spawning)
 	TArray<TObjectPtr<AEchoActor>> EchoActorsPool;
+	
+	UPROPERTY()
+	//Actions to Perform on Player Rewind finish to set Echo in correct Start State (Force Grab Cube when needed to start Timeline while grabbing a cube)
+	TArray<FRecordedAction> RecordingTimelineStartActions;
 };
 

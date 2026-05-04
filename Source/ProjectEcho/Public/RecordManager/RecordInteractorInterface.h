@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "IRecordInteractorInterface.generated.h"
+#include "RecordInteractorInterface.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE()
-class UIRecordInteractorInterface : public UInterface
+class URecordInteractorInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,7 +16,7 @@ class UIRecordInteractorInterface : public UInterface
 /**
  * 
  */
-class PROJECTECHO_API IIRecordInteractorInterface
+class PROJECTECHO_API IRecordInteractorInterface
 {
 	GENERATED_BODY()
 
@@ -24,4 +24,7 @@ class PROJECTECHO_API IIRecordInteractorInterface
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool ShouldRecord();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	int GetRecorderTimelineIndex();
 };
