@@ -16,6 +16,12 @@ class PROJECTECHO_API AEchoHUDBase : public AHUD
 	
 public:
 	void InitHUD();
+	void StartHUD();
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void PauseHUD();
+	UFUNCTION(BlueprintCallable)
+	virtual void ResumeHUD();
 	
 private:
 	virtual void InternalHUDInit();
@@ -31,4 +37,13 @@ protected:
 	
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="Receive Initialize Widgets", ToolTip="Called CreateWidgets."))
 	void ReceiveInitializeWidgets();
+	
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="Receive Start HUD"))
+	void ReceiveStartHUD();
+	
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="Receive Pause HUD"))
+	void ReceivePauseHUD();
+	
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="Receive Resume HUD"))
+	void ReceiveResumeHUD();
 };

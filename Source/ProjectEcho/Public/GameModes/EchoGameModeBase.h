@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "EchoGameModeBase.generated.h"
 
+class AEchoPlayerControllerBase;
 class AEchoHUDBase;
 /**
  * 
@@ -19,18 +20,48 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
-private:
 	virtual void InitializeGame();
 	virtual void InitializeUI();
 	
-protected:
+private:
+	void StartGame();
+	void EndGame();
 	
+public:
+	UFUNCTION(BlueprintCallable)
+	void ToggleGamePause();
+	UFUNCTION(BlueprintCallable)
+	virtual void PauseGame();
+	UFUNCTION(BlueprintCallable)
+	virtual void ResumeGame();
+protected:
 	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive Initialize Game")
 	void ReceiveInitializeGame();
 	
 	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive Initialize UI")
 	void ReceiveInitializeUI();
 	
+	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive Start Game")
+	void ReceiveStartGame();
+	
+	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive End Game")
+	void ReceiveEndGame();
+	
+	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive Pause Game")
+	void ReceivePauseGame();
+	
+	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive Resume Game")
+	void ReceiveResumeGame();
+	
+	UFUNCTION()
+	void OnPauseInputStarted();
+	
 	UPROPERTY()
 	TObjectPtr<AEchoHUDBase> EchoHUD;
+	
+	UPROPERTY()
+	TObjectPtr<AEchoPlayerControllerBase> EchoPlayerController;
+	
+	UPROPERTY()
+	bool bIsGamePaused = false;
 };
