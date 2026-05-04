@@ -8,6 +8,7 @@
 #include "Tools/Debug/DebugDataAsset.h"
 #include "DataAssetDeveloperSettings.generated.h"
 
+class UInputDataConfig;
 class UPropulseMechanicSettings;
 class UReflectMechanicSettings;
 class UInteractMechanicSettings;
@@ -50,4 +51,7 @@ public:
 	
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="States Settings")
 	TSoftObjectPtr<UStateMachineSettings> StateMachineData;
+	
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Input Settings")
+	TSoftObjectPtr<UInputDataConfig> InputDataConfig;
 };

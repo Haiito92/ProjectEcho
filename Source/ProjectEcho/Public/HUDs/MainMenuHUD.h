@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "EchoHUDBase.h"
-#include "EchoHUD.generated.h"
+#include "MainMenuHUD.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTECHO_API AEchoHUD : public AEchoHUDBase
+class PROJECTECHO_API AMainMenuHUD : public AEchoHUDBase
 {
 	GENERATED_BODY()
 };
