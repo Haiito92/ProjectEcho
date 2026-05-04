@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "EchoPlayerControllerBase.generated.h"
 
+class UInputMappingContext;
 /**
  * 
  */
@@ -18,8 +19,15 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseInputStartedSignature);
 	FPauseInputStartedSignature PauseInputStarted;
 
+	void InitializePlayerController();
+	
+	void EnableStateMachineInputs();
+	void DisableStateMachineInputs();
 protected:
 	virtual void SetupInputComponent() override;
 	
 	void OnPauseInputStarted();
+	
+	TObjectPtr<UInputMappingContext> IMCGlobal;
+	TObjectPtr<UInputMappingContext> IMCStateMachine;
 };

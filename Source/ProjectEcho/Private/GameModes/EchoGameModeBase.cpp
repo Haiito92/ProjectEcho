@@ -36,6 +36,7 @@ void AEchoGameModeBase::InitializeGame()
 		EchoPlayerController = Cast<AEchoPlayerControllerBase>(PlayerController);
 		if (IsValid(EchoPlayerController))
 		{
+			EchoPlayerController->InitializePlayerController();
 			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Successfully initialized player controller", FColor::Green, 3.0f);
 			EchoPlayerController->PauseInputStarted.AddDynamic(this, &AEchoGameModeBase::OnPauseInputStarted);
 		}
@@ -93,6 +94,12 @@ void AEchoGameModeBase::PauseGame()
 	bIsGamePaused = true;
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Pause Game", FColor::Orange, 3.0f);
 	
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
+	
+	FInputModeUIOnly InputMode;
+	EchoPlayerController->SetInputMode(InputMode);
+	EchoPlayerController->SetShowMouseCursor(true);
+	
 	EchoHUD->PauseHUD();
 }
 
@@ -102,7 +109,13 @@ void AEchoGameModeBase::ResumeGame()
 	bIsGamePaused = false;
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Resume Game", FColor::Orange, 3.0f);
 	
+	FInputModeGameOnly InputMode;
+	EchoPlayerController->SetInputMode(InputMode);
+	EchoPlayerController->SetShowMouseCursor(false);
+	
 	EchoHUD->ResumeHUD();
+	
+	UGameplayStatics::SetGamePaused(GetWorld(), false);
 }
 
 void AEchoGameModeBase::OnPauseInputStarted()
