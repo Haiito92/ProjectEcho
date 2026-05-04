@@ -36,6 +36,7 @@ struct FRecordedAction
 		this->ActionEnum = Action;
 	}
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ERecordedAction ActionEnum = ERecordedAction::None;
 };
 
@@ -45,19 +46,30 @@ struct FRecordTransformKey
 {
 	GENERATED_BODY()
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TimeKey;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector Position;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FRotator Rotation;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector Scale;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FRotator ControlRotation;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FRecordActionKey
 {
 	GENERATED_BODY()
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TimeKey;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FRecordedAction Action;
 };
 
@@ -76,7 +88,6 @@ USTRUCT(BlueprintType)
 struct FRecordInteractionKey
 {
 	GENERATED_BODY()
-	
 	float TimeKey;
 	int RecordTimelineIndex;
 };
