@@ -20,14 +20,46 @@ public:
 	
 	virtual void BeginPlay() override;
 	
-	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="CastStartLocation,CastDirection"))
-	bool TryReflect(const FVector& CastStartLocation, const FVector& CastDirection);
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="InCastStartLocation, InCastDirection"))
+	void StartReflect(const FVector& InCastStartLocation, const FVector& InCastDirection);
+	
+	UFUNCTION(BlueprintCallable)
+	void StopReflect();
+	
+	UFUNCTION(BlueprintCallable)
+	void ResetCooldownTimer();
+	
+	UFUNCTION(BlueprintCallable)
+	bool IsOn() const;
+	
+	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="InCastStartLocation"))
+	void SetCastStartLocation(const FVector& InCastStartLocation);
+	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="InCastDirection"))
+	void SetCastDirection(const FVector& InCastDirection);
 	
 protected:
+	UFUNCTION(BlueprintCallable)
+	bool TryReflect();
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveTryReflect();
 	
 private:
 	UPROPERTY()
 	TObjectPtr<UReflectMechanicSettings> ReflectMechanicSettings;
+	
+	UPROPERTY()
+	bool bIsOn;
+	
+	UPROPERTY()
+	float ReflectCooldown;
+	
+	UPROPERTY()
+	float ReflectTimer;
+	
+	UPROPERTY()
+	FVector CastStartLocation;
+	UPROPERTY()
+	FVector CastDirection;
 };

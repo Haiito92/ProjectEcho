@@ -25,4 +25,7 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Reflect")
 	float ReflectPower = 20.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Reflect")
+	float ReflectCooldown = 2.f;
 };

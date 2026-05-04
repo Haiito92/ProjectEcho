@@ -83,7 +83,10 @@ public:
 	void AStopPropulse();
 	
 	UFUNCTION(BlueprintCallable)
-	void AReflect();
+	void AStartReflect();
+	
+	UFUNCTION(BlueprintCallable)
+	void AStopReflect();
 	
 	UFUNCTION(BlueprintCallable)
 	void PlayerTakeDamage(int value);
@@ -200,6 +203,9 @@ public:
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReflectInputStarted);
 	FOnReflectInputStarted OnReflectInputStarted;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReflectInputCompleted);
+	FOnReflectInputCompleted OnReflectInputCompleted;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnReflected, const FVector&, ReflectDirection, float, ReflectPower);
 	FOnReflected OnReflected;

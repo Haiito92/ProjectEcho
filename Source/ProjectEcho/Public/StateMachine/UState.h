@@ -118,6 +118,9 @@ protected:
 	void OnReflectInputStarted();
 	
 	UFUNCTION()
+	void OnReflectInputCompleted();
+	
+	UFUNCTION()
 	virtual void OnRevive();
 	
 	UFUNCTION()
