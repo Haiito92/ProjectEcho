@@ -96,7 +96,7 @@ void AEchoGameModeBase::PauseGame()
 	
 	UGameplayStatics::SetGamePaused(GetWorld(), true);
 	
-	FInputModeUIOnly InputMode;
+	FInputModeGameAndUI InputMode;
 	EchoPlayerController->SetInputMode(InputMode);
 	EchoPlayerController->SetShowMouseCursor(true);
 	

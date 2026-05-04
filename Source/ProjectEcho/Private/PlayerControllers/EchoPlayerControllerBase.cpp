@@ -25,6 +25,70 @@ void AEchoPlayerControllerBase::InitializePlayerController()
 
 	IMCGlobal = InputDataConfig->IMCGlobal;
 	IMCStateMachine = InputDataConfig->IMCStateMachine;
+	
+	ULocalPlayer* LocalPlayer = GetLocalPlayer();
+	if (!IsValid(LocalPlayer))
+	{
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error,
+												  "Failed to setup input in player controller: LocalPlayer invalid!",
+												  FColor::Red, 3.0f);
+		return;
+	}
+	
+	UEnhancedInputLocalPlayerSubsystem* InputSubsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+	
+	if (IsValid(InputSubsystem))
+	{
+		if (!IsValid(InputDataConfig->IMCGlobal))
+		{
+			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error,
+													  "Player Controller Input Setup: IMC Global invalid!", FColor::Red,
+													  3.0f);
+		}
+		else
+		{
+			InputSubsystem->AddMappingContext(IMCGlobal, 0);
+		}
+	
+		if (!IsValid(InputDataConfig->IMCStateMachine))
+		{
+			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error,
+													  "Player Controller Input Setup: IMC StateMachine invalid!", FColor::Red,
+													  3.0f);
+		}
+		else
+		{
+			InputSubsystem->AddMappingContext(IMCStateMachine, 0);
+		}
+	}
+	else
+	{
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error,
+													  "Player Controller Input Setup: InputSystem invalid!", FColor::Red,
+													  3.0f);
+	}
+	
+
+	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
+	if (!IsValid(EnhancedInputComponent))
+	{
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error,
+												  "Failed to setup input in player controller: Input component invalid!",
+												  FColor::Red, 3.0f);
+		return;
+	}
+	
+	if (!IsValid(InputDataConfig->APause))
+	{
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error,
+												  "Player Controller Input Setup: Pause Action invalid!", FColor::Red,
+												  3.0f);
+	}
+	else
+	{
+		EnhancedInputComponent->BindAction(InputDataConfig->APause, ETriggerEvent::Started, this,
+										   &AEchoPlayerControllerBase::OnPauseInputStarted);
+	}
 }
 
 void AEchoPlayerControllerBase::EnableStateMachineInputs()
@@ -53,94 +117,6 @@ void AEchoPlayerControllerBase::DisableStateMachineInputs()
 	}
 
 	InputSystem->RemoveMappingContext(IMCStateMachine);
-}
-
-void AEchoPlayerControllerBase::SetupInputComponent()
-{
-	Super::SetupInputComponent();
-
-	const UDataAssetDeveloperSettings* DataSettings = GetDefault<UDataAssetDeveloperSettings>();
-	if (!IsValid(DataSettings))
-	{
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error,
-		                                          "Failed to setup input in player controller: DataSettings invalid!",
-		                                          FColor::Red, 3.0f);
-		return;
-	}
-
-	TObjectPtr<UInputDataConfig> InputDataConfig = DataSettings->InputDataConfig.LoadSynchronous();
-	if (!IsValid(InputDataConfig))
-	{
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error,
-		                                          "Failed to setup input in player controller: Input Data invalid!",
-		                                          FColor::Red, 3.0f);
-		return;
-	}
-
-	ULocalPlayer* LocalPlayer = GetLocalPlayer();
-	if (!IsValid(LocalPlayer))
-	{
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error,
-		                                          "Failed to setup input in player controller: LocalPlayer invalid!",
-		                                          FColor::Red, 3.0f);
-		return;
-	}
-	
-	UEnhancedInputLocalPlayerSubsystem* InputSubsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
-	
-	if (IsValid(InputSubsystem))
-	{
-		if (!IsValid(InputDataConfig->IMCGlobal))
-		{
-			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error,
-													  "Player Controller Input Setup: IMC Global invalid!", FColor::Red,
-													  3.0f);
-		}
-		else
-		{
-			
-			InputSubsystem->AddMappingContext(IMCGlobal, 0);
-		}
-	
-		if (!IsValid(InputDataConfig->IMCStateMachine))
-		{
-			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error,
-													  "Player Controller Input Setup: IMC StateMachine invalid!", FColor::Red,
-													  3.0f);
-		}
-		else
-		{
-			InputSubsystem->AddMappingContext(IMCStateMachine, 0);
-		}
-	}
-	else
-	{
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error,
-													  "Player Controller Input Setup: InputSystem invalid!", FColor::Red,
-													  3.0f);
-	}
-	
-
-	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
-	if (!IsValid(EnhancedInputComponent))
-	{
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error,
-		                                          "Failed to setup input in player controller: Input component invalid!",
-		                                          FColor::Red, 3.0f);
-		return;
-	}
-	
-	if (!IsValid(InputDataConfig->APause))
-	{
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error,
-		                                          "Player Controller Input Setup: Pause Action invalid!", FColor::Red,
-		                                          3.0f);
-	}
-	else
-	{
-		EnhancedInputComponent->BindAction(InputDataConfig->APause, ETriggerEvent::Started, this,
-		                                   &AEchoPlayerControllerBase::OnPauseInputStarted);
-	}
 }
 
 void AEchoPlayerControllerBase::OnPauseInputStarted()

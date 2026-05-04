@@ -24,10 +24,10 @@ public:
 	void EnableStateMachineInputs();
 	void DisableStateMachineInputs();
 protected:
-	virtual void SetupInputComponent() override;
-	
 	void OnPauseInputStarted();
 	
+	UPROPERTY()
 	TObjectPtr<UInputMappingContext> IMCGlobal;
+	UPROPERTY()
 	TObjectPtr<UInputMappingContext> IMCStateMachine;
 };
