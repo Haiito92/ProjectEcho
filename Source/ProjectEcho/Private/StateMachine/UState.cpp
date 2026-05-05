@@ -193,6 +193,7 @@ void UState::OnRecord()
 			
 			//Force Grab to Restore Grab State
 			if (GrabbingComponent->IsGrabbing()) RestoreStateActions.Add(FRecordedAction(ERecordedAction::ForceGrab));
+			if (IsValid(ReflectComponent) && ReflectComponent->IsOn()) RestoreStateActions.Add(FRecordedAction(ERecordedAction::StartReflect));
 			
 			RecordManagerSubsystem->StartRecord(Character, RestoreStateActions);
 		}
