@@ -76,14 +76,7 @@ void ACharacterST::Tick(float DeltaTime)
 void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	APlayerController* PlayerController = Cast<APlayerController>(GetController());
-	Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
-	if (Subsystem == nullptr) return;
 	
-	Subsystem->ClearAllMappings();
-	Subsystem->AddMappingContext(InputMapping, 0);
-	
-	if (PlayerController == nullptr) return;
 	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	
 	if(InputActions == nullptr)
@@ -114,8 +107,8 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Input->BindAction(InputActions->APropulse, ETriggerEvent::Started,this,&ACharacterST::AStartPropulse);
 	Input->BindAction(InputActions->APropulse, ETriggerEvent::Completed,this,&ACharacterST::AStopPropulse);
 	
-	Input->BindAction(InputActions->AReflect, ETriggerEvent::Started,this,&ACharacterST::AReflect);
-	
+	Input->BindAction(InputActions->AReflect, ETriggerEvent::Started,this,&ACharacterST::AStartReflect);
+	Input->BindAction(InputActions->AReflect, ETriggerEvent::Completed,this,&ACharacterST::AStopReflect);
 }
 
 void ACharacterST::InitPlayer()
@@ -225,9 +218,14 @@ void ACharacterST::AStopPropulse()
 	OnStopPropulse.Broadcast();
 }
 
-void ACharacterST::AReflect()
+void ACharacterST::AStartReflect()
 {
 	OnReflectInputStarted.Broadcast();
+}
+
+void ACharacterST::AStopReflect()
+{
+	OnReflectInputCompleted.Broadcast();
 }
 
 void ACharacterST::PlayerTakeDamage(int value)

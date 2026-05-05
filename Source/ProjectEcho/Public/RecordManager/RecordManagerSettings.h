@@ -42,6 +42,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Replay")
 	float GlobalRewindTime = 1.f;
 	
+	//Refresh Frequency for UI of Timelines Tick
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	float UIRefreshFrequency = 0.1f;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Echo Actors")
 	TMap<int, FEchoColorStruct> EchoColors;
 };

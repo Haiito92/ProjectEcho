@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "EchoPlayerControllerBase.generated.h"
 
+class UInputMappingContext;
 /**
  * 
  */
@@ -16,10 +17,18 @@ class PROJECTECHO_API AEchoPlayerControllerBase : public APlayerController
 	
 public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseInputStartedSignature);
+	UPROPERTY(BlueprintAssignable)
 	FPauseInputStartedSignature PauseInputStarted;
 
-protected:
-	virtual void SetupInputComponent() override;
+	void InitializePlayerController();
 	
+	void EnableStateMachineInputs();
+	void DisableStateMachineInputs();
+protected:
 	void OnPauseInputStarted();
+	
+	UPROPERTY()
+	TObjectPtr<UInputMappingContext> IMCGlobal;
+	UPROPERTY()
+	TObjectPtr<UInputMappingContext> IMCStateMachine;
 };

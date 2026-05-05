@@ -14,7 +14,7 @@ UReflectComponent::UReflectComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
 }
@@ -26,9 +26,71 @@ void UReflectComponent::BeginPlay()
 	const UDataAssetDeveloperSettings* DataAssetDevSettings = GetDefault<UDataAssetDeveloperSettings>();
 	
 	ReflectMechanicSettings = DataAssetDevSettings->ReflectMechanicSettings.LoadSynchronous();
+	
+	if (!IsValid(ReflectMechanicSettings))
+	{
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Error, "Can't init Reflect Component: reflect settings invalid", FColor::Red, 3.0f);
+		return;
+	}
+	
+	
+	ReflectCooldown = ReflectMechanicSettings->ReflectCooldown;
+	ReflectTimer = 0.0f;
 }
 
-bool UReflectComponent::TryReflect(const FVector& CastStartLocation, const FVector& CastDirection)
+void UReflectComponent::TickComponent(float DeltaTime, enum ELevelTick TickType,
+	FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
+	if (!bIsOn) return;
+	
+	ReflectTimer = FMath::Max(ReflectTimer - DeltaTime, 0.0f);
+	
+	if (ReflectTimer <= 0.0f)
+	{
+		if (TryReflect())
+		{
+			ReflectTimer = ReflectCooldown;
+		}
+	}
+}
+
+void UReflectComponent::StartReflect(const FVector& InCastStartLocation, const FVector& InCastDirection)
+{
+	bIsOn = true;
+	ResetCooldownTimer();
+	SetCastStartLocation(InCastStartLocation);
+	SetCastDirection(InCastDirection);
+}
+
+void UReflectComponent::StopReflect()
+{
+	bIsOn = false;
+}
+
+
+void UReflectComponent::ResetCooldownTimer()
+{
+	ReflectTimer = 0.0f;
+}
+
+bool UReflectComponent::IsOn() const
+{
+	return bIsOn;
+}
+
+void UReflectComponent::SetCastStartLocation(const FVector& InCastStartLocation)
+{
+	CastStartLocation = InCastStartLocation;
+}
+
+void UReflectComponent::SetCastDirection(const FVector& InCastDirection)
+{
+	CastDirection = InCastDirection;
+}
+
+bool UReflectComponent::TryReflect()
 {
 	if (!IsValid(ReflectMechanicSettings))
 	{
@@ -68,7 +130,7 @@ bool UReflectComponent::TryReflect(const FVector& CastStartLocation, const FVect
 
 	if (!HitResult.bBlockingHit)
 	{
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Log, "Didn't find any reflectable", FColor::White, 3.0f);
+		//UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Log, "Didn't find any reflectable", FColor::White, 3.0f);
 		return false;
 	}
 	

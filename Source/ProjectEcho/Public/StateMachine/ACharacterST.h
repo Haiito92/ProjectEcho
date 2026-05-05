@@ -83,7 +83,10 @@ public:
 	void AStopPropulse();
 	
 	UFUNCTION(BlueprintCallable)
-	void AReflect();
+	void AStartReflect();
+	
+	UFUNCTION(BlueprintCallable)
+	void AStopReflect();
 	
 	UFUNCTION(BlueprintCallable)
 	void PlayerTakeDamage(int value);
@@ -140,68 +143,99 @@ public:
 	virtual void FinalizePropulse_Implementation() override;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
+	UPROPERTY(BlueprintAssignable)
 	FMovePressed OnMovePressed;
+	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveStarted, bool, isPress);
+	UPROPERTY(BlueprintAssignable)
 	FMoveStarted OnMoveStarted;
+	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMoveReleased);
+	UPROPERTY(BlueprintAssignable)
 	FMoveReleased OnMoveReleased;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FJumpStarted);
+	UPROPERTY(BlueprintAssignable)
 	FJumpStarted OnJumpingStarted;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRunPressed);
+	UPROPERTY(BlueprintAssignable)
 	FRunPressed OnRunning;
+	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRunStarted, bool, isRunning);
+	UPROPERTY(BlueprintAssignable)
 	FRunStarted OnRunningStarted;
+	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRunReleased, bool, isRunning);
+	UPROPERTY(BlueprintAssignable)
 	FRunReleased OnRunningReleased;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGrabStarted);
+	UPROPERTY(BlueprintAssignable)
 	FGrabStarted OnGrabbingStarted;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReleaseStarted);
+	UPROPERTY(BlueprintAssignable)
 	FReleaseStarted OnReleaseStarted;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FThrowStarted);
+	UPROPERTY(BlueprintAssignable)
 	FThrowStarted OnThrowingStarted;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRecord);
+	UPROPERTY(BlueprintAssignable)
 	FOnRecord OnRecord;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDestroySlot);
+	UPROPERTY(BlueprintAssignable)
 	FOnDestroySlot OnDestroySlot;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnIncrementSlot);
+	UPROPERTY(BlueprintAssignable)
 	FOnIncrementSlot OnIncrementSlot;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDecrementSlot);
+	UPROPERTY(BlueprintAssignable)
 	FOnDecrementSlot OnDecrementSlot;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
+	UPROPERTY(BlueprintAssignable)
 	FOnDeath OnDeath;
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathEnd);
+	UPROPERTY(BlueprintAssignable)
 	FOnDeathEnd OnDeathEnd;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRevive);
+	UPROPERTY(BlueprintAssignable)
 	FOnRevive OnRevive;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInteract);
+	UPROPERTY(BlueprintAssignable)
 	FOnRevive OnInteract;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartPropulse);
+	UPROPERTY(BlueprintAssignable)
 	FOnStartPropulse OnStartPropulse;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopPropulse);
+	UPROPERTY(BlueprintAssignable)
 	FOnStopPropulse OnStopPropulse;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPropulsed, const FVector&, PropulseDirection, float, PropulsePower);
+	UPROPERTY(BlueprintAssignable)
 	FOnPropulsed OnPropulsed;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReflectInputStarted);
+	UPROPERTY(BlueprintAssignable)
 	FOnReflectInputStarted OnReflectInputStarted;
 	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReflectInputCompleted);
+	UPROPERTY(BlueprintAssignable)
+	FOnReflectInputCompleted OnReflectInputCompleted;
+	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnReflected, const FVector&, ReflectDirection, float, ReflectPower);
+	UPROPERTY(BlueprintAssignable)
 	FOnReflected OnReflected;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnValidGrab);
@@ -223,8 +257,6 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndRecord);
 	UPROPERTY(BlueprintAssignable)
 	FOnEndRecord OnEndRecord;
-	
-	
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputDataConfig> InputActions;

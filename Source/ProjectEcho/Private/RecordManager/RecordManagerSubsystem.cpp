@@ -200,6 +200,18 @@ void FEchoTimeline::OnDestroy()
 	EchoActor->SetActorHiddenInGame(true);
 }
 
+void FEchoTimeline::RecordFirstActionKeys(const TArray<FRecordedAction>& FirstActions)
+{
+	if (FirstActions.IsEmpty()) return;
+	for (const FRecordedAction& FirstAction : FirstActions)
+	{
+		FRecordActionKey ActionKey;
+		ActionKey.Action = FirstAction;
+		ActionKey.TimeKey = 0.01;
+		ActionKeys.Add(ActionKey);
+	}
+}
+
 #pragma endregion
 
 #pragma region GlobalTimeline
@@ -407,7 +419,7 @@ void URecordManagerSubsystem::InitRecordManager(const int& NbTimelineSlot)
 	}
 }
 
-void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<FRecordedAction>& RestoreStateAction)
+void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<FRecordedAction>& RestoreStateAction,  const TArray<FRecordedAction>& FirstActions)
 {
 	if (!CanStartRecord()) return;
 	if (!IsValid(InRecordedActor)) return;
@@ -434,6 +446,7 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<
 	RecordingTimeline.StartTimeKey = CurrentTimeKey;
 	RecordingTimeline.EchoActor = EchoActorsPool.Pop();
 	RecordingTimeline.RecordTransformKey(RecordedActor, 0);
+	RecordingTimeline.RecordFirstActionKeys(FirstActions);
 	OnStartRecording.Broadcast(CurrentTimeKey, CurrentRecordingTimelineIndex, RecordManagerSettings->EchoColors[CurrentRecordingTimelineIndex]);
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), RecordManagerSettings->TimeDilatationFactor);
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Start Recording", FColor::Turquoise, 3.f);
@@ -591,6 +604,25 @@ float URecordManagerSubsystem::GetGlobalTimelineLength()
 	return GlobalTimeline.GetLength();
 }
 
+FTimelineUIInfo URecordManagerSubsystem::GetRecordingTimelineUIInfo()
+{
+	FTimelineUIInfo Info;
+	if (!bIsRecording) return Info;
+	
+	Info.StartTimeKey = RecordingTimeline.StartTimeKey;
+	Info.Length = RecordingTimeline.GetLastTimeKey();
+	Info.Index = CurrentRecordingTimelineIndex;
+	Info.ActionKeys.Empty();
+	Info.EchoColorStruct = RecordManagerSettings->EchoColors[CurrentRecordingTimelineIndex];
+	for (const FRecordActionKey& ActionKey : RecordingTimeline.ActionKeys)
+	{
+		FUIActionKey ActionInfo = FUIActionKey(ActionKey.TimeKey, ActionKey.Action.ActionEnum);
+		Info.ActionKeys.Add(ActionInfo);
+	}
+	
+	return Info;
+}
+
 void URecordManagerSubsystem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -682,7 +714,12 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 		}
 	}
 	
-	OnTimelineReplayUpdate.Broadcast(previousTimeKey, CurrentTimeKey);
+	UIUpdateClock += DeltaTime;
+	if (UIUpdateClock >= RecordManagerSettings->UIRefreshFrequency)
+	{
+		OnTimelineReplayUpdate.Broadcast(previousTimeKey, CurrentTimeKey, bIsRecording);
+		UIUpdateClock -= RecordManagerSettings->UIRefreshFrequency;
+	}
 }
 
 void URecordManagerSubsystem::PlayPlayerRewind(const float& PreviousTimeKey, const float& TimeKey)
@@ -733,24 +770,27 @@ void URecordManagerSubsystem::DestroySelectedTimeline()
 
 void URecordManagerSubsystem::IncrementSelectedSlot()
 {
+	int PreviouslySelectedSlot = SelectedSlot;
 	SelectedSlot++;
 	if (SelectedSlot >= GlobalTimeline.NbSlots) SelectedSlot = 0;
-	OnTimelineSelected.Broadcast(SelectedSlot);
+	OnTimelineSelected.Broadcast(PreviouslySelectedSlot, SelectedSlot);
 }
 
 void URecordManagerSubsystem::DecrementSelectedSlot()
 {
+	int PreviouslySelectedSlot = SelectedSlot;
 	SelectedSlot--;
 	if (SelectedSlot < 0) SelectedSlot = GlobalTimeline.NbSlots - 1;
-	OnTimelineSelected.Broadcast(SelectedSlot);
+	OnTimelineSelected.Broadcast(PreviouslySelectedSlot, SelectedSlot);
 }
 
 void URecordManagerSubsystem::SelectSlot(int Index)
 {
 	if (Index > 0 && Index < GlobalTimeline.NbSlots - 1)
 	{
+		int PreviouslySelectedSlot = SelectedSlot;
 		SelectedSlot = Index;
-		OnTimelineSelected.Broadcast(SelectedSlot);
+		OnTimelineSelected.Broadcast(PreviouslySelectedSlot, SelectedSlot);
 	}
 }
 
