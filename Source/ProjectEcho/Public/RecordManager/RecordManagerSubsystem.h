@@ -28,23 +28,23 @@ struct FEchoTimeline
 	GENERATED_BODY()
 	
 	//Actor used to show Replay of Timeline (Echo)
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<AEchoActor> EchoActor = nullptr;
 	
-	//List of TransformKeys
-	UPROPERTY()
+	//TimeKey of Start of Timeline (from Global Timeline)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FRecordTransformKey> TransformKeys;
 	
 	//List of Action Keys
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FRecordActionKey> ActionKeys;
 	
 	//List of Rewind ActionKeys
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FRecordActionKey> RewindActionKeys;
 	
 	//TimeKey of Start of Timeline (from Global Timeline)
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float StartTimeKey;
 	
 	//Whether Timeline is currently active and showing a Replay (In Rewind or not)
@@ -201,7 +201,7 @@ public:
 	
 	//Select Precise Selected Slot Value, if Slot doesn't exit, value won't change
 	UFUNCTION(BlueprintCallable)
-	void SelectSlot(int Index);
+	void SelectSlot(int Index, bool bCanSelectNonExistentTimeline = false);
 	
 	UFUNCTION()
 	void OnRecordableInteractedWith(URecordableComponent* Self, bool bShouldRecord, int RecordTimelineIndex);
@@ -241,12 +241,12 @@ public:
 	FOnTimelineModified OnTimelineModified;
 	
 	//Called On Tick after Timeline Replay Update (gives previous TimeKey and New (Current) TimeKey)
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTimelineReplayUpdate, int, PreviousTimeKey, int, CurrentTimeKey);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnTimelineReplayUpdate, int, PreviousTimeKey, int, CurrentTimeKey, bool, bIsRecording);
 	UPROPERTY(BlueprintAssignable)
 	FOnTimelineReplayUpdate OnTimelineReplayUpdate;
 	
 	//Called On Timeline Selected Index Changed (gives Selected Timeline Index)
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimelineSelected, int, SelectedTimelineIndex);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTimelineSelected, int, PreviouslySelectedTimelineIndex, int, SelectedTimelineIndex);
 	UPROPERTY(BlueprintAssignable)
 	FOnTimelineSelected OnTimelineSelected;
 	
@@ -271,6 +271,10 @@ public:
 	//Get Global Timeline Length
 	UFUNCTION(BlueprintCallable)
 	float GetGlobalTimelineLength();
+	
+	//Get Recording Timeline UI Informations
+	UFUNCTION(BlueprintCallable)
+	FTimelineUIInfo GetRecordingTimelineUIInfo();
 	
 private:
 	virtual void Tick(float DeltaTime) override;
@@ -330,5 +334,8 @@ private:
 	UPROPERTY()
 	//Actions to Perform on Player Rewind finish to set Echo in correct Start State (Force Grab Cube when needed to start Timeline while grabbing a cube)
 	TArray<FRecordedAction> RecordingTimelineStartActions;
+	
+	UPROPERTY()
+	float UIUpdateClock = 0.f;
 };
 
