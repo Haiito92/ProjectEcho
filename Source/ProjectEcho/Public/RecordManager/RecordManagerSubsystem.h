@@ -201,7 +201,7 @@ public:
 	
 	//Select Precise Selected Slot Value, if Slot doesn't exit, value won't change
 	UFUNCTION(BlueprintCallable)
-	void SelectSlot(int Index);
+	void SelectSlot(int Index, bool bCanSelectNonExistentTimeline = false);
 	
 	UFUNCTION()
 	void OnRecordableInteractedWith(URecordableComponent* Self, bool bShouldRecord, int RecordTimelineIndex);
