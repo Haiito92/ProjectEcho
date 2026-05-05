@@ -32,18 +32,23 @@ struct FEchoTimeline
 	TObjectPtr<AEchoActor> EchoActor = nullptr;
 	
 	//List of TransformKeys
+	UPROPERTY()
 	TArray<FRecordTransformKey> TransformKeys;
 	
 	//List of Action Keys
+	UPROPERTY()
 	TArray<FRecordActionKey> ActionKeys;
 	
 	//List of Rewind ActionKeys
+	UPROPERTY()
 	TArray<FRecordActionKey> RewindActionKeys;
 	
 	//TimeKey of Start of Timeline (from Global Timeline)
+	UPROPERTY()
 	float StartTimeKey;
 	
 	//Whether Timeline is currently active and showing a Replay (In Rewind or not)
+	UPROPERTY()
 	bool bIsActive = false;
 
 	//Get Closest Next Key
@@ -99,10 +104,12 @@ struct FGlobalTimeline
 {
 	GENERATED_BODY()
 	
+	UPROPERTY()
 	TMap<int, FEchoTimeline> Timelines;
 	
 	void Initiate(int InNbSlots);
 
+	UPROPERTY()
 	int NbSlots = 5;
 	
 	//Play CurrentFrame for all Active Timelines, activate timelines that have not yet been activated
@@ -201,9 +208,11 @@ public:
 	FOnStopRecording OnStopRecording;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartPlayerRewinding);
+	UPROPERTY(BlueprintAssignable)
 	FOnStartPlayerRewinding OnStartPlayerRewinding;	
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopPlayerRewinding);
+	UPROPERTY(BlueprintAssignable)
 	FOnStopPlayerRewinding OnStopPlayerRewinding;
 	
 	//--- UI Events ---
@@ -263,9 +272,11 @@ private:
 	void PlayPlayerRewind(const float& PreviousTimeKey, const float& TimeKey);
 	
 protected:
+	UPROPERTY()
 	FGlobalTimeline GlobalTimeline;
 
 	//Current Recording Timeline;
+	UPROPERTY()
 	FEchoTimeline RecordingTimeline;
 	
 	UPROPERTY()
@@ -275,21 +286,27 @@ protected:
 	TObjectPtr<AActor> RecordedActor = nullptr;
 	
 	//Current TimeKey, used for Recording and Replays;
+	UPROPERTY()
 	float CurrentTimeKey = 0.0f;
 	
 	//Is Recording
+	UPROPERTY()
 	bool bIsRecording = false;
 	
 	//Is Timeline Replay in Rewind
+	UPROPERTY()
 	bool bIsInRewind = false;
 	
 	//Is Currently rewinding Player's Actions after a record
+	UPROPERTY()
 	bool bIsPlayerRewinding = false;
 	
 	//Current Selected Timeline Slot
+	UPROPERTY()
 	int SelectedSlot = 0;
 	
 	//Speed of Rewind (Calculated when rewind is Called
+	UPROPERTY()
 	float RewindSpeed = 0.f;
 	
 private:

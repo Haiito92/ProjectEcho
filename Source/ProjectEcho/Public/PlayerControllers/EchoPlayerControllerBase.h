@@ -17,6 +17,7 @@ class PROJECTECHO_API AEchoPlayerControllerBase : public APlayerController
 	
 public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseInputStartedSignature);
+	UPROPERTY(BlueprintAssignable)
 	FPauseInputStartedSignature PauseInputStarted;
 
 	void InitializePlayerController();
