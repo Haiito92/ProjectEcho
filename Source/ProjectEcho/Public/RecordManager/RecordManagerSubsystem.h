@@ -28,23 +28,23 @@ struct FEchoTimeline
 	GENERATED_BODY()
 	
 	//Actor used to show Replay of Timeline (Echo)
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<AEchoActor> EchoActor = nullptr;
 	
-	//List of TransformKeys
-	UPROPERTY()
+	//TimeKey of Start of Timeline (from Global Timeline)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FRecordTransformKey> TransformKeys;
 	
 	//List of Action Keys
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FRecordActionKey> ActionKeys;
 	
 	//List of Rewind ActionKeys
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FRecordActionKey> RewindActionKeys;
 	
 	//TimeKey of Start of Timeline (from Global Timeline)
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float StartTimeKey;
 	
 	//Whether Timeline is currently active and showing a Replay (In Rewind or not)
@@ -201,7 +201,7 @@ public:
 	
 	//Select Precise Selected Slot Value, if Slot doesn't exit, value won't change
 	UFUNCTION(BlueprintCallable)
-	void SelectSlot(int Index);
+	void SelectSlot(int Index, bool bCanSelectNonExistentTimeline = false);
 	
 	UFUNCTION()
 	void OnRecordableInteractedWith(URecordableComponent* Self, bool bShouldRecord, int RecordTimelineIndex);
