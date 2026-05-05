@@ -130,7 +130,7 @@ bool UReflectComponent::TryReflect()
 
 	if (!HitResult.bBlockingHit)
 	{
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Log, "Didn't find any reflectable", FColor::White, 3.0f);
+		//UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Log, "Didn't find any reflectable", FColor::White, 3.0f);
 		return false;
 	}
 	
