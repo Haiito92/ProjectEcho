@@ -32,6 +32,18 @@ struct FEchoTimeline
 	TObjectPtr<AEchoActor> EchoActor = nullptr;
 	
 	//List of TransformKeys
+	UPROPERTY()
+	TArray<FRecordTransformKey> TransformKeys;
+	
+	//List of Action Keys
+	UPROPERTY()
+	TArray<FRecordActionKey> ActionKeys;
+	
+	//List of Rewind ActionKeys
+	UPROPERTY()
+	TArray<FRecordActionKey> RewindActionKeys;
+	
+	//TimeKey of Start of Timeline (from Global Timeline)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FRecordTransformKey> TransformKeys;
 	
@@ -48,6 +60,7 @@ struct FEchoTimeline
 	float StartTimeKey;
 	
 	//Whether Timeline is currently active and showing a Replay (In Rewind or not)
+	UPROPERTY()
 	bool bIsActive = false;
 
 	//Get Closest Next Key
@@ -93,6 +106,9 @@ struct FEchoTimeline
 	
 	//Called when Timeline is being Destroyed
 	void OnDestroy();
+	
+	//Record First Action Key (Used when Starting to Record)
+	void RecordFirstActionKeys(const TArray<FRecordedAction>& FirstActions);
 };
 #pragma endregion
 
@@ -103,10 +119,12 @@ struct FGlobalTimeline
 {
 	GENERATED_BODY()
 	
+	UPROPERTY()
 	TMap<int, FEchoTimeline> Timelines;
 	
 	void Initiate(int InNbSlots);
 
+	UPROPERTY()
 	int NbSlots = 5;
 	
 	//Play CurrentFrame for all Active Timelines, activate timelines that have not yet been activated
@@ -151,7 +169,11 @@ public:
 	virtual void InitRecordManager(const int& NbTimelineSlot);
 	
 	UFUNCTION(BlueprintCallable)
-    void StartRecord(AActor* InRecordedActor, const TArray<FRecordedAction>& RestoreStateAction);
+	/* Start Record
+	 * RestoreStateAction -> Action to execute on First replay Only
+	 * FirstActions -> Action that will be registered as First Action Key
+	 */
+    void StartRecord(AActor* InRecordedActor, const TArray<FRecordedAction>& RestoreStateAction, const TArray<FRecordedAction>& FirstActions);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool CanStartRecord() const;
@@ -205,9 +227,11 @@ public:
 	FOnStopRecording OnStopRecording;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartPlayerRewinding);
+	UPROPERTY(BlueprintAssignable)
 	FOnStartPlayerRewinding OnStartPlayerRewinding;	
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopPlayerRewinding);
+	UPROPERTY(BlueprintAssignable)
 	FOnStopPlayerRewinding OnStopPlayerRewinding;
 	
 	//--- UI Events ---
@@ -229,12 +253,12 @@ public:
 	FOnTimelineModified OnTimelineModified;
 	
 	//Called On Tick after Timeline Replay Update (gives previous TimeKey and New (Current) TimeKey)
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTimelineReplayUpdate, int, PreviousTimeKey, int, CurrentTimeKey);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnTimelineReplayUpdate, int, PreviousTimeKey, int, CurrentTimeKey, bool, bIsRecording);
 	UPROPERTY(BlueprintAssignable)
 	FOnTimelineReplayUpdate OnTimelineReplayUpdate;
 	
 	//Called On Timeline Selected Index Changed (gives Selected Timeline Index)
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimelineSelected, int, SelectedTimelineIndex);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTimelineSelected, int, PreviouslySelectedTimelineIndex, int, SelectedTimelineIndex);
 	UPROPERTY(BlueprintAssignable)
 	FOnTimelineSelected OnTimelineSelected;
 	
@@ -260,6 +284,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetGlobalTimelineLength();
 	
+	//Get Recording Timeline UI Informations
+	UFUNCTION(BlueprintCallable)
+	FTimelineUIInfo GetRecordingTimelineUIInfo();
+	
 private:
 	virtual void Tick(float DeltaTime) override;
 	
@@ -267,9 +295,11 @@ private:
 	void PlayPlayerRewind(const float& PreviousTimeKey, const float& TimeKey);
 	
 protected:
+	UPROPERTY()
 	FGlobalTimeline GlobalTimeline;
 
 	//Current Recording Timeline;
+	UPROPERTY()
 	FEchoTimeline RecordingTimeline;
 	
 	UPROPERTY()
@@ -279,21 +309,27 @@ protected:
 	TObjectPtr<AActor> RecordedActor = nullptr;
 	
 	//Current TimeKey, used for Recording and Replays;
+	UPROPERTY()
 	float CurrentTimeKey = 0.0f;
 	
 	//Is Recording
+	UPROPERTY()
 	bool bIsRecording = false;
 	
 	//Is Timeline Replay in Rewind
+	UPROPERTY()
 	bool bIsInRewind = false;
 	
 	//Is Currently rewinding Player's Actions after a record
+	UPROPERTY()
 	bool bIsPlayerRewinding = false;
 	
 	//Current Selected Timeline Slot
+	UPROPERTY()
 	int SelectedSlot = 0;
 	
 	//Speed of Rewind (Calculated when rewind is Called
+	UPROPERTY()
 	float RewindSpeed = 0.f;
 	
 private:
@@ -310,5 +346,8 @@ private:
 	UPROPERTY()
 	//Actions to Perform on Player Rewind finish to set Echo in correct Start State (Force Grab Cube when needed to start Timeline while grabbing a cube)
 	TArray<FRecordedAction> RecordingTimelineStartActions;
+	
+	UPROPERTY()
+	float UIUpdateClock = 0.f;
 };
 

@@ -42,6 +42,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Replay")
 	float GlobalRewindTime = 1.f;
 	
+	//Refresh Frequency for UI of Timelines Tick
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	float UIRefreshFrequency = 0.1f;
+	
 	//Time taken for Standalone Global Timeline to rewind to Start
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Replay")
 	float StandaloneGlobalRewindTime = 0.5f;
