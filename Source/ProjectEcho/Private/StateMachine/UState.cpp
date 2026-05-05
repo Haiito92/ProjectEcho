@@ -46,6 +46,7 @@ void UState::Enter()
 	Character->OnStopPropulse.AddDynamic(this, &UState::OnPropulseInputStopped);
 	Character->OnPropulsed.AddDynamic(this, &UState::OnPropulsed);
 	Character->OnReflectInputStarted.AddDynamic(this, &UState::OnReflectInputStarted);
+	Character->OnReflectInputCompleted.AddDynamic(this, &UState::OnReflectInputCompleted);
 	Character->OnReflected.AddDynamic(this, &UState::OnReflected);
 	RecordManagerSubsystem->OnStartPlayerRewinding.AddDynamic(this, &UState::OnRewindingStarted);
 	RecordManagerSubsystem->OnStopPlayerRewinding.AddDynamic(this, &UState::OnRewindingEnded);
@@ -56,6 +57,11 @@ void UState::Enter()
 
 void UState::Tick(float DeltaTime)
 {
+	if (CanUseReflect() && IsValid(ReflectComponent) && ReflectComponent->IsOn())
+	{
+		ReflectComponent->SetCastStartLocation(Character->FirstPersonCameraComponent->GetComponentLocation());
+		ReflectComponent->SetCastDirection(UKismetMathLibrary::GetForwardVector(Character->GetControlRotation()));
+	}
 }
 
 void UState::Exit()
@@ -73,6 +79,7 @@ void UState::Exit()
 	Character->OnStopPropulse.RemoveDynamic(this, &UState::OnPropulseInputStopped);
 	Character->OnPropulsed.RemoveDynamic(this, &UState::OnPropulsed);
 	Character->OnReflectInputStarted.RemoveDynamic(this, &UState::OnReflectInputStarted);
+	Character->OnReflectInputCompleted.RemoveDynamic(this, &UState::OnReflectInputCompleted);
 	Character->OnReflected.RemoveDynamic(this, &UState::OnReflected);
 	RecordManagerSubsystem->OnStartPlayerRewinding.RemoveDynamic(this, &UState::OnRewindingStarted);
 	RecordManagerSubsystem->OnStopPlayerRewinding.RemoveDynamic(this, &UState::OnRewindingEnded);
@@ -266,12 +273,22 @@ void UState::OnReflectInputStarted()
 {
 	if (CanUseReflect() && IsValid(ReflectComponent))
 	{
-		ReflectComponent->TryReflect(
+		ReflectComponent->StartReflect(
 			Character->FirstPersonCameraComponent->GetComponentLocation(),
 			UKismetMathLibrary::GetForwardVector(Character->GetControlRotation())
 			);
 		
-		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::TryReflect));
+		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::StartReflect));
+	}
+}
+
+void UState::OnReflectInputCompleted()
+{
+	if (CanUseReflect() && IsValid(ReflectComponent))
+	{
+		ReflectComponent->StopReflect();
+		
+		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::StopReflect));
 	}
 }
 

@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "EchoHUDBase.h"
-#include "GameFramework/HUD.h"
 #include "EchoHUD.generated.h"
 
 /**
