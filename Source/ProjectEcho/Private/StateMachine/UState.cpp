@@ -189,12 +189,17 @@ void UState::OnRecord()
 		{
 			Character->OnStartRecord.Broadcast();
 			
+			//Actions Played only on first Replay
 			TArray<FRecordedAction> RestoreStateActions;
+			
+			//Actions Played at the beginning of each replay
+			TArray<FRecordedAction> FirstActions;
 			
 			//Force Grab to Restore Grab State
 			if (GrabbingComponent->IsGrabbing()) RestoreStateActions.Add(FRecordedAction(ERecordedAction::ForceGrab));
+			if (IsValid(ReflectComponent) && ReflectComponent->IsOn()) FirstActions.Add(FRecordedAction(ERecordedAction::StartReflect));
 			
-			RecordManagerSubsystem->StartRecord(Character, RestoreStateActions);
+			RecordManagerSubsystem->StartRecord(Character, RestoreStateActions, FirstActions);
 		}
 			
 	}
