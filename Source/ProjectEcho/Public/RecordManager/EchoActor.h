@@ -35,6 +35,7 @@ public:
 	
 	void HandleRewindStarted(const float& CurrentTimeKey);
 	void HandleRewindStopped(const float& CurrentTimeKey);
+	
 	UFUNCTION()
 	void OnTimelineDestroyed();
 	
