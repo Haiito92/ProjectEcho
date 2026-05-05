@@ -89,6 +89,9 @@ struct FEchoTimeline
 	
 	//Called when Timeline is being Destroyed
 	void OnDestroy();
+	
+	//Record First Action Key (Used when Starting to Record)
+	void RecordFirstActionKeys(const TArray<FRecordedAction>& FirstActions);
 };
 #pragma endregion
 
@@ -147,7 +150,11 @@ public:
 	virtual void InitRecordManager(const int& NbTimelineSlot);
 	
 	UFUNCTION(BlueprintCallable)
-    void StartRecord(AActor* InRecordedActor, const TArray<FRecordedAction>& RestoreStateAction);
+	/* Start Record
+	 * RestoreStateAction -> Action to execute on First replay Only
+	 * FirstActions -> Action that will be registered as First Action Key
+	 */
+    void StartRecord(AActor* InRecordedActor, const TArray<FRecordedAction>& RestoreStateAction, const TArray<FRecordedAction>& FirstActions);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool CanStartRecord() const;

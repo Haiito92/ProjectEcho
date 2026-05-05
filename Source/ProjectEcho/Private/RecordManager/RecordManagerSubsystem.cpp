@@ -200,6 +200,18 @@ void FEchoTimeline::OnDestroy()
 	EchoActor->SetActorHiddenInGame(true);
 }
 
+void FEchoTimeline::RecordFirstActionKeys(const TArray<FRecordedAction>& FirstActions)
+{
+	if (FirstActions.IsEmpty()) return;
+	for (const FRecordedAction& FirstAction : FirstActions)
+	{
+		FRecordActionKey ActionKey;
+		ActionKey.Action = FirstAction;
+		ActionKey.TimeKey = 0.01;
+		ActionKeys.Add(ActionKey);
+	}
+}
+
 #pragma endregion
 
 #pragma region GlobalTimeline
@@ -407,7 +419,7 @@ void URecordManagerSubsystem::InitRecordManager(const int& NbTimelineSlot)
 	}
 }
 
-void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<FRecordedAction>& RestoreStateAction)
+void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<FRecordedAction>& RestoreStateAction,  const TArray<FRecordedAction>& FirstActions)
 {
 	if (!CanStartRecord()) return;
 	if (!IsValid(InRecordedActor)) return;
@@ -434,6 +446,7 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<
 	RecordingTimeline.StartTimeKey = CurrentTimeKey;
 	RecordingTimeline.EchoActor = EchoActorsPool.Pop();
 	RecordingTimeline.RecordTransformKey(RecordedActor, 0);
+	RecordingTimeline.RecordFirstActionKeys(FirstActions);
 	OnStartRecording.Broadcast(CurrentTimeKey, CurrentRecordingTimelineIndex, RecordManagerSettings->EchoColors[CurrentRecordingTimelineIndex]);
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), RecordManagerSettings->TimeDilatationFactor);
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Start Recording", FColor::Turquoise, 3.f);
