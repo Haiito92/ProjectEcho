@@ -436,6 +436,7 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<
 
 	for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
 	{
+		if (!IsValid(RecordableComponent)) continue;
 		if (RecordableComponent->IsCurrentlyInteractedWith() && !RecordableComponent->IsRecording())
 		{
 			RecordableComponent->StartRecording(FRecordInteractionKey(CurrentTimeKey, CurrentRecordingTimelineIndex));
@@ -759,6 +760,7 @@ void URecordManagerSubsystem::DestroySelectedTimeline()
 	GlobalTimeline.DestroyTimeline(SelectedSlot, EchoActorsPool);
 	for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
 	{
+		if (!IsValid(RecordableComponent)) continue;
 		RecordableComponent->HandleTimelineDestruction(SelectedSlot);
 	}
 	if (GlobalTimeline.Timelines.IsEmpty())
