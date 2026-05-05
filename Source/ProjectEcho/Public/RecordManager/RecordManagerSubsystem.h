@@ -232,12 +232,12 @@ public:
 	FOnTimelineModified OnTimelineModified;
 	
 	//Called On Tick after Timeline Replay Update (gives previous TimeKey and New (Current) TimeKey)
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTimelineReplayUpdate, int, PreviousTimeKey, int, CurrentTimeKey);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnTimelineReplayUpdate, int, PreviousTimeKey, int, CurrentTimeKey, bool, bIsRecording);
 	UPROPERTY(BlueprintAssignable)
 	FOnTimelineReplayUpdate OnTimelineReplayUpdate;
 	
 	//Called On Timeline Selected Index Changed (gives Selected Timeline Index)
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimelineSelected, int, SelectedTimelineIndex);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTimelineSelected, int, PreviouslySelectedTimelineIndex, int, SelectedTimelineIndex);
 	UPROPERTY(BlueprintAssignable)
 	FOnTimelineSelected OnTimelineSelected;
 	
@@ -262,6 +262,10 @@ public:
 	//Get Global Timeline Length
 	UFUNCTION(BlueprintCallable)
 	float GetGlobalTimelineLength();
+	
+	//Get Recording Timeline UI Informations
+	UFUNCTION(BlueprintCallable)
+	FTimelineUIInfo GetRecordingTimelineUIInfo();
 	
 private:
 	virtual void Tick(float DeltaTime) override;
@@ -313,5 +317,8 @@ private:
 	UPROPERTY()
 	//Actions to Perform on Player Rewind finish to set Echo in correct Start State (Force Grab Cube when needed to start Timeline while grabbing a cube)
 	TArray<FRecordedAction> RecordingTimelineStartActions;
+	
+	UPROPERTY()
+	float UIUpdateClock = 0.f;
 };
 

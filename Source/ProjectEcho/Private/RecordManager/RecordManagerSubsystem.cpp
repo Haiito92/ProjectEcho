@@ -604,6 +604,25 @@ float URecordManagerSubsystem::GetGlobalTimelineLength()
 	return GlobalTimeline.GetLength();
 }
 
+FTimelineUIInfo URecordManagerSubsystem::GetRecordingTimelineUIInfo()
+{
+	FTimelineUIInfo Info;
+	if (!bIsRecording) return Info;
+	
+	Info.StartTimeKey = RecordingTimeline.StartTimeKey;
+	Info.Length = RecordingTimeline.GetLastTimeKey();
+	Info.Index = CurrentRecordingTimelineIndex;
+	Info.ActionKeys.Empty();
+	Info.EchoColorStruct = RecordManagerSettings->EchoColors[CurrentRecordingTimelineIndex];
+	for (const FRecordActionKey& ActionKey : RecordingTimeline.ActionKeys)
+	{
+		FUIActionKey ActionInfo = FUIActionKey(ActionKey.TimeKey, ActionKey.Action.ActionEnum);
+		Info.ActionKeys.Add(ActionInfo);
+	}
+	
+	return Info;
+}
+
 void URecordManagerSubsystem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -695,7 +714,12 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 		}
 	}
 	
-	OnTimelineReplayUpdate.Broadcast(previousTimeKey, CurrentTimeKey);
+	UIUpdateClock += DeltaTime;
+	if (UIUpdateClock >= RecordManagerSettings->UIRefreshFrequency)
+	{
+		OnTimelineReplayUpdate.Broadcast(previousTimeKey, CurrentTimeKey, bIsRecording);
+		UIUpdateClock -= RecordManagerSettings->UIRefreshFrequency;
+	}
 }
 
 void URecordManagerSubsystem::PlayPlayerRewind(const float& PreviousTimeKey, const float& TimeKey)
@@ -746,24 +770,27 @@ void URecordManagerSubsystem::DestroySelectedTimeline()
 
 void URecordManagerSubsystem::IncrementSelectedSlot()
 {
+	int PreviouslySelectedSlot = SelectedSlot;
 	SelectedSlot++;
 	if (SelectedSlot >= GlobalTimeline.NbSlots) SelectedSlot = 0;
-	OnTimelineSelected.Broadcast(SelectedSlot);
+	OnTimelineSelected.Broadcast(PreviouslySelectedSlot, SelectedSlot);
 }
 
 void URecordManagerSubsystem::DecrementSelectedSlot()
 {
+	int PreviouslySelectedSlot = SelectedSlot;
 	SelectedSlot--;
 	if (SelectedSlot < 0) SelectedSlot = GlobalTimeline.NbSlots - 1;
-	OnTimelineSelected.Broadcast(SelectedSlot);
+	OnTimelineSelected.Broadcast(PreviouslySelectedSlot, SelectedSlot);
 }
 
 void URecordManagerSubsystem::SelectSlot(int Index)
 {
 	if (Index > 0 && Index < GlobalTimeline.NbSlots - 1)
 	{
+		int PreviouslySelectedSlot = SelectedSlot;
 		SelectedSlot = Index;
-		OnTimelineSelected.Broadcast(SelectedSlot);
+		OnTimelineSelected.Broadcast(PreviouslySelectedSlot, SelectedSlot);
 	}
 }
 
