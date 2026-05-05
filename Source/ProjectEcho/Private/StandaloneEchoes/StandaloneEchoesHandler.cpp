@@ -104,6 +104,7 @@ void AStandaloneEchoesHandler::CreateTimelineFromEcho(AEchoActor* EchoActor)
 	if (EchoActor == nullptr) return;
 	FEchoTimeline EchoTimeline;
 	EchoTimeline.EchoActor = EchoActor;
+	EchoTimeline.StartTimeKey = CurrentTimeKey;
 	EchoTimeline.RecordTransformKey(EchoActor, CurrentTimeKey);
 	EchoTimeline.RecordTransformKey(EchoActor, CurrentTimeKey + 0.5f);
 	EchoTimelines.Add(EchoTimeline);
