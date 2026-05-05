@@ -31,18 +31,6 @@ struct FEchoTimeline
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<AEchoActor> EchoActor = nullptr;
 	
-	//List of TransformKeys
-	UPROPERTY()
-	TArray<FRecordTransformKey> TransformKeys;
-	
-	//List of Action Keys
-	UPROPERTY()
-	TArray<FRecordActionKey> ActionKeys;
-	
-	//List of Rewind ActionKeys
-	UPROPERTY()
-	TArray<FRecordActionKey> RewindActionKeys;
-	
 	//TimeKey of Start of Timeline (from Global Timeline)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FRecordTransformKey> TransformKeys;
