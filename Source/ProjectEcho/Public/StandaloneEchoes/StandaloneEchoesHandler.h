@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "StandaloneEchoesHandler.generated.h"
 
+class AEchoActor;
 class URecordManagerSettings;
 struct FEchoTimeline;
 
@@ -32,6 +33,12 @@ public:
 	//Play CurrentFrame for all Active Timelines, activate timelines that have not yet been activated
 	UFUNCTION()
 	void Play(const float& PreviousTimeKey, const float& TimeKey, bool bIsInRewind, bool& bOutHasReachedEnd);
+	
+	UFUNCTION(BlueprintCallable)
+	void CreateTimelineFromEcho(AEchoActor* EchoActor);
+	
+	UFUNCTION(BlueprintCallable)
+	int GetTimelineIndexFromEcho(AEchoActor* EchoActor);
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

@@ -4,6 +4,7 @@
 #include "StandaloneEchoes/StandaloneEchoesHandler.h"
 
 #include "DataAssetDeveloperSettings.h"
+#include "RecordManager/EchoActor.h"
 #include "RecordManager/RecordManagerSubsystem.h"
 
 
@@ -96,6 +97,25 @@ void AStandaloneEchoesHandler::Play(const float& PreviousTimeKey, const float& T
 	}
 	
 	bOutHasReachedEnd = bIsInRewind ? false : !bHasNotReachedEnd;
+}
+
+void AStandaloneEchoesHandler::CreateTimelineFromEcho(AEchoActor* EchoActor)
+{
+	if (EchoActor == nullptr) return;
+	FEchoTimeline EchoTimeline;
+	EchoTimeline.EchoActor = EchoActor;
+	EchoTimeline.RecordTransformKey(EchoActor, CurrentTimeKey);
+	EchoTimeline.RecordTransformKey(EchoActor, CurrentTimeKey + 0.5f);
+	EchoTimelines.Add(EchoTimeline);
+}
+
+int AStandaloneEchoesHandler::GetTimelineIndexFromEcho(AEchoActor* EchoActor)
+{
+	for (int i = 0; i < EchoTimelines.Num(); ++i)
+	{
+		if (EchoActor == EchoTimelines[i].EchoActor) return i;
+	}
+	return -1;
 }
 
 float AStandaloneEchoesHandler::GetTimelinesLength()
