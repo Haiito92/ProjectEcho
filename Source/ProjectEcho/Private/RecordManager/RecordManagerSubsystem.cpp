@@ -759,6 +759,7 @@ void URecordManagerSubsystem::DestroySelectedTimeline()
 	if (bIsInRewind) return; //Forbid Timeline Destruction during Rewind
 	if (!GlobalTimeline.Timelines.Contains(SelectedSlot)) return;
 	GlobalTimeline.DestroyTimeline(SelectedSlot, EchoActorsPool);
+	int DestroyedSlot = SelectedSlot;
 	
 	//Decrement Until Correct Timeline
 	DecrementSelectedSlot();
@@ -774,7 +775,7 @@ void URecordManagerSubsystem::DestroySelectedTimeline()
 		CurrentTimeKey = 0.0f;
 	}
 	
-	OnTimelineDestroyed.Broadcast(SelectedSlot);
+	OnTimelineDestroyed.Broadcast(DestroyedSlot);
 }
 
 void URecordManagerSubsystem::IncrementSelectedSlot()
