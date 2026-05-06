@@ -1,5 +1,6 @@
 #pragma once
 #include "CoreMinimal.h"
+#include "PlayerInterface.h"
 #include "GameFramework/Character.h"
 #include "KillMechanic/Killable.h"
 #include "PropulseMechanic/Propulsable.h"
@@ -20,7 +21,7 @@ class UStateMachine;
 class UEnhancedInputLocalPlayerSubsystem;
 
 UCLASS()
-class PROJECTECHO_API ACharacterST : public ACharacter, public IKillable, public IReflectable, public IPropulsable, public IRecordHandlerInterface
+class PROJECTECHO_API ACharacterST : public ACharacter, public IKillable, public IReflectable, public IPropulsable, public IRecordHandlerInterface, public IPlayerInterface
 {
 	GENERATED_BODY()
 
