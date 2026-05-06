@@ -36,7 +36,7 @@ void UActivatorComponent::SwitchOn_Implementation()
 	{
 		if (IsValid(Activable) && Activable->Implements<UActivable>())
 		{
-			IActivable::Execute_Activate(Activable);
+			IActivable::Execute_AddPower(Activable);
 		}
 	}
 
@@ -51,7 +51,7 @@ void UActivatorComponent::SwitchOff_Implementation()
 	{
 		if (IsValid(Activable) && Activable->Implements<UActivable>())
 		{
-			IActivable::Execute_Deactivate(Activable);
+			IActivable::Execute_RemovePower(Activable);
 		}
 	}
 
