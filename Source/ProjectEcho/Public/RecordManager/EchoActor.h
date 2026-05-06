@@ -23,7 +23,6 @@ public:
 public:
 	void HandleActionKey(const FRecordedAction& Action);
 	
-	
 	UFUNCTION()
 	void SetControlRotation(const FRotator& ControlRotation);
 	

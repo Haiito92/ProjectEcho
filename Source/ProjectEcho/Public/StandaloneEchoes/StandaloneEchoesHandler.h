@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "StandaloneEchoesHandler.generated.h"
 
+struct FRecordedAction;
 class AEchoActor;
 class URecordManagerSettings;
 struct FEchoTimeline;
@@ -34,16 +35,34 @@ public:
 	UFUNCTION()
 	void Play(const float& PreviousTimeKey, const float& TimeKey, bool bIsInRewind, bool& bOutHasReachedEnd);
 	
+	//Play In Editor Current Key (Will Only play Transform Keys)
+	UFUNCTION(BlueprintCallable)
+	void PlayInEditor(const float& TimeKey);
+	
 	UFUNCTION(BlueprintCallable)
 	void CreateTimelineFromEcho(AEchoActor* EchoActor);
 	
 	UFUNCTION(BlueprintCallable)
 	int GetTimelineIndexFromEcho(AEchoActor* EchoActor);
 	
-protected:
+	UFUNCTION(BlueprintCallable)
+	int CreateTransformKey(int TimelineIndex, const float& TimeKey);
+	
+	UFUNCTION(BlueprintCallable)
+	int CreateActionKey(int TimelineIndex, const float& TimeKey, const FRecordedAction& RecordedAction);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	float GetTimelinesLength();
+	
+	//Tool Setter Functions
+	
+	UFUNCTION(BlueprintCallable)
+	void SetStartTimeKey(int TimelineIndex, float StartTimeKey);
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FEchoTimeline> EchoTimelines;
 	
+protected:
 	UPROPERTY(BlueprintReadOnly)
 	float CurrentTimeKey = 0.0f;
 	
@@ -57,5 +76,4 @@ protected:
 	TObjectPtr<URecordManagerSettings> RecordManagerSettings = nullptr;
 	
 private:
-	float GetTimelinesLength();
 };

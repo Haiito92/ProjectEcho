@@ -43,8 +43,9 @@ const FRecordTransformKey* FEchoTimeline::GetPreviousTransformKey(const float& T
 	return key;
 }
 
-const float& FEchoTimeline::GetLastTimeKey() const
+float FEchoTimeline::GetLastTimeKey() const
 {
+	if (TransformKeys.IsEmpty()) return 0;
 	return TransformKeys[TransformKeys.Num() - 1].TimeKey;
 }
 
@@ -135,17 +136,7 @@ void FEchoTimeline::PlayReplay(const float& PreviousKey,const float& CurrentTime
 	if (!IsValid(EchoActor)) return;
 	if (GetLastTimeKey() < CurrentTimeKey) return;
 	
-	//Play Transform Key (Lerp between two closest Keys)
-	const FRecordTransformKey* PreviousTransformKey = GetPreviousTransformKey(CurrentTimeKey);
-	const FRecordTransformKey* NextTransformKey = GetNextTransformKey(CurrentTimeKey);
-	if (NextTransformKey == nullptr || PreviousTransformKey == nullptr) return;
-	
-	//Place Actor according to previous and next TransformKey 
-	float lerpValue = (CurrentTimeKey - PreviousTransformKey->TimeKey) / (NextTransformKey->TimeKey - PreviousTransformKey->TimeKey);
-	EchoActor->SetActorLocation(FMath::Lerp(PreviousTransformKey->Position, NextTransformKey->Position, lerpValue));
-	EchoActor->SetActorRotation(FMath::Lerp(PreviousTransformKey->Rotation, NextTransformKey->Rotation, lerpValue));
-	EchoActor->SetActorScale3D(FMath::Lerp(PreviousTransformKey->Scale, NextTransformKey->Scale, lerpValue));
-	EchoActor->SetControlRotation(FMath::Lerp(PreviousTransformKey->ControlRotation, NextTransformKey->ControlRotation, lerpValue));
+	PlayTransformKeys(CurrentTimeKey);
 	
 	//Play Action Keys
 	TArray<FRecordActionKey> CurrentActionKeys;
@@ -157,6 +148,21 @@ void FEchoTimeline::PlayReplay(const float& PreviousKey,const float& CurrentTime
 			EchoActor->HandleActionKey(ActionKey.Action);
 		}
 	}
+}
+
+void FEchoTimeline::PlayTransformKeys(const float& CurrentTimeKey)
+{
+	//Play Transform Key (Lerp between two closest Keys)
+	const FRecordTransformKey* PreviousTransformKey = GetPreviousTransformKey(CurrentTimeKey);
+	const FRecordTransformKey* NextTransformKey = GetNextTransformKey(CurrentTimeKey);
+	if (NextTransformKey == nullptr || PreviousTransformKey == nullptr) return;
+	
+	//Place Actor according to previous and next TransformKey 
+	float lerpValue = (CurrentTimeKey - PreviousTransformKey->TimeKey) / (NextTransformKey->TimeKey - PreviousTransformKey->TimeKey);
+	EchoActor->SetActorLocation(FMath::Lerp(PreviousTransformKey->Position, NextTransformKey->Position, lerpValue));
+	EchoActor->SetActorRotation(FMath::Lerp(PreviousTransformKey->Rotation, NextTransformKey->Rotation, lerpValue));
+	EchoActor->SetActorScale3D(FMath::Lerp(PreviousTransformKey->Scale, NextTransformKey->Scale, lerpValue));
+	EchoActor->SetControlRotation(FMath::Lerp(PreviousTransformKey->ControlRotation, NextTransformKey->ControlRotation, lerpValue));
 }
 
 void FEchoTimeline::PlayFirstKey(TArray<FRecordedAction> RestoreFirstStateAction)
