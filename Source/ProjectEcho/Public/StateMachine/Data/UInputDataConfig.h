@@ -11,42 +11,51 @@ class UInputDataConfig : public UDataAsset
 public:
 	GENERATED_BODY()
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Actions")
 	UInputAction* AMove;
 	 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Actions")
 	UInputAction* ARun;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Actions")
 	UInputAction* AJump;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Actions")
 	UInputAction* ALook;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Actions")
 	UInputAction* AGrab;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Actions")
 	UInputAction* AThrow;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Actions")
 	UInputAction* ARecord;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Actions")
 	UInputAction* AIncrementSlot;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Actions")
 	UInputAction* ADecrementSlot;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Actions")
 	UInputAction* ADestroySlot;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Actions")
 	UInputAction* AInteract;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Actions")
 	UInputAction* APropulse;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Actions")
 	UInputAction* AReflect;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Actions")
+	UInputAction* APause;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Mappings")
+	UInputMappingContext* IMCGlobal;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Mappings")
+	UInputMappingContext* IMCStateMachine;
 };

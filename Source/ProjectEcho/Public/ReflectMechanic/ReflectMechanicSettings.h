@@ -25,4 +25,13 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Reflect")
 	float ReflectPower = 20.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Reflect")
+	float ReflectCooldown = 2.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Reflect", meta=(ClampMin=0.0f, ClampMax=90.0f))
+	float ReflectLiftAngle = 20.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Reflect", meta=(ClampMin=0.0f, ClampMax=90.0f))
+	float ReflectLiftAngleThreshold = 45.f;
 };

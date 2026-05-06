@@ -43,6 +43,10 @@ public:
 	
 	//Called when Forced Grabbed
 	UFUNCTION(BlueprintNativeEvent)
+	void OnObjectBeforeForceGrabbed();
+	
+	//Called when Forced Grabbed
+	UFUNCTION(BlueprintNativeEvent)
 	void OnObjectForceGrabbed();
 	
 	//Called when Thrown

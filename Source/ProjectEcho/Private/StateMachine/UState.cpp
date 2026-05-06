@@ -1,7 +1,9 @@
 #include "Public/StateMachine/UState.h"
 
+#include "DataAssetDeveloperSettings.h"
 #include "EchoSystem.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GrabMechanic/GrabbingComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -9,6 +11,7 @@
 #include "RecordManager/RecordHandlerComponent.h"
 #include "RecordManager/RecordManagerSubsystem.h"
 #include "ReflectMechanic/ReflectComponent.h"
+#include "ReflectMechanic/ReflectMechanicSettings.h"
 #include "StateMachine/ACharacterST.h"
 #include "Tools/Debug/EchoDebug.h"
 #include "Tools/Debug/EchoMessageType.h"
@@ -19,7 +22,7 @@ UState::UState()
 {
 }
 
-void UState::InitState(UStateMachine* InStateMachine,ACharacterST* InCharacter)
+void UState::InitState(UStateMachine* InStateMachine, ACharacterST* InCharacter)
 {
 	StateMachine = InStateMachine;
 	Character = InCharacter;
@@ -27,7 +30,7 @@ void UState::InitState(UStateMachine* InStateMachine,ACharacterST* InCharacter)
 	RecordManagerSubsystem = GetWorld()->GetSubsystem<URecordManagerSubsystem>();
 	InteractorComponent = Character->FindComponentByClass<UInteractorComponent>();
 	ReflectComponent = Character->FindComponentByClass<UReflectComponent>();
-	PropulseComponent = Character -> FindComponentByClass<UPropulseComponent>();
+	PropulseComponent = Character->FindComponentByClass<UPropulseComponent>();
 	RecordHandlerComponent = Character->RecordHandlerComponent;
 }
 
@@ -43,18 +46,25 @@ void UState::Enter()
 	Character->OnInteract.AddDynamic(this, &UState::OnInteract);
 	Character->OnRevive.AddDynamic(this, &UState::OnRevive);
 	Character->OnStartPropulse.AddDynamic(this, &UState::OnPropulseInputStarted);
+	Character->OnStopPropulse.AddDynamic(this, &UState::OnPropulseInputStopped);
 	Character->OnPropulsed.AddDynamic(this, &UState::OnPropulsed);
 	Character->OnReflectInputStarted.AddDynamic(this, &UState::OnReflectInputStarted);
+	Character->OnReflectInputCompleted.AddDynamic(this, &UState::OnReflectInputCompleted);
 	Character->OnReflected.AddDynamic(this, &UState::OnReflected);
 	RecordManagerSubsystem->OnStartPlayerRewinding.AddDynamic(this, &UState::OnRewindingStarted);
 	RecordManagerSubsystem->OnStopPlayerRewinding.AddDynamic(this, &UState::OnRewindingEnded);
-	
+
 	Character->bCanBeReflected = (StateSettings & EStateSettings::CanBeReflected) == EStateSettings::CanBeReflected;
 	Character->bCanBePropulsed = (StateSettings & EStateSettings::CanBePropulsed) == EStateSettings::CanBePropulsed;
 }
 
 void UState::Tick(float DeltaTime)
 {
+	if (CanUseReflect() && IsValid(ReflectComponent) && ReflectComponent->IsOn())
+	{
+		ReflectComponent->SetCastStartLocation(Character->FirstPersonCameraComponent->GetComponentLocation());
+		ReflectComponent->SetCastDirection(UKismetMathLibrary::GetForwardVector(Character->GetControlRotation()));
+	}
 }
 
 void UState::Exit()
@@ -69,12 +79,14 @@ void UState::Exit()
 	Character->OnInteract.RemoveDynamic(this, &UState::OnInteract);
 	Character->OnRevive.RemoveDynamic(this, &UState::OnRevive);
 	Character->OnStartPropulse.RemoveDynamic(this, &UState::OnPropulseInputStarted);
+	Character->OnStopPropulse.RemoveDynamic(this, &UState::OnPropulseInputStopped);
 	Character->OnPropulsed.RemoveDynamic(this, &UState::OnPropulsed);
 	Character->OnReflectInputStarted.RemoveDynamic(this, &UState::OnReflectInputStarted);
+	Character->OnReflectInputCompleted.RemoveDynamic(this, &UState::OnReflectInputCompleted);
 	Character->OnReflected.RemoveDynamic(this, &UState::OnReflected);
 	RecordManagerSubsystem->OnStartPlayerRewinding.RemoveDynamic(this, &UState::OnRewindingStarted);
 	RecordManagerSubsystem->OnStopPlayerRewinding.RemoveDynamic(this, &UState::OnRewindingEnded);
-	
+
 	Character->bCanBeReflected = false;
 	Character->bCanBePropulsed = false;
 }
@@ -117,8 +129,9 @@ void UState::OnGrabbingStarted()
 	{
 		if (GrabbingComponent->IsGrabbing())
 		{
-			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::TryRelease), FRecordedAction(ERecordedAction::ForceGrab));
-			
+			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
+				FRecordedAction(ERecordedAction::TryRelease), FRecordedAction(ERecordedAction::ForceGrab));
+
 			if (GrabbingComponent->TryRelease())
 				Character->OnValidRelease.Broadcast();
 		}
@@ -126,8 +139,9 @@ void UState::OnGrabbingStarted()
 		{
 			if (GrabbingComponent->TryGrab(Character->GetControlRotation()))
 				Character->OnValidGrab.Broadcast();
-			
-			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::TryGrab), FRecordedAction(ERecordedAction::ForceRelease));
+
+			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
+				FRecordedAction(ERecordedAction::TryGrab), FRecordedAction(ERecordedAction::ForceRelease));
 		}
 	}
 }
@@ -136,8 +150,9 @@ void UState::OnThrowingStarted()
 {
 	if (CanUseGrab())
 	{
-		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::TryThrow), FRecordedAction(ERecordedAction::ForceGrab));
-		
+		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
+			FRecordedAction(ERecordedAction::TryThrow), FRecordedAction(ERecordedAction::ForceGrab));
+
 		if (GrabbingComponent->TryThrow(Character->GetControlRotation()))
 			Character->OnValidThrow.Broadcast();
 	}
@@ -179,9 +194,20 @@ void UState::OnRecord()
 		else
 		{
 			Character->OnStartRecord.Broadcast();
-			RecordManagerSubsystem->StartRecord(Character);
+
+			//Actions Played only on first Replay
+			TArray<FRecordedAction> RestoreStateActions;
+
+			//Actions Played at the beginning of each replay
+			TArray<FRecordedAction> FirstActions;
+
+			//Force Grab to Restore Grab State
+			if (GrabbingComponent->IsGrabbing()) RestoreStateActions.Add(FRecordedAction(ERecordedAction::ForceGrab));
+			if (IsValid(ReflectComponent) && ReflectComponent->IsOn()) FirstActions.Add(
+				FRecordedAction(ERecordedAction::StartReflect));
+
+			RecordManagerSubsystem->StartRecord(Character, RestoreStateActions, FirstActions);
 		}
-			
 	}
 }
 
@@ -216,11 +242,12 @@ void UState::OnInteract()
 			InteractorComponent,
 			Character->FirstPersonCameraComponent->GetComponentLocation(),
 			UKismetMathLibrary::GetForwardVector(Character->GetControlRotation())
-			);
-		
+		);
+
 		if (IsValid(RecordHandlerComponent))
 		{
-			UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine, EEchoMessageType::Log, "Valid Record Handler", FColor::Green, 3.0f);
+			UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine, EEchoMessageType::Log,
+			                                    "Valid Record Handler", FColor::Green, 3.0f);
 			RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::Interact));
 		}
 	}
@@ -230,15 +257,28 @@ void UState::OnPropulseInputStarted()
 {
 	if (CanUsePropulse() && IsValid(PropulseComponent))
 	{
-		PropulseComponent->TryPropulse();
-		
-		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::TryPropulse));
+		PropulseComponent->StartPropulse();
+
+		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
+			FRecordedAction(ERecordedAction::StartPropulse));
+	}
+}
+
+void UState::OnPropulseInputStopped()
+{
+	if (CanUsePropulse() && IsValid(PropulseComponent))
+	{
+		PropulseComponent->StopPropulse();
+
+		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
+			FRecordedAction(ERecordedAction::StopPropulse));
 	}
 }
 
 void UState::OnPropulsed(const FVector& PropulseDirection, float PropulsePower)
 {
-	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine, EEchoMessageType::Log, "UState: On Propulsed", FColor::Green, 3.0f);
+	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine, EEchoMessageType::Log, "UState: On Propulsed",
+	                                    FColor::Green, 3.0f);
 
 	FVector PropulseForce = PropulseDirection.GetSafeNormal() * PropulsePower;
 	Character->LaunchCharacter(PropulseForce, false, false);
@@ -248,20 +288,116 @@ void UState::OnReflectInputStarted()
 {
 	if (CanUseReflect() && IsValid(ReflectComponent))
 	{
-		ReflectComponent->TryReflect(
+		ReflectComponent->StartReflect(
 			Character->FirstPersonCameraComponent->GetComponentLocation(),
 			UKismetMathLibrary::GetForwardVector(Character->GetControlRotation())
-			);
-		
-		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::TryReflect));
+		);
+
+		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
+			FRecordedAction(ERecordedAction::StartReflect));
+	}
+}
+
+void UState::OnReflectInputCompleted()
+{
+	if (CanUseReflect() && IsValid(ReflectComponent))
+	{
+		ReflectComponent->StopReflect();
+
+		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
+			FRecordedAction(ERecordedAction::StopReflect));
 	}
 }
 
 void UState::OnReflected(const FVector& ReflectDirection, float ReflectPower)
 {
-	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine, EEchoMessageType::Log, "UState: On Reflected", FColor::Green, 3.0f);
+	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine, EEchoMessageType::Log, "UState: On Reflected",
+	                                    FColor::Green, 3.0f);
 
-	FVector ReflectForce = ReflectDirection.GetSafeNormal() * ReflectPower;
+	UWorld* World = GetWorld();
+	UReflectMechanicSettings* ReflectSettings = nullptr;
+	
+	const UDataAssetDeveloperSettings* DataAssetSettings = GetDefault<UDataAssetDeveloperSettings>();
+	if (IsValid(DataAssetSettings))
+	{
+		ReflectSettings = DataAssetSettings->ReflectMechanicSettings.LoadSynchronous();
+	}
+	
+	if (Character->GetCharacterMovement()->IsFalling() || !IsValid(World) || !IsValid(ReflectSettings))
+	{
+		FVector ReflectForce = ReflectDirection.GetSafeNormal() * ReflectPower;
+		Character->LaunchCharacter(ReflectForce, false, false);
+		return;
+	}
+	
+	UCapsuleComponent* CapsuleComponent = Character->GetCapsuleComponent();
+	if (!IsValid(CapsuleComponent))
+	{
+		FVector ReflectForce = ReflectDirection.GetSafeNormal() * ReflectPower;
+		Character->LaunchCharacter(ReflectForce, false, false);
+		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Log, "No capsule comp: can't fake up vector." , FColor::Green, 3.0f);
+		return;
+	}
+	
+	FVector CapsuleDownVector = CapsuleComponent->GetUpVector() * -1;
+	FVector LineStart = CapsuleComponent->GetComponentLocation() + CapsuleDownVector * CapsuleComponent->GetScaledCapsuleHalfHeight();
+	FVector LineEnd = LineStart + CapsuleDownVector * 50.0f;
+	
+	FCollisionQueryParams QueryParams = FCollisionQueryParams::DefaultQueryParam;
+	QueryParams.AddIgnoredActor(Character);
+	QueryParams.bReturnPhysicalMaterial = false;
+	QueryParams.bTraceComplex = true;
+	
+	UEchoDebug::DrawLine(this, EEchoSystem::Reflect, LineStart, LineEnd, FColor::Red, 3.0f);
+	
+	FHitResult HitResult;
+	World->LineTraceSingleByChannel(
+		HitResult,
+		LineStart, 
+		LineEnd,
+		ECollisionChannel::ECC_WorldStatic,
+		QueryParams
+		);
+	
+	if (!HitResult.bBlockingHit)
+	{
+		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Log, "No blocking hit: no need to fake up vector." , FColor::Green, 3.0f);
+		FVector ReflectForce = ReflectDirection.GetSafeNormal() * ReflectPower;
+		Character->LaunchCharacter(ReflectForce, false, false);
+		return;
+	}
+	
+	FVector ReflectDirectionNormalized = ReflectDirection.GetSafeNormal();
+	FVector UpVector = HitResult.ImpactNormal;
+	
+	float Dot = UKismetMathLibrary::Dot_VectorVector(UpVector, ReflectDirectionNormalized);
+	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Log, "Dot: " + FString::SanitizeFloat(Dot), FColor::Green, 3.0f);
+	
+	if (Dot > 0)
+	{
+		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Log, "Dot is positive: no need to fake up vector." , FColor::Green, 3.0f);
+		FVector ReflectForce = ReflectDirection.GetSafeNormal() * ReflectPower;
+		Character->LaunchCharacter(ReflectForce, false, false);
+		return;
+	}
+	
+	FVector RightVector = UKismetMathLibrary::Cross_VectorVector(UpVector, ReflectDirectionNormalized);
+	FVector ForwardVector = UKismetMathLibrary::Cross_VectorVector(RightVector, UpVector);
+	
+	// We don't divide by length product cuz it's 1 since both vectors are normalized
+	float Cos = UKismetMathLibrary::Dot_VectorVector(ForwardVector.GetSafeNormal(), ReflectDirectionNormalized);
+	
+	float ReflectAngleToGround = FMath::RadiansToDegrees(FMath::Acos(Cos));
+	
+	if (ReflectAngleToGround > ReflectSettings->ReflectLiftAngle)
+	{
+		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Log, "ReflectAngleToGround superior to threshold: no need to fake up vector." , FColor::Green, 3.0f);
+		FVector ReflectForce = ReflectDirection.GetSafeNormal() * ReflectPower;
+		Character->LaunchCharacter(ReflectForce, false, false);
+		return;
+	}
+	
+	FVector ReflectForce = UKismetMathLibrary::RotateAngleAxis(ForwardVector, -ReflectSettings->ReflectLiftAngle, RightVector) * ReflectPower;
 	Character->LaunchCharacter(ReflectForce, false, false);
 }
 

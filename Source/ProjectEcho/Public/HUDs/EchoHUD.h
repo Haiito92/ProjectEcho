@@ -3,21 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/HUD.h"
+#include "EchoHUDBase.h"
 #include "EchoHUD.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTECHO_API AEchoHUD : public AHUD
+class PROJECTECHO_API AEchoHUD : public AEchoHUDBase
 {
 	GENERATED_BODY()
-
-public:
-	void InitHUD();
-
-protected:
-	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive Init HUD")
-	void ReceiveInitHUD();
 };

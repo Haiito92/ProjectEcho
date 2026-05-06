@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EchoGameModeBase.h"
 #include "GameFramework/GameModeBase.h"
 #include "EchoGameMode.generated.h"
 
@@ -13,27 +14,12 @@ class APlayerStart;
  * 
  */
 UCLASS(Blueprintable, BlueprintType)
-class PROJECTECHO_API AEchoGameMode : public AGameModeBase
+class PROJECTECHO_API AEchoGameMode : public AEchoGameModeBase
 {
 	GENERATED_BODY()
-
-	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-	
-	void InitializeGame();
-	void StartGame();
-	void EndGame();
-
 protected:
-	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive Initialize Game")
-	void ReceiveInitializeGame();
-	
-	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive Start Game")
-	void ReceiveStartGame();
-	
-	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive End Game")
-	void ReceiveEndGame();
-	
+	virtual void InitializeGame() override;
+
 	UFUNCTION()
 	void OnPlayerDeathEnd();
 	
@@ -41,6 +27,4 @@ protected:
 	TObjectPtr<APlayerStart> EchoPlayerStart;
 	UPROPERTY()
 	TObjectPtr<ACharacterST> EchoPlayerCharacter;
-	UPROPERTY()
-	TObjectPtr<AEchoHUD> EchoHUD;
 };

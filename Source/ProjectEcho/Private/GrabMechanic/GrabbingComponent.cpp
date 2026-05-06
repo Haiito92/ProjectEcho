@@ -153,10 +153,15 @@ void UGrabbingComponent::TryForceGrabHeldCube()
 		if (HitResult.GetActor()->GetClass()->ImplementsInterface(UGrabbableInterface::StaticClass()) && IGrabbableInterface::Execute_CanBeGrabbed(HitResult.GetActor()))
 		{
 			GrabbedActor = HitResult.GetActor();
+			IGrabbableInterface::Execute_OnObjectBeforeForceGrabbed(GrabbedActor);
 			FAttachmentTransformRules AttachmentTransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
 			GrabbedActor->AttachToComponent(this, AttachmentTransformRules);
 			IGrabbableInterface::Execute_OnObjectForceGrabbed(GrabbedActor);
 		}
+	}
+	else
+	{
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Grab, EEchoMessageType::Error,"Failed to Try ForceGrab Held Cube (Nothing found on SphereCast)", FColor::White, 3.f);
 	}
 }
 

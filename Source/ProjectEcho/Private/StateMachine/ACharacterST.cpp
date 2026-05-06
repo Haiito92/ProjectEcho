@@ -76,14 +76,7 @@ void ACharacterST::Tick(float DeltaTime)
 void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	APlayerController* PlayerController = Cast<APlayerController>(GetController());
-	Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
-	if (Subsystem == nullptr) return;
 	
-	Subsystem->ClearAllMappings();
-	Subsystem->AddMappingContext(InputMapping, 0);
-	
-	if (PlayerController == nullptr) return;
 	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	
 	if(InputActions == nullptr)
@@ -111,15 +104,17 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Input->BindAction(InputActions->ADestroySlot, ETriggerEvent::Started, this, &ACharacterST::DestroySlot);
 	Input->BindAction(InputActions->AInteract, ETriggerEvent::Started,this,&ACharacterST::AInteract);
 	
-	Input->BindAction(InputActions->APropulse, ETriggerEvent::Started,this,&ACharacterST::APropulse);
+	Input->BindAction(InputActions->APropulse, ETriggerEvent::Started,this,&ACharacterST::AStartPropulse);
+	Input->BindAction(InputActions->APropulse, ETriggerEvent::Completed,this,&ACharacterST::AStopPropulse);
 	
-	Input->BindAction(InputActions->AReflect, ETriggerEvent::Started,this,&ACharacterST::AReflect);
-	
+	Input->BindAction(InputActions->AReflect, ETriggerEvent::Started,this,&ACharacterST::AStartReflect);
+	Input->BindAction(InputActions->AReflect, ETriggerEvent::Completed,this,&ACharacterST::AStopReflect);
 }
 
 void ACharacterST::InitPlayer()
 {
 	RecordHandlerComponent = FindComponentByClass<URecordHandlerComponent>();
+	GrabbingComponent = FindComponentByClass<UGrabbingComponent>();
 	InitStateMachine();
 	LoadData();
 }
@@ -129,6 +124,9 @@ void ACharacterST::LoadData()
 	UPlayerData* playerData = GetDefault<UDataAssetDeveloperSettings>()->PlayerData.LoadSynchronous();
 	Life = playerData->InitLife;
 	MaxVelocity = playerData->MaxVelocity;
+	GetCharacterMovement()->MaxAcceleration = playerData->MoveAcceleration;
+	GetCharacterMovement()->AirControlBoostVelocityThreshold = playerData->AirPrecision;
+	GetCharacterMovement()->GravityScale = playerData->GravityScale;
 }
 
 void ACharacterST::AMove(const FInputActionValue& Value)
@@ -210,14 +208,24 @@ void ACharacterST::AInteract()
 	OnInteract.Broadcast();
 }
 
-void ACharacterST::APropulse()
+void ACharacterST::AStartPropulse()
 {
 	OnStartPropulse.Broadcast();
 }
 
-void ACharacterST::AReflect()
+void ACharacterST::AStopPropulse()
+{
+	OnStopPropulse.Broadcast();
+}
+
+void ACharacterST::AStartReflect()
 {
 	OnReflectInputStarted.Broadcast();
+}
+
+void ACharacterST::AStopReflect()
+{
+	OnReflectInputCompleted.Broadcast();
 }
 
 void ACharacterST::PlayerTakeDamage(int value)
@@ -299,6 +307,20 @@ TArray<FRecordedAction> ACharacterST::GetToRecordRewindActions()
 {
 	if (IsValid(RecordHandlerComponent)) return RecordHandlerComponent->GetToRecordRewindActions();
 	return TArray<FRecordedAction>();
+}
+
+void ACharacterST::HandleRewindActionKey_Implementation(const FRecordedAction& RewindAction)
+{
+	switch (RewindAction.ActionEnum)
+	{
+	case ERecordedAction::ForceRelease:
+		if (IsValid(GrabbingComponent))
+		{
+			GrabbingComponent->ForceRelease();
+		}
+	default: 
+		break;
+	}
 }
 
 bool ACharacterST::CanBePropulsed_Implementation() const

@@ -34,7 +34,7 @@ class UState : public UObject
 public:
 	GENERATED_BODY()
 	UState();
-
+	
 	virtual void Enter();
 	virtual void Tick(float DeltaTime);
 	virtual void Exit();
@@ -105,6 +105,8 @@ protected:
 	
 	UFUNCTION()
 	void OnPropulseInputStarted();
+	UFUNCTION()
+	void OnPropulseInputStopped();
 	
 	UFUNCTION()
 	void OnPropulsed(const FVector& PropulseDirection, float PropulsePower);
@@ -114,6 +116,9 @@ protected:
 	
 	UFUNCTION()
 	void OnReflectInputStarted();
+	
+	UFUNCTION()
+	void OnReflectInputCompleted();
 	
 	UFUNCTION()
 	virtual void OnRevive();
