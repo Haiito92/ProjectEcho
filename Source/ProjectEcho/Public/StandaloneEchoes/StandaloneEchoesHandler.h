@@ -75,5 +75,4 @@ protected:
 	UPROPERTY()
 	TObjectPtr<URecordManagerSettings> RecordManagerSettings = nullptr;
 	
-private:
 };
