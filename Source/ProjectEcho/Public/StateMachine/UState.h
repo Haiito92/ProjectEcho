@@ -77,9 +77,6 @@ protected:
 	void OnRewindingStarted();
 	
 	UFUNCTION()
-	void OnRewindingEnded();
-	
-	UFUNCTION()
 	void OnJumpingStarted();
 	
 	UFUNCTION()
@@ -119,9 +116,6 @@ protected:
 	
 	UFUNCTION()
 	void OnReflectInputCompleted();
-	
-	UFUNCTION()
-	virtual void OnRevive();
 	
 	UFUNCTION()
 	void CheckIsFalling() const;

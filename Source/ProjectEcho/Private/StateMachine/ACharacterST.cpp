@@ -253,25 +253,7 @@ void ACharacterST::Revive()
 	OnRevive.Broadcast();
 }
 
-void ACharacterST::ActivateCharacterInput()
-{
-	if (Subsystem == nullptr)
-	{
-		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::GameLoop,EEchoMessageType::Error,"Subsystem character null");
-		return;
-	}
-	Subsystem->AddMappingContext(InputMapping,0);
-}
 
-void ACharacterST::DeactivateCharacterInput()
-{
-	if (Subsystem == nullptr)
-	{
-		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::GameLoop,EEchoMessageType::Error,"Subsystem character null");
-		return;
-	}
-	Subsystem->RemoveMappingContext(InputMapping);
-}
 
 void ACharacterST::InitStateMachine()
 {

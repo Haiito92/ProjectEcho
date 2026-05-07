@@ -102,12 +102,6 @@ public:
 	void Revive();
 	
 	UFUNCTION()
-	void ActivateCharacterInput();
-	
-	UFUNCTION()
-	void DeactivateCharacterInput();
-	
-	UFUNCTION()
 	void InitStateMachine();
 	
 	UFUNCTION()

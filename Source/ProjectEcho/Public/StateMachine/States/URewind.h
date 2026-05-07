@@ -12,4 +12,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void Enter() override;
 	virtual void Exit() override;
+	
+	UFUNCTION()
+	void OnRewindingEnded();
 };

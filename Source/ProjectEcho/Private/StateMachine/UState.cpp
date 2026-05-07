@@ -44,7 +44,6 @@ void UState::Enter()
 	Character->OnDecrementSlot.AddDynamic(this, &UState::OnDecrementSlot);
 	Character->OnDeath.AddDynamic(this, &UState::OnDeath);
 	Character->OnInteract.AddDynamic(this, &UState::OnInteract);
-	Character->OnRevive.AddDynamic(this, &UState::OnRevive);
 	Character->OnStartPropulse.AddDynamic(this, &UState::OnPropulseInputStarted);
 	Character->OnStopPropulse.AddDynamic(this, &UState::OnPropulseInputStopped);
 	Character->OnPropulsed.AddDynamic(this, &UState::OnPropulsed);
@@ -52,7 +51,6 @@ void UState::Enter()
 	Character->OnReflectInputCompleted.AddDynamic(this, &UState::OnReflectInputCompleted);
 	Character->OnReflected.AddDynamic(this, &UState::OnReflected);
 	RecordManagerSubsystem->OnStartPlayerRewinding.AddDynamic(this, &UState::OnRewindingStarted);
-	RecordManagerSubsystem->OnStopPlayerRewinding.AddDynamic(this, &UState::OnRewindingEnded);
 
 	Character->bCanBeReflected = (StateSettings & EStateSettings::CanBeReflected) == EStateSettings::CanBeReflected;
 	Character->bCanBePropulsed = (StateSettings & EStateSettings::CanBePropulsed) == EStateSettings::CanBePropulsed;
@@ -77,7 +75,6 @@ void UState::Exit()
 	Character->OnDecrementSlot.RemoveDynamic(this, &UState::OnDecrementSlot);
 	Character->OnDeath.RemoveDynamic(this, &UState::OnDeath);
 	Character->OnInteract.RemoveDynamic(this, &UState::OnInteract);
-	Character->OnRevive.RemoveDynamic(this, &UState::OnRevive);
 	Character->OnStartPropulse.RemoveDynamic(this, &UState::OnPropulseInputStarted);
 	Character->OnStopPropulse.RemoveDynamic(this, &UState::OnPropulseInputStopped);
 	Character->OnPropulsed.RemoveDynamic(this, &UState::OnPropulsed);
@@ -85,7 +82,6 @@ void UState::Exit()
 	Character->OnReflectInputCompleted.RemoveDynamic(this, &UState::OnReflectInputCompleted);
 	Character->OnReflected.RemoveDynamic(this, &UState::OnReflected);
 	RecordManagerSubsystem->OnStartPlayerRewinding.RemoveDynamic(this, &UState::OnRewindingStarted);
-	RecordManagerSubsystem->OnStopPlayerRewinding.RemoveDynamic(this, &UState::OnRewindingEnded);
 
 	Character->bCanBeReflected = false;
 	Character->bCanBePropulsed = false;
@@ -164,10 +160,7 @@ void UState::OnRewindingStarted()
 	StateMachine->ChangeState(EState::Rewind);
 }
 
-void UState::OnRewindingEnded()
-{
-	StateMachine->ChangeState(EState::Idle);
-}
+
 
 void UState::CheckIsFalling() const
 {
@@ -399,8 +392,4 @@ void UState::OnReflected(const FVector& ReflectDirection, float ReflectPower)
 	
 	FVector ReflectForce = UKismetMathLibrary::RotateAngleAxis(ForwardVector, -ReflectSettings->ReflectLiftAngle, RightVector) * ReflectPower;
 	Character->LaunchCharacter(ReflectForce, false, false);
-}
-
-void UState::OnRevive()
-{
 }
