@@ -328,6 +328,9 @@ private:
 	TArray<TObjectPtr<URecordableComponent>> RecordableComponents;
 	
 	UPROPERTY()
+	TArray<AActor*> RecordListeners;
+	
+	UPROPERTY()
 	//Pool of EchoActor to display Timelines (avoid runtime Spawning)
 	TArray<TObjectPtr<AEchoActor>> EchoActorsPool;
 	
