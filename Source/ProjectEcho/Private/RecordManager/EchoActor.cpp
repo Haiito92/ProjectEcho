@@ -48,6 +48,13 @@ void AEchoActor::OnTimelineDestroyed()
 	ReceiveOnTimelineDestroyed();
 }
 
+void AEchoActor::Laserize_Implementation()
+{
+	ILaserizable::Laserize_Implementation();
+	
+	OnEchoDestroyed.Broadcast(EchoIndex);
+}
+
 void AEchoActor::RegisterRecordable(TScriptInterface<IRecordableInterface> Recordable)
 {
 	OnRegisterRecordable.Broadcast(Recordable);

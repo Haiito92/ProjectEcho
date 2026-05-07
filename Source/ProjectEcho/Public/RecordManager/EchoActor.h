@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "EchoColorStruct.h"
+#include "EchoInterface.h"
+#include "LaserMechanic/Laserizable.h"
 
 #include "EchoActor.generated.h"
 
@@ -12,7 +14,7 @@ class IRecordableInterface;
 enum class ERecordedAction : uint8;
 
 UCLASS()
-class PROJECTECHO_API AEchoActor : public AActor
+class PROJECTECHO_API AEchoActor : public AActor, public IEchoInterface, public ILaserizable
 {
 	GENERATED_BODY()
 
@@ -42,6 +44,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveOnTimelineDestroyed();
 	
+	UFUNCTION()
+	virtual void Laserize_Implementation() override;
+	
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveHandleActionKey(ERecordedAction Action);
@@ -58,6 +63,12 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void RegisterRecordable(TScriptInterface<IRecordableInterface> Recordable);
 	
+public:	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEchoDestroyedSignature, int, EchoIndex);
+	UPROPERTY(BlueprintAssignable)
+	FOnEchoDestroyedSignature OnEchoDestroyed;
+	
+protected:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRegisterRecordable, TScriptInterface<IRecordableInterface>, Recordable);
 	UPROPERTY(BlueprintAssignable)
 	FOnRegisterRecordable OnRegisterRecordable;

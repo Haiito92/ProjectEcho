@@ -243,6 +243,13 @@ void ACharacterST::Kill_Implementation()
 	Life = 0;
 }
 
+void ACharacterST::Laserize_Implementation()
+{
+	ILaserizable::Laserize_Implementation();
+	
+	Execute_Kill(this);
+}
+
 void ACharacterST::DeathEnd()
 {
 	OnDeathEnd.Broadcast();
