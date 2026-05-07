@@ -18,6 +18,7 @@ void UDeath::Tick(float DeltaTime)
 void UDeath::Enter()
 {
 	Character->OnRevive.AddDynamic(this, &UDeath::OnRevive);
+	Character->DeathEnd();
 }
 
 void UDeath::Exit()
@@ -34,7 +35,6 @@ void UDeath::InitState(UStateMachine* InStateMachine, ACharacterST* InCharacter)
 
 void UDeath::OnRevive()
 {
-	Character->DeathEnd();
 	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine, EEchoMessageType::Log, "Death to Revive", FColor::Blue, 3.0f);
 	StateMachine->ChangeState(EState::Revive);
 }
