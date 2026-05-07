@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "EchoColorStruct.h"
+#include "EchoInterface.h"
+#include "LaserMechanic/Laserizable.h"
 
 #include "EchoActor.generated.h"
 
@@ -12,7 +14,7 @@ class IRecordableInterface;
 enum class ERecordedAction : uint8;
 
 UCLASS()
-class PROJECTECHO_API AEchoActor : public AActor
+class PROJECTECHO_API AEchoActor : public AActor, public IEchoInterface, public ILaserizable
 {
 	GENERATED_BODY()
 

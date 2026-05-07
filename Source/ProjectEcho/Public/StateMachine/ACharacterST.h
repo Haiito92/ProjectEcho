@@ -3,6 +3,7 @@
 #include "PlayerInterface.h"
 #include "GameFramework/Character.h"
 #include "KillMechanic/Killable.h"
+#include "LaserMechanic/Laserizable.h"
 #include "PropulseMechanic/Propulsable.h"
 #include "ReflectMechanic/Reflectable.h"
 #include "RecordManager/RecordHandlerInterface.h"
@@ -21,7 +22,7 @@ class UStateMachine;
 class UEnhancedInputLocalPlayerSubsystem;
 
 UCLASS()
-class PROJECTECHO_API ACharacterST : public ACharacter, public IKillable, public IReflectable, public IPropulsable, public IRecordHandlerInterface, public IPlayerInterface
+class PROJECTECHO_API ACharacterST : public ACharacter, public IKillable, public IReflectable, public IPropulsable, public IRecordHandlerInterface, public IPlayerInterface, public ILaserizable
 {
 	GENERATED_BODY()
 
@@ -94,6 +95,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void Kill_Implementation() override;
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void Laserize_Implementation() override;
 	
 	UFUNCTION(BlueprintCallable)
 	void DeathEnd();
