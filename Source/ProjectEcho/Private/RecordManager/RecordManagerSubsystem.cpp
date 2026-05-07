@@ -419,7 +419,7 @@ void URecordManagerSubsystem::InitRecordManager(const int& NbTimelineSlot)
 		}
 	}
 	
-	UGameplayStatics::GetAllActorsWithInterface(GetWorld(), URecordableInterface::StaticClass(), RecordListeners);
+	UGameplayStatics::GetAllActorsWithInterface(GetWorld(), URecordListener::StaticClass(), RecordListeners);
 }
 
 void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<FRecordedAction>& RestoreStateAction,  const TArray<FRecordedAction>& FirstActions)
