@@ -69,6 +69,12 @@ struct FEchoTimeline
 	//Record current Transform into aTransformKey in Timeline List
 	void RecordTransformKey(AActor* RecordedActor, const float& CurrentTimeKey);
 	
+	//Replace Current Transform or Record Transform Key if none exist
+	void ReplaceTransformKey(AActor* RecordedActor, const float& CurrentTimeKey, bool bRecordIfNotFound = false);
+	
+	//Returns true if Contains Transform Key for given Time Key
+	bool HasTransformKey(const float& CurrentTimeKey) const;
+	
 	//Record All Actions executed between last record and now into an ActionKey in Timeline List
 	void RecordActionKey(AActor* RecordedActor, const float& CurrentTimeKey);
 	

@@ -99,19 +99,20 @@ void AStandaloneEchoesHandler::Play(const float& PreviousTimeKey, const float& T
 	bOutHasReachedEnd = bIsInRewind ? false : !bHasNotReachedEnd;
 }
 
-void AStandaloneEchoesHandler::PlayInEditor(const float& TimeKey)
+void AStandaloneEchoesHandler::PlayInEditor(const float& GlobalTimeKey)
 {
 	for (FEchoTimeline& EchoTimeline : EchoTimelines)
 	{
 		if (EchoTimeline.EchoActor == nullptr) continue;
 		
-		EchoTimeline.PlayTransformKeys(TimeKey);
+		EchoTimeline.PlayTransformKeys(GlobalTimeKey - EchoTimeline.StartTimeKey);
 	}
 }
 
 void AStandaloneEchoesHandler::CreateTimelineFromEcho(AEchoActor* EchoActor)
 {
 	if (EchoActor == nullptr) return;
+	this->Modify();
 	FEchoTimeline EchoTimeline;
 	EchoTimeline.EchoActor = EchoActor;
 	EchoTimeline.StartTimeKey = CurrentTimeKey;
@@ -129,22 +130,33 @@ int AStandaloneEchoesHandler::GetTimelineIndexFromEcho(AEchoActor* EchoActor)
 	return -1;
 }
 
-int AStandaloneEchoesHandler::CreateTransformKey(int TimelineIndex, const float& TimeKey)
+int AStandaloneEchoesHandler::CreateTransformKey(int TimelineIndex, const float& LocalTimeKey)
 {
 	if (TimelineIndex > EchoTimelines.Num() || TimelineIndex < 0) return -1;
-	EchoTimelines[TimelineIndex].RecordTransformKey(EchoTimelines[TimelineIndex].EchoActor, TimeKey);
+	this->Modify();
+	EchoTimelines[TimelineIndex].RecordTransformKey(EchoTimelines[TimelineIndex].EchoActor, LocalTimeKey);
 	for (int i = 0; i < EchoTimelines[TimelineIndex].TransformKeys.Num(); ++i)
 	{
-		if (EchoTimelines[TimelineIndex].TransformKeys[i].TimeKey == TimeKey) return i;
+		if (EchoTimelines[TimelineIndex].TransformKeys[i].TimeKey == LocalTimeKey) return i;
 	}
 	return -1;
 }
 
-int AStandaloneEchoesHandler::CreateActionKey(int TimelineIndex, const float& TimeKey,
-	const FRecordedAction& RecordedAction)
+void AStandaloneEchoesHandler::ReplaceTransformKey(int TimelineIndex, const float& LocalTimeKey, bool bRecordIfNotFound)
+{
+	if (EchoTimelines.IsValidIndex(TimelineIndex))
+	{
+		this->Modify();
+		EchoTimelines[TimelineIndex].ReplaceTransformKey(EchoTimelines[TimelineIndex].EchoActor, LocalTimeKey, bRecordIfNotFound);
+	}
+}
+
+int AStandaloneEchoesHandler::CreateActionKey(int TimelineIndex, const float& LocalTimeKey,
+                                              const FRecordedAction& RecordedAction)
 {
 	if (TimelineIndex > EchoTimelines.Num() || TimelineIndex < 0) return -1;
-	EchoTimelines[TimelineIndex].ActionKeys.Add(FRecordActionKey(TimeKey, RecordedAction));
+	this->Modify();
+	EchoTimelines[TimelineIndex].ActionKeys.Add(FRecordActionKey(LocalTimeKey, RecordedAction));
 	EchoTimelines[TimelineIndex].ActionKeys.Sort([](const FRecordActionKey& A, const FRecordActionKey& B)
 	{
 		return A.TimeKey < B.TimeKey;
@@ -152,9 +164,33 @@ int AStandaloneEchoesHandler::CreateActionKey(int TimelineIndex, const float& Ti
 	
 	for (int i = 0; i < EchoTimelines[TimelineIndex].ActionKeys.Num(); ++i)
 	{
-		if (EchoTimelines[TimelineIndex].ActionKeys[i].TimeKey == TimeKey) return i;
+		if (EchoTimelines[TimelineIndex].ActionKeys[i].TimeKey == LocalTimeKey) return i;
 	}
 	return -1;
+}
+
+bool AStandaloneEchoesHandler::HasTransformKey(int TimelineIndex, const float& LocalTimeKey)
+{
+	if (EchoTimelines.IsValidIndex(TimelineIndex))
+	{
+		return EchoTimelines[TimelineIndex].HasTransformKey(LocalTimeKey);
+	}
+	return false;
+}
+
+void AStandaloneEchoesHandler::ModifyTransformKeyTimeKey(int TimelineIndex, const float& TimeKey,
+	const float& NewTimeKey)
+{
+	if (EchoTimelines.IsValidIndex(TimelineIndex))
+	{
+		FRecordTransformKey* FoundTransformKey = EchoTimelines[TimelineIndex].TransformKeys.FindByPredicate([TimeKey](const FRecordTransformKey& TransformKey)
+		{
+			return TransformKey.TimeKey == TimeKey;
+		});
+		if (FoundTransformKey == nullptr) return;
+		this->Modify();
+		FoundTransformKey->TimeKey = NewTimeKey;
+	}
 }
 
 float AStandaloneEchoesHandler::GetTimelinesLength()
@@ -174,6 +210,7 @@ void AStandaloneEchoesHandler::SetStartTimeKey(int TimelineIndex, float StartTim
 {
 	if (EchoTimelines.IsValidIndex(TimelineIndex))
 	{
+		this->Modify();
 		EchoTimelines[TimelineIndex].StartTimeKey = StartTimeKey;
 	}
 }

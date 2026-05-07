@@ -18,7 +18,7 @@ const FRecordTransformKey* FEchoTimeline::GetNextTransformKey(const float& TimeK
 {
 	for (const FRecordTransformKey& TransformKey : TransformKeys)
 	{
-		if (TransformKey.TimeKey >= TimeKey)
+		if (TransformKey.TimeKey > TimeKey)
 		{
 			return &TransformKey;
 		}
@@ -104,6 +104,35 @@ void FEchoTimeline::RecordTransformKey(AActor* RecordedActor, const float& Curre
 	});
 }
 
+void FEchoTimeline::ReplaceTransformKey(AActor* RecordedActor, const float& CurrentTimeKey, bool bRecordIfNotFound)
+{
+	FRecordTransformKey* FoundTransformKey = TransformKeys.FindByPredicate([CurrentTimeKey](const FRecordTransformKey& TransformKey)
+	{
+		return TransformKey.TimeKey == CurrentTimeKey;
+	});
+	if (FoundTransformKey == nullptr)
+	{
+		if (bRecordIfNotFound) RecordTransformKey(RecordedActor, CurrentTimeKey);
+		return;
+	}
+	FoundTransformKey->Position = RecordedActor->GetActorLocation();
+	FoundTransformKey->Rotation = RecordedActor->GetActorRotation();
+	FoundTransformKey->Scale = RecordedActor->GetActorScale();
+	if (RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass()))
+	{
+		FoundTransformKey->ControlRotation = IRecordHandlerInterface::Execute_GetToRecordControlRotation(RecordedActor);
+	};
+}
+
+bool FEchoTimeline::HasTransformKey(const float& CurrentTimeKey) const
+{
+	const FRecordTransformKey* FoundTransformKey = TransformKeys.FindByPredicate([CurrentTimeKey](const FRecordTransformKey& TransformKey)
+	{
+		return TransformKey.TimeKey == CurrentTimeKey;
+	});
+	return FoundTransformKey != nullptr;
+}
+
 void FEchoTimeline::RecordActionKey(AActor* RecordedActor, const float& CurrentTimeKey)
 {
 	if (!RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass())) return;
@@ -155,7 +184,15 @@ void FEchoTimeline::PlayTransformKeys(const float& CurrentTimeKey)
 	//Play Transform Key (Lerp between two closest Keys)
 	const FRecordTransformKey* PreviousTransformKey = GetPreviousTransformKey(CurrentTimeKey);
 	const FRecordTransformKey* NextTransformKey = GetNextTransformKey(CurrentTimeKey);
-	if (NextTransformKey == nullptr || PreviousTransformKey == nullptr) return;
+	if (PreviousTransformKey == nullptr) return;
+	if (NextTransformKey == nullptr)
+	{
+		EchoActor->SetActorLocation(PreviousTransformKey->Position);
+		EchoActor->SetActorRotation(PreviousTransformKey->Rotation);
+		EchoActor->SetActorScale3D(PreviousTransformKey->Scale);
+		EchoActor->SetControlRotation(PreviousTransformKey->ControlRotation);
+		return;
+	};
 	
 	//Place Actor according to previous and next TransformKey 
 	float lerpValue = (CurrentTimeKey - PreviousTransformKey->TimeKey) / (NextTransformKey->TimeKey - PreviousTransformKey->TimeKey);

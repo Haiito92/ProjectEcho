@@ -37,19 +37,32 @@ public:
 	
 	//Play In Editor Current Key (Will Only play Transform Keys)
 	UFUNCTION(BlueprintCallable)
-	void PlayInEditor(const float& TimeKey);
+	void PlayInEditor(const float& GlobalTimeKey);
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, meta = ())
 	void CreateTimelineFromEcho(AEchoActor* EchoActor);
 	
 	UFUNCTION(BlueprintCallable)
 	int GetTimelineIndexFromEcho(AEchoActor* EchoActor);
 	
-	UFUNCTION(BlueprintCallable)
-	int CreateTransformKey(int TimelineIndex, const float& TimeKey);
+#pragma region TransformKey
 	
 	UFUNCTION(BlueprintCallable)
-	int CreateActionKey(int TimelineIndex, const float& TimeKey, const FRecordedAction& RecordedAction);
+	int CreateTransformKey(int TimelineIndex, const float& LocalTimeKey);
+	
+	UFUNCTION(BlueprintCallable)
+	void ReplaceTransformKey(int TimelineIndex, const float& LocalTimeKey, bool bRecordIfNotFound = false);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool HasTransformKey(int TimelineIndex, const float& LocalTimeKey);
+	
+	UFUNCTION(BlueprintCallable)
+	void ModifyTransformKeyTimeKey(int TimelineIndex, const float& TimeKey, const float& NewTimeKey);
+	
+#pragma endregion
+	
+	UFUNCTION(BlueprintCallable)
+	int CreateActionKey(int TimelineIndex, const float& LocalTimeKey, const FRecordedAction& RecordedAction);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetTimelinesLength();
