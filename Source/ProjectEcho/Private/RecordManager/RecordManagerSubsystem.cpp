@@ -337,6 +337,7 @@ void FGlobalTimeline::DestroyTimeline(int SelectedSlot, TArray<TObjectPtr<AEchoA
 		//Remove Timeline
 		Timelines[SelectedSlot].OnDestroy();
 		OutEchoActorPool.Add(Timelines[SelectedSlot].EchoActor);
+		Timelines[SelectedSlot].EchoActor->SetActorLocation(FVector(-100000));
 		Timelines.Remove(SelectedSlot);
 		
 		if (StartTimeKey == 0.0f && !Timelines.IsEmpty())
@@ -402,6 +403,8 @@ void URecordManagerSubsystem::InitRecordManager(const int& NbTimelineSlot)
 		SpawnedEchoActor->SetActorHiddenInGame(true);
 		SpawnedEchoActor->FinishSpawning(SpawnTransform);
 		EchoActorsPool.Add(SpawnedEchoActor);
+		SpawnedEchoActor->OnEchoDestroyed.AddDynamic(this, &URecordManagerSubsystem::OnEchoDestroyed);
+		SpawnedEchoActor->SetActorLocation(FVector(-100000));
 	}
 	
 	//Find All Recordables
@@ -787,15 +790,28 @@ void URecordManagerSubsystem::PlayPlayerRewind(const float& PreviousTimeKey, con
 	}
 }
 
+void URecordManagerSubsystem::OnEchoDestroyed(int EchoIndex)
+{
+	DestroyTimeline(EchoIndex);
+}
+
 void URecordManagerSubsystem::DestroySelectedTimeline()
+{
+	DestroyTimeline(SelectedSlot);
+}
+
+void URecordManagerSubsystem::DestroyTimeline(int TimelineIndex)
 {
 	if (bIsInRewind) return; //Forbid Timeline Destruction during Rewind
 	if (!GlobalTimeline.Timelines.Contains(SelectedSlot)) return;
 	GlobalTimeline.DestroyTimeline(SelectedSlot, EchoActorsPool);
 	int DestroyedSlot = SelectedSlot;
 	
-	//Decrement Until Correct Timeline
-	DecrementSelectedSlot();
+	if (TimelineIndex == SelectedSlot)
+	{
+		//Decrement Until Correct Timeline
+		DecrementSelectedSlot();
+	}
 	
 	for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
 	{

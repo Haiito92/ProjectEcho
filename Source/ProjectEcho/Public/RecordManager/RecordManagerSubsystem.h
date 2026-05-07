@@ -191,6 +191,10 @@ public:
     UFUNCTION(BlueprintCallable)
     void DestroySelectedTimeline();
     	
+	//Destroys the Timeline at the index 
+	UFUNCTION(BlueprintCallable)
+	void DestroyTimeline(int TimelineIndex);
+	
     // Increment the Selected Slot Value, if reaches end, goes back to first Slot
     UFUNCTION(BlueprintCallable)
     void IncrementSelectedSlot();
@@ -282,6 +286,8 @@ private:
 	//Handle Replay of Player Rewind (Placement of Actions
 	void PlayPlayerRewind(const float& PreviousTimeKey, const float& TimeKey);
 	
+	UFUNCTION()
+	void OnEchoDestroyed(int EchoIndex);
 protected:
 	UPROPERTY()
 	FGlobalTimeline GlobalTimeline;
