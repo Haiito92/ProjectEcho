@@ -39,7 +39,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void PlayInEditor(const float& GlobalTimeKey);
 	
-	UFUNCTION(BlueprintCallable, meta = ())
+	UFUNCTION(BlueprintCallable)
 	void CreateTimelineFromEcho(AEchoActor* EchoActor);
 	
 	UFUNCTION(BlueprintCallable)
@@ -57,7 +57,7 @@ public:
 	bool HasTransformKey(int TimelineIndex, const float& LocalTimeKey);
 	
 	UFUNCTION(BlueprintCallable)
-	void ModifyTransformKeyTimeKey(int TimelineIndex, const float& TimeKey, const float& NewTimeKey);
+	int ModifyTransformKeyTimeKey(int TimelineIndex, const float& TimeKey, const float& NewTimeKey);
 	
 #pragma endregion
 	

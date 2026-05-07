@@ -178,7 +178,7 @@ bool AStandaloneEchoesHandler::HasTransformKey(int TimelineIndex, const float& L
 	return false;
 }
 
-void AStandaloneEchoesHandler::ModifyTransformKeyTimeKey(int TimelineIndex, const float& TimeKey,
+int AStandaloneEchoesHandler::ModifyTransformKeyTimeKey(int TimelineIndex, const float& TimeKey,
 	const float& NewTimeKey)
 {
 	if (EchoTimelines.IsValidIndex(TimelineIndex))
@@ -187,10 +187,19 @@ void AStandaloneEchoesHandler::ModifyTransformKeyTimeKey(int TimelineIndex, cons
 		{
 			return TransformKey.TimeKey == TimeKey;
 		});
-		if (FoundTransformKey == nullptr) return;
+		if (FoundTransformKey == nullptr) return -1;
 		this->Modify();
 		FoundTransformKey->TimeKey = NewTimeKey;
+		EchoTimelines[TimelineIndex].TransformKeys.Sort([](const FRecordTransformKey& A, const FRecordTransformKey& B)
+		{
+			return A.TimeKey < B.TimeKey;
+		});
+		for (int i = 0; i < EchoTimelines[TimelineIndex].TransformKeys.Num(); ++i)
+		{
+			if (EchoTimelines[TimelineIndex].TransformKeys[i].TimeKey == NewTimeKey) return i;
+		}
 	}
+	return -1;
 }
 
 float AStandaloneEchoesHandler::GetTimelinesLength()
