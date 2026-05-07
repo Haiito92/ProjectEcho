@@ -337,6 +337,7 @@ void FGlobalTimeline::DestroyTimeline(int SelectedSlot, TArray<TObjectPtr<AEchoA
 		//Remove Timeline
 		Timelines[SelectedSlot].OnDestroy();
 		OutEchoActorPool.Add(Timelines[SelectedSlot].EchoActor);
+		Timelines[SelectedSlot].EchoActor->SetActorLocation(FVector(-100000));
 		Timelines.Remove(SelectedSlot);
 		
 		if (StartTimeKey == 0.0f && !Timelines.IsEmpty())
@@ -403,6 +404,7 @@ void URecordManagerSubsystem::InitRecordManager(const int& NbTimelineSlot)
 		SpawnedEchoActor->FinishSpawning(SpawnTransform);
 		EchoActorsPool.Add(SpawnedEchoActor);
 		SpawnedEchoActor->OnEchoDestroyed.AddDynamic(this, &URecordManagerSubsystem::OnEchoDestroyed);
+		SpawnedEchoActor->SetActorLocation(FVector(-100000));
 	}
 	
 	//Find All Recordables
