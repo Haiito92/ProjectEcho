@@ -17,14 +17,13 @@ void UDeath::Tick(float DeltaTime)
 
 void UDeath::Enter()
 {
-	Super::Enter();
-	Character->DeactivateCharacterInput();
+	Character->OnRevive.AddDynamic(this, &UDeath::OnRevive);
 	Character->DeathEnd();
 }
 
 void UDeath::Exit()
 {
-	Super::Exit();
+	Character->OnRevive.RemoveDynamic(this, &UDeath::OnRevive);
 }
 
 void UDeath::InitState(UStateMachine* InStateMachine, ACharacterST* InCharacter)

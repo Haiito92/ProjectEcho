@@ -10,6 +10,7 @@
 #include "RecordManager/RecordableComponent.h"
 #include "RecordManager/RecordableInterface.h"
 #include "RecordManager/RecordHandlerInterface.h"
+#include "RecordManager/RecordListener.h"
 #include "Tools/Debug/EchoDebug.h"
 
 #pragma region Timeline
@@ -379,6 +380,7 @@ void FGlobalTimeline::DestroyTimeline(int SelectedSlot, TArray<TObjectPtr<AEchoA
 		//Remove Timeline
 		Timelines[SelectedSlot].OnDestroy();
 		OutEchoActorPool.Add(Timelines[SelectedSlot].EchoActor);
+		Timelines[SelectedSlot].EchoActor->SetActorLocation(FVector(-100000));
 		Timelines.Remove(SelectedSlot);
 		
 		if (StartTimeKey == 0.0f && !Timelines.IsEmpty())
@@ -444,6 +446,8 @@ void URecordManagerSubsystem::InitRecordManager(const int& NbTimelineSlot)
 		SpawnedEchoActor->SetActorHiddenInGame(true);
 		SpawnedEchoActor->FinishSpawning(SpawnTransform);
 		EchoActorsPool.Add(SpawnedEchoActor);
+		SpawnedEchoActor->OnEchoDestroyed.AddDynamic(this, &URecordManagerSubsystem::OnEchoDestroyed);
+		SpawnedEchoActor->SetActorLocation(FVector(-100000));
 	}
 	
 	//Find All Recordables
@@ -460,6 +464,8 @@ void URecordManagerSubsystem::InitRecordManager(const int& NbTimelineSlot)
 			}
 		}
 	}
+	
+	UGameplayStatics::GetAllActorsWithInterface(GetWorld(), URecordListener::StaticClass(), RecordListeners);
 }
 
 void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<FRecordedAction>& RestoreStateAction,  const TArray<FRecordedAction>& FirstActions)
@@ -495,6 +501,11 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<
 	OnStartRecording.Broadcast(CurrentTimeKey, CurrentRecordingTimelineIndex, RecordManagerSettings->EchoColors[CurrentRecordingTimelineIndex]);
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), RecordManagerSettings->TimeDilatationFactor);
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Start Recording", FColor::Turquoise, 3.f);
+	
+	for (AActor* RecordListener : RecordListeners)
+	{
+		IRecordListener::Execute_ReactToRecordStart(RecordListener);
+	}
 }
 
 bool URecordManagerSubsystem::CanStartRecord() const
@@ -523,6 +534,11 @@ void URecordManagerSubsystem::StopRecord()
 	
 		//Start Player Rewind
 		StartPlayerRewind();
+		
+		for (AActor* RecordListener : RecordListeners)
+		{
+			IRecordListener::Execute_ReactToRecordEnd(RecordListener);
+		}
 	}
 }
 
@@ -533,6 +549,11 @@ void URecordManagerSubsystem::StartPlayerRewind()
 	RewindSpeed = RecordingTimeline.GetLastTimeKey() / RecordManagerSettings->PlayerRewindTime;
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Start PlayerRewind at Speed : " + FString::SanitizeFloat(RewindSpeed), FColor::Turquoise, 3.f);
 	OnStartPlayerRewinding.Broadcast();
+	
+	for (AActor* RecordListener : RecordListeners)
+	{
+		IRecordListener::Execute_ReactToPlayerRewindStart(RecordListener);
+	}
 }
 
 void URecordManagerSubsystem::StopPlayerRewind()
@@ -555,6 +576,11 @@ void URecordManagerSubsystem::StopPlayerRewind()
 	RecordingTimelineStartActions.Empty();
 	GlobalTimeline.RegisterTimeline(CurrentRecordingTimelineIndex, RecordingTimeline, RecordManagerSettings);
 	OnTimelineCreated.Broadcast(CurrentRecordingTimelineIndex);
+	
+	for (AActor* RecordListener : RecordListeners)
+	{
+		IRecordListener::Execute_ReactToPlayerRewindEnd(RecordListener);
+	}
 }
 
 void URecordManagerSubsystem::StartRewind()
@@ -570,6 +596,11 @@ void URecordManagerSubsystem::StartRewind()
 	}
 	
 	GlobalTimeline.HandleRewindStarted(CurrentTimeKey);
+	
+	for (AActor* RecordListener : RecordListeners)
+	{
+		IRecordListener::Execute_ReactToRewindStart(RecordListener);
+	}
 }
 
 void URecordManagerSubsystem::StopRewind()
@@ -585,6 +616,11 @@ void URecordManagerSubsystem::StopRewind()
 	}
 	
 	GlobalTimeline.HandleRewindStopped(CurrentTimeKey);
+	
+	for (AActor* RecordListener : RecordListeners)
+	{
+		IRecordListener::Execute_ReactToRewindEnd(RecordListener);
+	}
 }
 
 bool URecordManagerSubsystem::IsRecording()
@@ -797,15 +833,28 @@ void URecordManagerSubsystem::PlayPlayerRewind(const float& PreviousTimeKey, con
 	}
 }
 
+void URecordManagerSubsystem::OnEchoDestroyed(int EchoIndex)
+{
+	DestroyTimeline(EchoIndex);
+}
+
 void URecordManagerSubsystem::DestroySelectedTimeline()
+{
+	DestroyTimeline(SelectedSlot);
+}
+
+void URecordManagerSubsystem::DestroyTimeline(int TimelineIndex)
 {
 	if (bIsInRewind) return; //Forbid Timeline Destruction during Rewind
 	if (!GlobalTimeline.Timelines.Contains(SelectedSlot)) return;
 	GlobalTimeline.DestroyTimeline(SelectedSlot, EchoActorsPool);
 	int DestroyedSlot = SelectedSlot;
 	
-	//Decrement Until Correct Timeline
-	DecrementSelectedSlot();
+	if (TimelineIndex == SelectedSlot)
+	{
+		//Decrement Until Correct Timeline
+		DecrementSelectedSlot();
+	}
 	
 	for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
 	{
