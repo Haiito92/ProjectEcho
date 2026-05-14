@@ -61,8 +61,12 @@ public:
 	
 #pragma endregion
 	
+#pragma region Action
+	
 	UFUNCTION(BlueprintCallable)
 	int CreateActionKey(int TimelineIndex, const float& LocalTimeKey, const FRecordedAction& RecordedAction);
+	
+#pragma endregion
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetTimelinesLength();
