@@ -142,12 +142,12 @@ int AStandaloneEchoesHandler::CreateTransformKey(int TimelineIndex, const float&
 	return -1;
 }
 
-void AStandaloneEchoesHandler::ReplaceTransformKey(int TimelineIndex, const float& LocalTimeKey, bool bRecordIfNotFound)
+void AStandaloneEchoesHandler::ReplaceTransformKey(int TimelineIndex, const float& LocalTimeKey, const FRotator& ControlRotation, bool bRecordIfNotFound)
 {
 	if (EchoTimelines.IsValidIndex(TimelineIndex))
 	{
 		this->Modify();
-		EchoTimelines[TimelineIndex].ReplaceTransformKey(EchoTimelines[TimelineIndex].EchoActor, LocalTimeKey, bRecordIfNotFound);
+		EchoTimelines[TimelineIndex].ReplaceTransformKey(EchoTimelines[TimelineIndex].EchoActor, LocalTimeKey, bRecordIfNotFound, &ControlRotation);
 	}
 }
 

@@ -3,6 +3,7 @@
 
 #include "DataAssetDeveloperSettings.h"
 #include "EchoSystem.h"
+#include "ProjectEcho.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
@@ -105,7 +106,7 @@ void FEchoTimeline::RecordTransformKey(AActor* RecordedActor, const float& Curre
 	});
 }
 
-void FEchoTimeline::ReplaceTransformKey(AActor* RecordedActor, const float& CurrentTimeKey, bool bRecordIfNotFound)
+void FEchoTimeline::ReplaceTransformKey(AActor* RecordedActor, const float& CurrentTimeKey, bool bRecordIfNotFound, const FRotator* OverrideControlRotation)
 {
 	FRecordTransformKey* FoundTransformKey = TransformKeys.FindByPredicate([CurrentTimeKey](const FRecordTransformKey& TransformKey)
 	{
@@ -119,10 +120,14 @@ void FEchoTimeline::ReplaceTransformKey(AActor* RecordedActor, const float& Curr
 	FoundTransformKey->Position = RecordedActor->GetActorLocation();
 	FoundTransformKey->Rotation = RecordedActor->GetActorRotation();
 	FoundTransformKey->Scale = RecordedActor->GetActorScale();
-	if (RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass()))
+	if (OverrideControlRotation != nullptr)
+	{
+		FoundTransformKey->ControlRotation = *OverrideControlRotation;
+	}
+	else if (RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass()))
 	{
 		FoundTransformKey->ControlRotation = IRecordHandlerInterface::Execute_GetToRecordControlRotation(RecordedActor);
-	};
+	}
 }
 
 bool FEchoTimeline::HasTransformKey(const float& CurrentTimeKey) const

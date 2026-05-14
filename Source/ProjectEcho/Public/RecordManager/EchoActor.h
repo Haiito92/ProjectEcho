@@ -23,6 +23,7 @@ public:
 	AEchoActor();
 	
 public:
+	UFUNCTION()
 	void HandleActionKey(const FRecordedAction& Action);
 	
 	UFUNCTION()
@@ -45,6 +46,10 @@ public:
 	
 	UFUNCTION()
 	virtual void Laserize_Implementation() override;
+	
+	//Called to Get Control Rotation
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, BlueprintPure)
+	FRotator GetEchoControlRotation();
 	
 protected:
 	UFUNCTION(BlueprintImplementableEvent)

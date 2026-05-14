@@ -51,7 +51,7 @@ public:
 	int CreateTransformKey(int TimelineIndex, const float& LocalTimeKey);
 	
 	UFUNCTION(BlueprintCallable)
-	void ReplaceTransformKey(int TimelineIndex, const float& LocalTimeKey, bool bRecordIfNotFound = false);
+	void ReplaceTransformKey(int TimelineIndex, const float& LocalTimeKey, const FRotator& ControlRotation, bool bRecordIfNotFound = false);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool HasTransformKey(int TimelineIndex, const float& LocalTimeKey);
