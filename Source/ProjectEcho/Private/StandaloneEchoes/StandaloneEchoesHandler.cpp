@@ -151,24 +151,6 @@ void AStandaloneEchoesHandler::ReplaceTransformKey(int TimelineIndex, const floa
 	}
 }
 
-int AStandaloneEchoesHandler::CreateActionKey(int TimelineIndex, const float& LocalTimeKey,
-                                              const FRecordedAction& RecordedAction)
-{
-	if (TimelineIndex > EchoTimelines.Num() || TimelineIndex < 0) return -1;
-	this->Modify();
-	EchoTimelines[TimelineIndex].ActionKeys.Add(FRecordActionKey(LocalTimeKey, RecordedAction));
-	EchoTimelines[TimelineIndex].ActionKeys.Sort([](const FRecordActionKey& A, const FRecordActionKey& B)
-	{
-		return A.TimeKey < B.TimeKey;
-	});
-	
-	for (int i = 0; i < EchoTimelines[TimelineIndex].ActionKeys.Num(); ++i)
-	{
-		if (EchoTimelines[TimelineIndex].ActionKeys[i].TimeKey == LocalTimeKey) return i;
-	}
-	return -1;
-}
-
 bool AStandaloneEchoesHandler::HasTransformKey(int TimelineIndex, const float& LocalTimeKey)
 {
 	if (EchoTimelines.IsValidIndex(TimelineIndex))
@@ -200,6 +182,56 @@ int AStandaloneEchoesHandler::ModifyTransformKeyTimeKey(int TimelineIndex, const
 		}
 	}
 	return -1;
+}
+
+int AStandaloneEchoesHandler::CreateActionKey(int TimelineIndex, const float& LocalTimeKey,
+											  const FRecordedAction& RecordedAction)
+{
+	if (TimelineIndex > EchoTimelines.Num() || TimelineIndex < 0) return -1;
+	this->Modify();
+	EchoTimelines[TimelineIndex].ActionKeys.Add(FRecordActionKey(LocalTimeKey, RecordedAction));
+	EchoTimelines[TimelineIndex].ActionKeys.Sort([](const FRecordActionKey& A, const FRecordActionKey& B)
+	{
+		return A.TimeKey < B.TimeKey;
+	});
+	
+	for (int i = 0; i < EchoTimelines[TimelineIndex].ActionKeys.Num(); ++i)
+	{
+		if (EchoTimelines[TimelineIndex].ActionKeys[i].TimeKey == LocalTimeKey) return i;
+	}
+	return -1;
+}
+
+int AStandaloneEchoesHandler::ModifyActionKeyTimeKey(int TimelineIndex, const int& KeyIndex, const float& NewTimeKey)
+{
+	if (EchoTimelines.IsValidIndex(TimelineIndex))
+	{
+		if (!EchoTimelines[TimelineIndex].ActionKeys.IsValidIndex(KeyIndex)) return -1;
+		this->Modify();
+		FRecordActionKey& RecordActionKey = EchoTimelines[TimelineIndex].ActionKeys[KeyIndex];
+		RecordActionKey.TimeKey = NewTimeKey;
+		EchoTimelines[TimelineIndex].ActionKeys.Sort([](const FRecordActionKey& A, const FRecordActionKey& B)
+		{
+			return A.TimeKey < B.TimeKey;
+		});
+		for (int i = 0; i < EchoTimelines[TimelineIndex].ActionKeys.Num(); ++i)
+		{
+			if (EchoTimelines[TimelineIndex].ActionKeys[i].TimeKey == RecordActionKey.TimeKey && 
+				EchoTimelines[TimelineIndex].ActionKeys[i].Action == RecordActionKey.Action) return i;
+		}
+	}
+	return -1;
+}
+
+void AStandaloneEchoesHandler::ModifyActionKeyAction(int TimelineIndex,  const int& KeyIndex,
+	const FRecordedAction& RecordedAction)
+{
+	if (EchoTimelines.IsValidIndex(TimelineIndex))
+	{
+		if (EchoTimelines[TimelineIndex].ActionKeys.IsValidIndex(KeyIndex)) return;
+		this->Modify();
+		EchoTimelines[TimelineIndex].ActionKeys[KeyIndex].Action = RecordedAction;
+	}
 }
 
 float AStandaloneEchoesHandler::GetTimelinesLength()

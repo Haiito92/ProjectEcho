@@ -38,6 +38,11 @@ struct FRecordedAction
 		this->ActionEnum = Action;
 	}
 	
+	bool operator==(const FRecordedAction& Other) const
+	{
+		return ActionEnum == Other.ActionEnum;
+	}
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ERecordedAction ActionEnum = ERecordedAction::None;
 };

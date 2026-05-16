@@ -66,6 +66,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int CreateActionKey(int TimelineIndex, const float& LocalTimeKey, const FRecordedAction& RecordedAction);
 	
+	UFUNCTION(BlueprintCallable)
+	int ModifyActionKeyTimeKey(int TimelineIndex, const int& KeyIndex, const float& NewTimeKey);
+	
+	UFUNCTION(BlueprintCallable)
+	void ModifyActionKeyAction(int TimelineIndex, const int& KeyIndex, const FRecordedAction& RecordedAction);
+	
 #pragma endregion
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
