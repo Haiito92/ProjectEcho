@@ -115,3 +115,8 @@ void UPropulseComponent::ResetCooldownTimer()
 {
 	PropulseTimer = 0.0f;
 }
+
+bool UPropulseComponent::IsOn() const
+{
+	return bIsOn;
+}
