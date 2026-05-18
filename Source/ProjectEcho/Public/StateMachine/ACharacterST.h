@@ -200,10 +200,16 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
 	UPROPERTY(BlueprintAssignable)
 	FOnDeath OnDeath;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathInRecord);
+	UPROPERTY(BlueprintAssignable)
+	FOnDeathInRecord OnDeathInRecord;
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathEnd);
 	UPROPERTY(BlueprintAssignable)
 	FOnDeathEnd OnDeathEnd;
+	
+	
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRevive);
 	UPROPERTY(BlueprintAssignable)
