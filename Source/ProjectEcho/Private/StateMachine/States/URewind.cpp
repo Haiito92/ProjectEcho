@@ -36,6 +36,8 @@ void URewind::Exit()
 {
 	Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	RecordManagerSubsystem->OnStopPlayerRewinding.RemoveDynamic(this, &URewind::OnRewindingEnded);
+	
+	if (Character->ReflectInputPressed()) Character->SetShouldRestoreReflect(true);
 }
 
 void URewind::OnRewindingEnded()

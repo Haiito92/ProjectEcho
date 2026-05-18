@@ -220,13 +220,14 @@ void ACharacterST::AStopPropulse()
 
 void ACharacterST::AStartReflect()
 {
-	bReflectInputOn = true;
+	bReflectInputPressed = true;
 	OnReflectInputStarted.Broadcast();
 }
 
 void ACharacterST::AStopReflect()
 {
-	bReflectInputOn = false;
+	bReflectInputPressed = false;
+	SetShouldRestoreReflect(false);
 	OnReflectInputCompleted.Broadcast();
 }
 
@@ -332,7 +333,19 @@ void ACharacterST::FinalizePropulse_Implementation()
 {
 }
 
-bool ACharacterST::GetReflectInputOn() const
+bool ACharacterST::ReflectInputPressed() const
 {
-	return bReflectInputOn;
+	return bReflectInputPressed;
+}
+
+void ACharacterST::SetShouldRestoreReflect(bool InShouldRestore)
+{
+	bShouldRestoreReflect = InShouldRestore;
+}
+
+bool ACharacterST::ConsumeShouldRestoreReflect()
+{
+	bool Temp = bShouldRestoreReflect;
+	bShouldRestoreReflect = false;
+	return Temp;
 }

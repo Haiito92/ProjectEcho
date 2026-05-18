@@ -54,6 +54,11 @@ void UState::Enter()
 
 	Character->bCanBeReflected = (StateSettings & EStateSettings::CanBeReflected) == EStateSettings::CanBeReflected;
 	Character->bCanBePropulsed = (StateSettings & EStateSettings::CanBePropulsed) == EStateSettings::CanBePropulsed;
+	
+	if (Character->ConsumeShouldRestoreReflect())
+	{
+		OnReflectInputStarted();
+	}
 }
 
 void UState::Tick(float DeltaTime)
