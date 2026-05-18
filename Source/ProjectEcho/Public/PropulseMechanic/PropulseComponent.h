@@ -33,6 +33,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ResetCooldownTimer();
+	
+	UFUNCTION(BlueprintCallable)
+	bool IsOn() const;
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveTryPropulse();
