@@ -2,6 +2,7 @@
 
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "RecordManager/RecordManagerSubsystem.h"
 #include "StateMachine/ACharacterST.h"
 
 
@@ -20,15 +21,18 @@ void URewind::Tick(float DeltaTime)
 
 void URewind::Enter()
 {
-	Super::Enter();
 	Character->GetCharacterMovement()->DisableMovement();
 	Character->GetCharacterMovement()->StopMovementImmediately();
-	Character->DeactivateCharacterInput();
+	RecordManagerSubsystem->OnStopPlayerRewinding.AddDynamic(this, &URewind::OnRewindingEnded);
 }
 
 void URewind::Exit()
 {
-	Super::Exit();
 	Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-	Character->ActivateCharacterInput();
+	RecordManagerSubsystem->OnStopPlayerRewinding.RemoveDynamic(this, &URewind::OnRewindingEnded);
+}
+
+void URewind::OnRewindingEnded()
+{
+	StateMachine->ChangeState(EState::Idle);
 }

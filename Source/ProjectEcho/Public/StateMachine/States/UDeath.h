@@ -13,8 +13,8 @@ public:
 	virtual void InitState(UStateMachine* InStateMachine, ACharacterST* InCharacter) override;
 	
 protected:
-	
-	virtual void OnRevive() override;
+	UFUNCTION()
+	virtual void OnRevive();
 
 	
 };
