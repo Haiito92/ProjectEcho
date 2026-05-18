@@ -324,7 +324,7 @@ void UState::OnReflected(const FVector& ReflectDirection, float ReflectPower)
 	if (Character->GetCharacterMovement()->IsFalling() || !IsValid(World) || !IsValid(ReflectSettings))
 	{
 		FVector ReflectForce = ReflectDirection.GetSafeNormal() * ReflectPower;
-		Character->LaunchCharacter(ReflectForce, false, false);
+		Character->LaunchCharacter(ReflectForce, true, true);
 		return;
 	}
 	
@@ -332,7 +332,7 @@ void UState::OnReflected(const FVector& ReflectDirection, float ReflectPower)
 	if (!IsValid(CapsuleComponent))
 	{
 		FVector ReflectForce = ReflectDirection.GetSafeNormal() * ReflectPower;
-		Character->LaunchCharacter(ReflectForce, false, false);
+		Character->LaunchCharacter(ReflectForce, true, true);
 		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Log, "No capsule comp: can't fake up vector." , FColor::Green, 3.0f);
 		return;
 	}
@@ -361,7 +361,7 @@ void UState::OnReflected(const FVector& ReflectDirection, float ReflectPower)
 	{
 		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Log, "No blocking hit: no need to fake up vector." , FColor::Green, 3.0f);
 		FVector ReflectForce = ReflectDirection.GetSafeNormal() * ReflectPower;
-		Character->LaunchCharacter(ReflectForce, false, false);
+		Character->LaunchCharacter(ReflectForce, true, true);
 		return;
 	}
 	
@@ -375,7 +375,7 @@ void UState::OnReflected(const FVector& ReflectDirection, float ReflectPower)
 	{
 		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Log, "Dot is positive: no need to fake up vector." , FColor::Green, 3.0f);
 		FVector ReflectForce = ReflectDirection.GetSafeNormal() * ReflectPower;
-		Character->LaunchCharacter(ReflectForce, false, false);
+		Character->LaunchCharacter(ReflectForce, true, true);
 		return;
 	}
 	
@@ -391,10 +391,10 @@ void UState::OnReflected(const FVector& ReflectDirection, float ReflectPower)
 	{
 		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Log, "ReflectAngleToGround superior to threshold: no need to fake up vector." , FColor::Green, 3.0f);
 		FVector ReflectForce = ReflectDirection.GetSafeNormal() * ReflectPower;
-		Character->LaunchCharacter(ReflectForce, false, false);
+		Character->LaunchCharacter(ReflectForce, true, true);
 		return;
 	}
 	
 	FVector ReflectForce = UKismetMathLibrary::RotateAngleAxis(ForwardVector, -ReflectSettings->ReflectLiftAngle, RightVector) * ReflectPower;
-	Character->LaunchCharacter(ReflectForce, false, false);
+	Character->LaunchCharacter(ReflectForce, true, true);
 }
