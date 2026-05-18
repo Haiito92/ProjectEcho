@@ -141,6 +141,10 @@ public:
 	UFUNCTION()
 	virtual void FinalizePropulse_Implementation() override;
 	
+	
+	UFUNCTION()
+	bool GetReflectInputOn() const;
+	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
 	UPROPERTY(BlueprintAssignable)
 	FMovePressed OnMovePressed;
@@ -293,4 +297,6 @@ public:
 	
 	bool bCanBeReflected = false;
 	bool bCanBePropulsed = false;
+	
+	bool bReflectInputOn = false;
 };

@@ -89,7 +89,7 @@ void UState::Exit()
 
 bool UState::CanUseGrab()
 {
-	return (StateSettings & EStateSettings::CanGrab) == EStateSettings::CanGrab;
+	return (StateSettings & EStateSettings::CanGrab) == EStateSettings::CanGrab && !ReflectComponent->IsOn() && !PropulseComponent->IsOn();
 }
 
 bool UState::CanUseRecord()
@@ -99,17 +99,17 @@ bool UState::CanUseRecord()
 
 bool UState::CanUseInteract()
 {
-	return (StateSettings & EStateSettings::CanInteract) == EStateSettings::CanInteract;
+	return (StateSettings & EStateSettings::CanInteract) == EStateSettings::CanInteract && !ReflectComponent->IsOn() && !GrabbingComponent->IsGrabbing() && !PropulseComponent->IsOn();
 }
 
 bool UState::CanUsePropulse()
 {
-	return (StateSettings & EStateSettings::CanPropulse) == EStateSettings::CanPropulse;
+	return (StateSettings & EStateSettings::CanPropulse) == EStateSettings::CanPropulse && !ReflectComponent->IsOn() && !GrabbingComponent->IsGrabbing();
 }
 
 bool UState::CanUseReflect()
 {
-	return (StateSettings & EStateSettings::CanReflect) == EStateSettings::CanReflect;
+	return (StateSettings & EStateSettings::CanReflect) == EStateSettings::CanReflect && !GrabbingComponent->IsGrabbing() && !PropulseComponent->IsOn();
 }
 
 void UState::OnMovePressed(FVector2D InMoveInput)

@@ -220,11 +220,13 @@ void ACharacterST::AStopPropulse()
 
 void ACharacterST::AStartReflect()
 {
+	bReflectInputOn = true;
 	OnReflectInputStarted.Broadcast();
 }
 
 void ACharacterST::AStopReflect()
 {
+	bReflectInputOn = false;
 	OnReflectInputCompleted.Broadcast();
 }
 
@@ -328,4 +330,9 @@ void ACharacterST::Propulse_Implementation(const FVector& PropulseDirection, flo
 
 void ACharacterST::FinalizePropulse_Implementation()
 {
+}
+
+bool ACharacterST::GetReflectInputOn() const
+{
+	return bReflectInputOn;
 }

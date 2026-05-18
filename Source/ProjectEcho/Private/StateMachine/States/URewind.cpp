@@ -3,6 +3,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "RecordManager/RecordManagerSubsystem.h"
+#include "ReflectMechanic/ReflectComponent.h"
 #include "StateMachine/ACharacterST.h"
 
 
@@ -24,6 +25,11 @@ void URewind::Enter()
 	Character->GetCharacterMovement()->DisableMovement();
 	Character->GetCharacterMovement()->StopMovementImmediately();
 	RecordManagerSubsystem->OnStopPlayerRewinding.AddDynamic(this, &URewind::OnRewindingEnded);
+	
+	if (ReflectComponent->IsOn())
+	{
+		ReflectComponent->StopReflect();
+	}
 }
 
 void URewind::Exit()
