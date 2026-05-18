@@ -329,3 +329,8 @@ void ACharacterST::Propulse_Implementation(const FVector& PropulseDirection, flo
 void ACharacterST::FinalizePropulse_Implementation()
 {
 }
+
+void ACharacterST::ForceRelease_Implementation()
+{
+	if (IsValid(GrabbingComponent)) GrabbingComponent->ForceRelease();
+}
