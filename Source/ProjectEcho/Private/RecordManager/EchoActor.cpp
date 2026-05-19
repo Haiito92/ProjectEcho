@@ -20,7 +20,6 @@ void AEchoActor::BeginPlay()
 	Super::BeginPlay();
 	GrabbingComponent = FindComponentByClass<UGrabbingComponent>();
 	ReflectComponent = FindComponentByClass<UReflectComponent>();
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, IsValid(ReflectComponent)? FColor::Green : FColor::Red, "ReflectComponent");
 }
 
 void AEchoActor::HandleActionKey(const FRecordedAction& Action)
