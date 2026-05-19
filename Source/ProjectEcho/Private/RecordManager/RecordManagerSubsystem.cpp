@@ -6,6 +6,7 @@
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
+#include "LevelStreaming/LevelStreamingWorldSubsystem.h"
 #include "RecordManager/EchoActor.h"
 #include "RecordManager/RecordableComponent.h"
 #include "RecordManager/RecordableInterface.h"
@@ -436,6 +437,15 @@ void URecordManagerSubsystem::InitRecordManager(const int& NbTimelineSlot)
 	}
 	
 	UGameplayStatics::GetAllActorsWithInterface(GetWorld(), URecordListener::StaticClass(), RecordListeners);
+	
+	//Bind to LevelStreaming Functions : 
+
+	ULevelStreamingWorldSubsystem* LevelStreamingWorldSubsystem = GetWorld()->GetSubsystem<ULevelStreamingWorldSubsystem>();
+	if (LevelStreamingWorldSubsystem != nullptr)
+	{
+		LevelStreamingWorldSubsystem->StreamLevelLoaded.AddDynamic(this, &URecordManagerSubsystem::OnNewLevelLoaded);
+		LevelStreamingWorldSubsystem->StreamLevelUnloaded.AddDynamic(this, &URecordManagerSubsystem::OnLevelUnloaded);
+	}
 }
 
 void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<FRecordedAction>& RestoreStateAction,  const TArray<FRecordedAction>& FirstActions)
@@ -674,6 +684,22 @@ FTimelineUIInfo URecordManagerSubsystem::GetRecordingTimelineUIInfo()
 	}
 	
 	return Info;
+}
+
+void URecordManagerSubsystem::OnNewLevelLoaded(const TArray<AActor*>& Actors)
+{
+	for (AActor* Actor : Actors)
+	{
+		
+	}
+}
+
+void URecordManagerSubsystem::OnLevelUnloaded(const TArray<AActor*>& Actors)
+{
+	for (AActor* Actor : Actors)
+	{
+		
+	}
 }
 
 void URecordManagerSubsystem::Tick(float DeltaTime)
