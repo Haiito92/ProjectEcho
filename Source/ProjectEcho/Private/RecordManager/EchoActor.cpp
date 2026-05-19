@@ -7,6 +7,7 @@
 #include "GrabMechanic/GrabbingComponent.h"
 #include "RecordManager/RecordableInterface.h"
 #include "RecordManager/RecordManagerSubsystem.h"
+#include "ReflectMechanic/ReflectComponent.h"
 
 AEchoActor::AEchoActor()
 {
@@ -17,7 +18,9 @@ AEchoActor::AEchoActor()
 void AEchoActor::BeginPlay()
 {
 	Super::BeginPlay();
-	GrabbingComponent = GetComponentByClass<UGrabbingComponent>();
+	GrabbingComponent = FindComponentByClass<UGrabbingComponent>();
+	ReflectComponent = FindComponentByClass<UReflectComponent>();
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, IsValid(ReflectComponent)? FColor::Green : FColor::Red, "ReflectComponent");
 }
 
 void AEchoActor::HandleActionKey(const FRecordedAction& Action)
@@ -29,6 +32,23 @@ void AEchoActor::HandleActionKey(const FRecordedAction& Action)
 void AEchoActor::ForceRelease_Implementation()
 {
 	if (IsValid(GrabbingComponent)) GrabbingComponent->ForceRelease();
+}
+
+void AEchoActor::TakeStateSnapshot()
+{
+	if (IsValid(ReflectComponent)) EchoStateSnapshot.bIsReflecting = ReflectComponent->IsOn();
+}
+
+void AEchoActor::RestoreStateSnapshot()
+{
+	if (IsValid(ReflectComponent))
+	{
+		if (ReflectComponent->IsOn() != EchoStateSnapshot.bIsReflecting)
+		{
+			if (ReflectComponent->IsOn()) ReflectComponent->StopReflect();
+			else ReflectComponent->StartReflect();
+		}
+	}
 }
 
 void AEchoActor::SetControlRotation(const FRotator& ControlRotation)
@@ -43,14 +63,24 @@ void AEchoActor::InitEcho(const int& index, const FEchoColorStruct& EchoColor)
 	ReceiveInitEcho(EchoColor);
 }
 
-void AEchoActor::HandleRewindStarted(const float& CurrentTimeKey)
+void AEchoActor::HandleRewindStarted(const float& CurrentTimeKey, bool bIsPlayerRewind)
 {
 	ReceiveHandleRewindStarted(CurrentTimeKey);
 }
 
-void AEchoActor::HandleRewindStopped(const float& CurrentTimeKey)
+void AEchoActor::HandleRewindStopped(const float& CurrentTimeKey, bool bIsPlayerRewind)
 {
+	if (bIsPlayerRewind)
+	{
+		RestoreStateSnapshot();
+	}
+	
 	ReceiveHandleRewindStopped(CurrentTimeKey);
+}
+
+void AEchoActor::HandleRecordStarted(const float& CurrentTimeKey)
+{
+	TakeStateSnapshot();
 }
 
 void AEchoActor::OnTimelineDestroyed()

@@ -7,6 +7,7 @@
 #include "EchoInterface.h"
 #include "GrabMechanic/GrabberActorInterface.h"
 #include "LaserMechanic/Laserizable.h"
+#include "ReflectMechanic/ReflectComponent.h"
 
 #include "EchoActor.generated.h"
 
@@ -14,6 +15,25 @@ class UGrabbingComponent;
 struct FRecordedAction;
 class IRecordableInterface;
 enum class ERecordedAction : uint8;
+
+USTRUCT(Blueprintable)
+struct FEchoStateSnapshot
+{
+	GENERATED_BODY()
+	
+	FEchoStateSnapshot()
+	{
+		bIsReflecting = false;
+	}
+
+	explicit FEchoStateSnapshot(const bool bInIsReflecting)
+	{
+		bIsReflecting = bInIsReflecting;
+	}
+	
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsReflecting = false;
+};
 
 UCLASS()
 class PROJECTECHO_API AEchoActor : public AActor, public IEchoInterface, public ILaserizable, public IGrabberActorInterface
@@ -31,6 +51,12 @@ public:
 	
 	virtual void ForceRelease_Implementation() override;
 	
+	//Take a Snapshot of all States to Restore
+	void TakeStateSnapshot();
+	
+	//Restore State from previously recorded State Snapshot
+	void RestoreStateSnapshot();
+	
 	UFUNCTION()
 	void SetControlRotation(const FRotator& ControlRotation);
 	
@@ -40,8 +66,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveInitEcho(FEchoColorStruct EchoColor);
 	
-	void HandleRewindStarted(const float& CurrentTimeKey);
-	void HandleRewindStopped(const float& CurrentTimeKey);
+	void HandleRewindStarted(const float& CurrentTimeKey, bool bIsPlayerRewind);
+	void HandleRewindStopped(const float& CurrentTimeKey, bool bIsPlayerRewind); 
+	void HandleRecordStarted(const float& CurrentTimeKey);
 	
 	UFUNCTION()
 	void OnTimelineDestroyed();
@@ -72,7 +99,7 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEchoDestroyedSignature, int, EchoIndex);
 	UPROPERTY(BlueprintAssignable)
 	FOnEchoDestroyedSignature OnEchoDestroyed;
-	
+
 protected:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRegisterRecordable, TScriptInterface<IRecordableInterface>, Recordable);
 	UPROPERTY(BlueprintAssignable)
@@ -81,7 +108,13 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	int EchoIndex = 0;
 	
+	UPROPERTY(BlueprintReadWrite)
+	FEchoStateSnapshot EchoStateSnapshot;
+	
 private:
 	UPROPERTY()
 	TObjectPtr<UGrabbingComponent> GrabbingComponent = nullptr;
+	
+	UPROPERTY()
+	TObjectPtr<UReflectComponent> ReflectComponent = nullptr;
 };
