@@ -27,4 +27,7 @@ protected:
 	TObjectPtr<APlayerStart> EchoPlayerStart;
 	UPROPERTY()
 	TObjectPtr<ACharacterST> EchoPlayerCharacter;
+	
+	UPROPERTY()
+	FTransform PlayerRespawnTransform;
 };
