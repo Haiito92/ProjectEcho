@@ -150,6 +150,9 @@ public:
 	UFUNCTION()
 	bool ConsumeShouldRestoreReflect();
 	
+	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="InRespawnTransform"))
+	void SetRespawnTransform(const FTransform& InRespawnTransform);
+	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
 	UPROPERTY(BlueprintAssignable)
 	FMovePressed OnMovePressed;
@@ -300,9 +303,17 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
 	
+	UPROPERTY()
 	bool bCanBeReflected = false;
+	UPROPERTY()
 	bool bCanBePropulsed = false;
 	
+	UPROPERTY()
 	bool bShouldRestoreReflect = false;
+	UPROPERTY()
 	bool bReflectInputPressed = false;
+	
+	
+	UPROPERTY()
+	FTransform RespawnTransform;
 };

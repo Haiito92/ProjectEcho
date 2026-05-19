@@ -260,6 +260,7 @@ void ACharacterST::DeathEnd()
 
 void ACharacterST::Revive()
 {
+	SetActorTransform(RespawnTransform);
 	OnRevive.Broadcast();
 }
 
@@ -348,4 +349,9 @@ bool ACharacterST::ConsumeShouldRestoreReflect()
 	bool Temp = bShouldRestoreReflect;
 	bShouldRestoreReflect = false;
 	return Temp;
+}
+
+void ACharacterST::SetRespawnTransform(const FTransform& InRespawnTransform)
+{
+	RespawnTransform = InRespawnTransform;
 }

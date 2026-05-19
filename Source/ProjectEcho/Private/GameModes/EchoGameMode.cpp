@@ -50,15 +50,16 @@ void AEchoGameMode::InitializeGame()
 	}
 
 	EchoPlayerStart = Cast<APlayerStart>(UGameplayStatics::GetActorOfClass(this, APlayerStart::StaticClass()));
+	
+	FTransform PlayerRespawnTransform;
 	PlayerRespawnTransform.SetLocation(EchoPlayerStart->GetActorLocation());
 	PlayerRespawnTransform.SetRotation(EchoPlayerStart->GetActorRotation().Quaternion());
+	EchoPlayerCharacter->SetRespawnTransform(PlayerRespawnTransform);
 }
 
 void AEchoGameMode::OnPlayerDeathEnd()
 {
 	if (!IsValid(EchoPlayerCharacter) || !IsValid(EchoPlayerStart)) return;
-
-	EchoPlayerCharacter->SetActorTransform(PlayerRespawnTransform);
 
 	EchoPlayerCharacter->Revive();
 }
