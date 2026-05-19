@@ -220,11 +220,14 @@ void ACharacterST::AStopPropulse()
 
 void ACharacterST::AStartReflect()
 {
+	bReflectInputPressed = true;
 	OnReflectInputStarted.Broadcast();
 }
 
 void ACharacterST::AStopReflect()
 {
+	bReflectInputPressed = false;
+	SetShouldRestoreReflect(false);
 	OnReflectInputCompleted.Broadcast();
 }
 
@@ -263,6 +266,7 @@ void ACharacterST::DeathEnd()
 
 void ACharacterST::Revive()
 {
+	SetActorTransform(RespawnTransform);
 	OnRevive.Broadcast();
 }
 
@@ -334,4 +338,31 @@ void ACharacterST::Propulse_Implementation(const FVector& PropulseDirection, flo
 
 void ACharacterST::FinalizePropulse_Implementation()
 {
+}
+
+bool ACharacterST::ReflectInputPressed() const
+{
+	return bReflectInputPressed;
+}
+
+void ACharacterST::SetShouldRestoreReflect(bool InShouldRestore)
+{
+	bShouldRestoreReflect = InShouldRestore;
+}
+
+bool ACharacterST::ConsumeShouldRestoreReflect()
+{
+	bool Temp = bShouldRestoreReflect;
+	bShouldRestoreReflect = false;
+	return Temp;	
+}
+
+void ACharacterST::ForceRelease_Implementation()
+{
+	if (IsValid(GrabbingComponent)) GrabbingComponent->ForceRelease();
+}
+
+void ACharacterST::SetRespawnTransform(const FTransform& InRespawnTransform)
+{
+	RespawnTransform = InRespawnTransform;
 }

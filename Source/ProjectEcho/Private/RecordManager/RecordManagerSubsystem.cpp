@@ -184,14 +184,19 @@ void FEchoTimeline::ActivateTimeline(bool bInIsActive)
 	}
 }
 
-void FEchoTimeline::HandleRewindStarted(const float& CurrentTimeKey)
+void FEchoTimeline::HandleRewindStarted(const float& CurrentTimeKey, bool bIsPlayerRewind)
 {
-	EchoActor->HandleRewindStarted(CurrentTimeKey);
+	EchoActor->HandleRewindStarted(CurrentTimeKey, bIsPlayerRewind);
 }
 
-void FEchoTimeline::HandleRewindStopped(const float& CurrentTimeKey)
+void FEchoTimeline::HandleRewindStopped(const float& CurrentTimeKey, bool bIsPlayerRewind)
 {
-	EchoActor->HandleRewindStopped(CurrentTimeKey);
+	EchoActor->HandleRewindStopped(CurrentTimeKey, bIsPlayerRewind);
+}
+
+void FEchoTimeline::HandleRecordStarted(const float& CurrentTimeKey)
+{
+	EchoActor->HandleRecordStarted(CurrentTimeKey);
 }
 
 void FEchoTimeline::OnDestroy()
@@ -361,19 +366,27 @@ void FGlobalTimeline::DestroyTimeline(int SelectedSlot, TArray<TObjectPtr<AEchoA
 	}
 }
 
-void FGlobalTimeline::HandleRewindStarted(const float& CurrentTimeKey)
+void FGlobalTimeline::HandleRewindStarted(const float& CurrentTimeKey, bool bIsPlayerRewind)
 {
 	for (TTuple<int, FEchoTimeline>& TimelineTuple: Timelines)
 	{
-		TimelineTuple.Get<1>().HandleRewindStarted(CurrentTimeKey);
+		TimelineTuple.Get<1>().HandleRewindStarted(CurrentTimeKey, bIsPlayerRewind);
 	}
 }
 
-void FGlobalTimeline::HandleRewindStopped(const float& CurrentTimeKey)
+void FGlobalTimeline::HandleRewindStopped(const float& CurrentTimeKey, bool bIsPlayerRewind)
 {
 	for (TTuple<int, FEchoTimeline>& TimelineTuple: Timelines)
 	{
-		TimelineTuple.Get<1>().HandleRewindStopped(CurrentTimeKey);
+		TimelineTuple.Get<1>().HandleRewindStopped(CurrentTimeKey, bIsPlayerRewind);
+	}
+}
+
+void FGlobalTimeline::HandleRecordStarted(const float& CurrentTimeKey)
+{
+	for (TTuple<int, FEchoTimeline>& TimelineTuple: Timelines)
+	{
+		TimelineTuple.Get<1>().HandleRecordStarted(CurrentTimeKey);
 	}
 }
 
@@ -440,6 +453,8 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<
 	{
 		IRecordHandlerInterface::Execute_StartRecording(RecordedActor);
 	}
+	
+	GlobalTimeline.HandleRecordStarted(CurrentTimeKey);
 
 	for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
 	{
@@ -501,7 +516,7 @@ void URecordManagerSubsystem::StopRecord()
 
 void URecordManagerSubsystem::StartPlayerRewind()
 {
-	StartRewind();
+	StartRewind(true);
 	bIsPlayerRewinding = true;
 	RewindSpeed = RecordingTimeline.GetLastTimeKey() / RecordManagerSettings->PlayerRewindTime;
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Start PlayerRewind at Speed : " + FString::SanitizeFloat(RewindSpeed), FColor::Turquoise, 3.f);
@@ -526,7 +541,7 @@ void URecordManagerSubsystem::StopPlayerRewind()
 	RecordedActor = nullptr;
 
 	OnStopPlayerRewinding.Broadcast();
-	StopRewind();
+	StopRewind(true);
 	bIsPlayerRewinding = false;
 	
 	RecordingTimeline.PlayFirstKey(RecordingTimelineStartActions);
@@ -540,7 +555,7 @@ void URecordManagerSubsystem::StopPlayerRewind()
 	}
 }
 
-void URecordManagerSubsystem::StartRewind()
+void URecordManagerSubsystem::StartRewind(bool bIsPlayerRewind)
 {
 	bIsInRewind = true;
 	for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
@@ -552,7 +567,7 @@ void URecordManagerSubsystem::StartRewind()
 		}
 	}
 	
-	GlobalTimeline.HandleRewindStarted(CurrentTimeKey);
+	GlobalTimeline.HandleRewindStarted(CurrentTimeKey, bIsPlayerRewind);
 	
 	for (AActor* RecordListener : RecordListeners)
 	{
@@ -560,7 +575,7 @@ void URecordManagerSubsystem::StartRewind()
 	}
 }
 
-void URecordManagerSubsystem::StopRewind()
+void URecordManagerSubsystem::StopRewind(bool bIsPlayerRewind)
 {
 	bIsInRewind = false;
 	for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
@@ -572,7 +587,7 @@ void URecordManagerSubsystem::StopRewind()
 		}
 	}
 	
-	GlobalTimeline.HandleRewindStopped(CurrentTimeKey);
+	GlobalTimeline.HandleRewindStopped(CurrentTimeKey, bIsPlayerRewind);
 	
 	for (AActor* RecordListener : RecordListeners)
 	{

@@ -15,15 +15,15 @@ class PROJECTECHO_API UGrabMechanicSettings : public UDataAsset
 	GENERATED_BODY()
 	
 public:
-	//Offset of SphereTrace from Actor's Location
+	//Offset of SphereCast Start Location from Actor's Location
 	UPROPERTY(EditDefaultsOnly, Category="Sphere Trace")
 	FVector SphereTraceBaseLocationOffset = FVector(0.0f, 0.0f, 0.0f);
 	
-	//Distance of SphereTrace from Actor's Location
+	//Length of SphereCast (Distance between Start of Cast and End of Cast)
 	UPROPERTY(EditDefaultsOnly, Category="Sphere Trace")
 	float SphereTraceDistance = 50.f;
 	
-	//SphereTrace Radius
+	//SphereCast Radius
 	UPROPERTY(EditDefaultsOnly, Category="Sphere Trace")
 	float SphereTraceRadius = 50.f;
 	

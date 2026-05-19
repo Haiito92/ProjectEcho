@@ -64,6 +64,12 @@ void UReflectComponent::StartReflect(const FVector& InCastStartLocation, const F
 	SetCastDirection(InCastDirection);
 }
 
+void UReflectComponent::StartReflect()
+{
+	bIsOn = true;
+	ResetCooldownTimer();
+}
+
 void UReflectComponent::StopReflect()
 {
 	bIsOn = false;

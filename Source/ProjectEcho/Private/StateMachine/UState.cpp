@@ -55,6 +55,11 @@ void UState::Enter()
 
 	Character->bCanBeReflected = (StateSettings & EStateSettings::CanBeReflected) == EStateSettings::CanBeReflected;
 	Character->bCanBePropulsed = (StateSettings & EStateSettings::CanBePropulsed) == EStateSettings::CanBePropulsed;
+	
+	if (Character->ConsumeShouldRestoreReflect())
+	{
+		OnReflectInputStarted();
+	}
 }
 
 void UState::Tick(float DeltaTime)
@@ -96,7 +101,7 @@ void UState::Exit()
 
 bool UState::CanUseGrab()
 {
-	return (StateSettings & EStateSettings::CanGrab) == EStateSettings::CanGrab;
+	return (StateSettings & EStateSettings::CanGrab) == EStateSettings::CanGrab && !ReflectComponent->IsOn() && !PropulseComponent->IsOn();
 }
 
 bool UState::CanUseRecord()
@@ -106,17 +111,17 @@ bool UState::CanUseRecord()
 
 bool UState::CanUseInteract()
 {
-	return (StateSettings & EStateSettings::CanInteract) == EStateSettings::CanInteract;
+	return (StateSettings & EStateSettings::CanInteract) == EStateSettings::CanInteract && !ReflectComponent->IsOn() && !GrabbingComponent->IsGrabbing() && !PropulseComponent->IsOn();
 }
 
 bool UState::CanUsePropulse()
 {
-	return (StateSettings & EStateSettings::CanPropulse) == EStateSettings::CanPropulse;
+	return (StateSettings & EStateSettings::CanPropulse) == EStateSettings::CanPropulse && !ReflectComponent->IsOn() && !GrabbingComponent->IsGrabbing();
 }
 
 bool UState::CanUseReflect()
 {
-	return (StateSettings & EStateSettings::CanReflect) == EStateSettings::CanReflect;
+	return (StateSettings & EStateSettings::CanReflect) == EStateSettings::CanReflect && !GrabbingComponent->IsGrabbing() && !PropulseComponent->IsOn();
 }
 
 void UState::OnMovePressed(FVector2D InMoveInput)
@@ -341,7 +346,7 @@ void UState::OnReflected(const FVector& ReflectDirection, float ReflectPower)
 	if (Character->GetCharacterMovement()->IsFalling() || !IsValid(World) || !IsValid(ReflectSettings))
 	{
 		FVector ReflectForce = ReflectDirection.GetSafeNormal() * ReflectPower;
-		Character->LaunchCharacter(ReflectForce, false, false);
+		Character->LaunchCharacter(ReflectForce, true, true);
 		return;
 	}
 	
@@ -349,7 +354,7 @@ void UState::OnReflected(const FVector& ReflectDirection, float ReflectPower)
 	if (!IsValid(CapsuleComponent))
 	{
 		FVector ReflectForce = ReflectDirection.GetSafeNormal() * ReflectPower;
-		Character->LaunchCharacter(ReflectForce, false, false);
+		Character->LaunchCharacter(ReflectForce, true, true);
 		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Log, "No capsule comp: can't fake up vector." , FColor::Green, 3.0f);
 		return;
 	}
@@ -378,7 +383,7 @@ void UState::OnReflected(const FVector& ReflectDirection, float ReflectPower)
 	{
 		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Log, "No blocking hit: no need to fake up vector." , FColor::Green, 3.0f);
 		FVector ReflectForce = ReflectDirection.GetSafeNormal() * ReflectPower;
-		Character->LaunchCharacter(ReflectForce, false, false);
+		Character->LaunchCharacter(ReflectForce, true, true);
 		return;
 	}
 	
@@ -392,7 +397,7 @@ void UState::OnReflected(const FVector& ReflectDirection, float ReflectPower)
 	{
 		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Log, "Dot is positive: no need to fake up vector." , FColor::Green, 3.0f);
 		FVector ReflectForce = ReflectDirection.GetSafeNormal() * ReflectPower;
-		Character->LaunchCharacter(ReflectForce, false, false);
+		Character->LaunchCharacter(ReflectForce, true, true);
 		return;
 	}
 	
@@ -408,10 +413,10 @@ void UState::OnReflected(const FVector& ReflectDirection, float ReflectPower)
 	{
 		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Log, "ReflectAngleToGround superior to threshold: no need to fake up vector." , FColor::Green, 3.0f);
 		FVector ReflectForce = ReflectDirection.GetSafeNormal() * ReflectPower;
-		Character->LaunchCharacter(ReflectForce, false, false);
+		Character->LaunchCharacter(ReflectForce, true, true);
 		return;
 	}
 	
 	FVector ReflectForce = UKismetMathLibrary::RotateAngleAxis(ForwardVector, -ReflectSettings->ReflectLiftAngle, RightVector) * ReflectPower;
-	Character->LaunchCharacter(ReflectForce, false, false);
+	Character->LaunchCharacter(ReflectForce, true, true);
 }
