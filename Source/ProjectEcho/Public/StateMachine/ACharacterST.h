@@ -255,6 +255,10 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnValidRelease OnValidRelease;
 	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnValidReflect);
+	UPROPERTY(BlueprintAssignable)
+	FOnValidReflect OnValidReflect;
+	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartRecord);
 	UPROPERTY(BlueprintAssignable)
 	FOnStartRecord OnStartRecord;
