@@ -5,26 +5,31 @@
 #include "CoreMinimal.h"
 #include "EchoColorStruct.h"
 #include "EchoInterface.h"
+#include "GrabMechanic/GrabberActorInterface.h"
 #include "LaserMechanic/Laserizable.h"
 
 #include "EchoActor.generated.h"
 
+class UGrabbingComponent;
 struct FRecordedAction;
 class IRecordableInterface;
 enum class ERecordedAction : uint8;
 
 UCLASS()
-class PROJECTECHO_API AEchoActor : public AActor, public IEchoInterface, public ILaserizable
+class PROJECTECHO_API AEchoActor : public AActor, public IEchoInterface, public ILaserizable, public IGrabberActorInterface
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this actor's properties
 	AEchoActor();
+protected:
+	virtual void BeginPlay() override;
 	
 public:
 	void HandleActionKey(const FRecordedAction& Action);
 	
+	virtual void ForceRelease_Implementation() override;
 	
 	UFUNCTION()
 	void SetControlRotation(const FRotator& ControlRotation);
@@ -75,4 +80,8 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly)
 	int EchoIndex = 0;
+	
+private:
+	UPROPERTY()
+	TObjectPtr<UGrabbingComponent> GrabbingComponent = nullptr;
 };

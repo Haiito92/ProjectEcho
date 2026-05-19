@@ -14,10 +14,21 @@ AEchoActor::AEchoActor()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
+void AEchoActor::BeginPlay()
+{
+	Super::BeginPlay();
+	GrabbingComponent = GetComponentByClass<UGrabbingComponent>();
+}
+
 void AEchoActor::HandleActionKey(const FRecordedAction& Action)
 {
 	//Call BP Function
 	ReceiveHandleActionKey(Action.ActionEnum);
+}
+
+void AEchoActor::ForceRelease_Implementation()
+{
+	if (IsValid(GrabbingComponent)) GrabbingComponent->ForceRelease();
 }
 
 void AEchoActor::SetControlRotation(const FRotator& ControlRotation)

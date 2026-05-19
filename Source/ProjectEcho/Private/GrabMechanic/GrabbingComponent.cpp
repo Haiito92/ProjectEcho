@@ -117,7 +117,7 @@ void UGrabbingComponent::ForceGrab(AActor* Actor)
 			GrabbedActor = Actor;
 			FAttachmentTransformRules AttachmentTransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
 			GrabbedActor->AttachToComponent(this, AttachmentTransformRules);
-			IGrabbableInterface::Execute_OnObjectForceGrabbed(GrabbedActor);
+			IGrabbableInterface::Execute_OnObjectForceGrabbed(GrabbedActor, this->GetOwner());
 		}
 	}
 }
@@ -156,7 +156,7 @@ void UGrabbingComponent::TryForceGrabHeldCube()
 			IGrabbableInterface::Execute_OnObjectBeforeForceGrabbed(GrabbedActor);
 			FAttachmentTransformRules AttachmentTransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
 			GrabbedActor->AttachToComponent(this, AttachmentTransformRules);
-			IGrabbableInterface::Execute_OnObjectForceGrabbed(GrabbedActor);
+			IGrabbableInterface::Execute_OnObjectForceGrabbed(GrabbedActor, this->GetOwner());
 		}
 	}
 	else
