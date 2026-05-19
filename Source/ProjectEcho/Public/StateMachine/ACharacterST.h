@@ -141,6 +141,15 @@ public:
 	UFUNCTION()
 	virtual void FinalizePropulse_Implementation() override;
 	
+	UFUNCTION()
+	bool ReflectInputPressed() const;
+	
+	UFUNCTION()
+	void SetShouldRestoreReflect(bool InShouldRestore);
+	
+	UFUNCTION()
+	bool ConsumeShouldRestoreReflect();
+	
 	virtual void ForceRelease_Implementation() override;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
@@ -295,4 +304,7 @@ public:
 	
 	bool bCanBeReflected = false;
 	bool bCanBePropulsed = false;
+	
+	bool bShouldRestoreReflect = false;
+	bool bReflectInputPressed = false;
 };
