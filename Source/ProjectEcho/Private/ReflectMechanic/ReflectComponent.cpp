@@ -58,15 +58,22 @@ void UReflectComponent::TickComponent(float DeltaTime, enum ELevelTick TickType,
 
 void UReflectComponent::StartReflect(const FVector& InCastStartLocation, const FVector& InCastDirection)
 {
-	bIsOn = true;
-	ResetCooldownTimer();
 	SetCastStartLocation(InCastStartLocation);
 	SetCastDirection(InCastDirection);
+	StartReflect();
+}
+
+void UReflectComponent::StartReflect()
+{
+	bIsOn = true;
+	ResetCooldownTimer();
+	OnReflectStarted.Broadcast();
 }
 
 void UReflectComponent::StopReflect()
 {
 	bIsOn = false;
+	OnReflectStopped.Broadcast();
 }
 
 
@@ -162,6 +169,8 @@ bool UReflectComponent::TryReflect()
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Log, "Reflect successfully executed!", FColor::Green, 3.0f);
 
 	IReflectable::Execute_FinalizeReflect(ReflectedActor);
+	
+	OnObjectReflected.Broadcast();
 	
 	return true;
 }
