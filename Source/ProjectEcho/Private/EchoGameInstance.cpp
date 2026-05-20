@@ -4,6 +4,19 @@
 #include "Public/EchoGameInstance.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "Options/OptionsGameInstanceSubsystem.h"
+
+void UEchoGameInstance::Init()
+{
+	Super::Init();
+	
+	UOptionsGameInstanceSubsystem* OptionsSubsystem = GetSubsystem<UOptionsGameInstanceSubsystem>();
+	
+	if (IsValid(OptionsSubsystem))
+	{
+		OptionsSubsystem->InitializeSubsystem();
+	}
+}
 
 void UEchoGameInstance::LoadMainMenuLevel()
 {

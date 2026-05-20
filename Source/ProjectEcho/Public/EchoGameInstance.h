@@ -14,7 +14,10 @@ class PROJECTECHO_API UEchoGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 	
+public:
+	virtual void Init() override;
 protected:
+	
 	UFUNCTION(BlueprintCallable)
 	void LoadMainMenuLevel();
 	
