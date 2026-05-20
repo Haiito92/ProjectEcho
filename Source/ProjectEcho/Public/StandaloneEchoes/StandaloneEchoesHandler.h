@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "StandaloneEchoesHandler.generated.h"
 
+enum class ERecordedAction : uint8;
 struct FRecordedAction;
 class AEchoActor;
 class URecordManagerSettings;
@@ -37,7 +38,7 @@ public:
 	
 	//Play In Editor Current Key (Will Only play Transform Keys)
 	UFUNCTION(BlueprintCallable)
-	void PlayInEditor(const float& GlobalTimeKey);
+	TMap<int /*TimelineIndex*/, FRotator /*ControlRotation*/> PlayInEditor(const float& GlobalTimeKey);
 	
 	UFUNCTION(BlueprintCallable)
 	void CreateTimelineFromEcho(AEchoActor* EchoActor);
@@ -72,6 +73,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ModifyActionKeyAction(int TimelineIndex, const int& KeyIndex, const FRecordedAction& RecordedAction);
 	
+	UFUNCTION(BlueprintCallable)
+	void RecreateAllRewindActions(int TimelineIndex);
 #pragma endregion
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -98,4 +101,6 @@ protected:
 	UPROPERTY()
 	TObjectPtr<URecordManagerSettings> RecordManagerSettings = nullptr;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TMap<ERecordedAction, ERecordedAction> RewindEquivalentActions;
 };

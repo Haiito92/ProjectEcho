@@ -99,14 +99,18 @@ void AStandaloneEchoesHandler::Play(const float& PreviousTimeKey, const float& T
 	bOutHasReachedEnd = bIsInRewind ? false : !bHasNotReachedEnd;
 }
 
-void AStandaloneEchoesHandler::PlayInEditor(const float& GlobalTimeKey)
+TMap<int /*TimelineIndex*/, FRotator /*ControlRotation*/> AStandaloneEchoesHandler::PlayInEditor(const float& GlobalTimeKey)
 {
-	for (FEchoTimeline& EchoTimeline : EchoTimelines)
+	TMap<int /*TimelineIndex*/, FRotator /*ControlRotation*/> ControlRotMap;
+	for (int i = 0; i < EchoTimelines.Num(); ++i)
 	{
-		if (EchoTimeline.EchoActor == nullptr) continue;
+		if (!EchoTimelines.IsValidIndex(i)) continue;
+		if (EchoTimelines[i].EchoActor == nullptr) continue;
 		
-		EchoTimeline.PlayTransformKeys(GlobalTimeKey - EchoTimeline.StartTimeKey);
+		EchoTimelines[i].PlayTransformKeys(GlobalTimeKey - EchoTimelines[i].StartTimeKey);
+		ControlRotMap.Add(i, EchoTimelines[i].GetControlRotationOfCurrentKey(GlobalTimeKey));
 	}
+	return ControlRotMap;
 }
 
 void AStandaloneEchoesHandler::CreateTimelineFromEcho(AEchoActor* EchoActor)
@@ -246,6 +250,27 @@ void AStandaloneEchoesHandler::ModifyActionKeyAction(int TimelineIndex,  const i
 		this->Modify();
 #endif
 		EchoTimelines[TimelineIndex].ActionKeys[KeyIndex].Action = RecordedAction;
+	}
+}
+
+void AStandaloneEchoesHandler::RecreateAllRewindActions(int TimelineIndex)
+{
+	if (EchoTimelines.IsValidIndex(TimelineIndex))
+	{
+#if WITH_EDITOR
+		this->Modify();
+#endif
+		EchoTimelines[TimelineIndex].RewindActionKeys.Empty();
+		for (const FRecordActionKey& RecordActionKey : EchoTimelines[TimelineIndex].ActionKeys)
+		{
+			if (RewindEquivalentActions.Contains(RecordActionKey.Action.ActionEnum))
+			{
+				FRecordActionKey RewindKey = FRecordActionKey();
+				RewindKey.TimeKey = RecordActionKey.TimeKey;
+				RewindKey.Action = FRecordedAction(RewindEquivalentActions[RecordActionKey.Action.ActionEnum]);
+				EchoTimelines[TimelineIndex].RewindActionKeys.Add(RewindKey);
+			}
+		}
 	}
 }
 

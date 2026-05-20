@@ -88,6 +88,8 @@ struct FEchoTimeline
 	
 	void PlayTransformKeys(const float& CurrentTimeKey);
 	
+	FRotator GetControlRotationOfCurrentKey(const float& CurrentTimeKey);
+	
 	//Play First Key of Timeline and Play Given Actions (Used to restore a State)
 	void PlayFirstKey(TArray<FRecordedAction> RestoreFirstStateAction);
 	

@@ -209,6 +209,18 @@ void FEchoTimeline::PlayTransformKeys(const float& CurrentTimeKey)
 	EchoActor->SetControlRotation(FMath::Lerp(PreviousTransformKey->ControlRotation, NextTransformKey->ControlRotation, lerpValue));
 }
 
+FRotator FEchoTimeline::GetControlRotationOfCurrentKey(const float& CurrentTimeKey)
+{
+	const FRecordTransformKey* PreviousTransformKey = GetPreviousTransformKey(CurrentTimeKey);
+	const FRecordTransformKey* NextTransformKey = GetNextTransformKey(CurrentTimeKey);
+	
+	if (PreviousTransformKey == nullptr) return FRotator();
+	if (NextTransformKey == nullptr) return PreviousTransformKey->ControlRotation;
+
+	float lerpValue = (CurrentTimeKey - PreviousTransformKey->TimeKey) / (NextTransformKey->TimeKey - PreviousTransformKey->TimeKey);
+	return FMath::Lerp(PreviousTransformKey->ControlRotation, NextTransformKey->ControlRotation, lerpValue);
+}
+
 void FEchoTimeline::PlayFirstKey(TArray<FRecordedAction> RestoreFirstStateAction)
 {
 	if (!IsValid(EchoActor)) return;
