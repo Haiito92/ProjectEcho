@@ -22,9 +22,15 @@ public:
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="OptionVolumeType"))
 	float GetVolume(const OptionsVolumes& OptionVolumeType) const;
 	
+	UFUNCTION(BlueprintCallable)
+	EWindowMode::Type GetWindowMode() const;
+	
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="OptionVolumeType"))
 	void SetVolume(const OptionsVolumes& OptionVolumeType, float Volume);
 	
+	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="InWindowMode"))
+	void SetWindowMode(const EWindowMode::Type& InWindowMode);
+
 private:
 	
 	UPROPERTY()
@@ -44,4 +50,7 @@ private:
 	float SFXVolume = 1.0f;
 	UPROPERTY()
 	float VoicesVolume = 1.0f;
+	
+	UPROPERTY()
+	TEnumAsByte<EWindowMode::Type> WindowMode = EWindowMode::WindowedFullscreen;
 };

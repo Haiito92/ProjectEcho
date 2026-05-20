@@ -4,6 +4,7 @@
 #include "Options/OptionsGameInstanceSubsystem.h"
 
 #include "DataAssetDeveloperSettings.h"
+#include "GameFramework/GameUserSettings.h"
 #include "Options/OptionsSettingsData.h"
 #include "Sound/SoundSubmix.h"
 #include "Tools/Debug/EchoDebug.h"
@@ -57,6 +58,11 @@ float UOptionsGameInstanceSubsystem::GetVolume(const OptionsVolumes& OptionVolum
 			return -1.0f;
 		}
 	}
+}
+
+EWindowMode::Type UOptionsGameInstanceSubsystem::GetWindowMode() const
+{
+	return WindowMode;
 }
 
 
@@ -122,4 +128,20 @@ void UOptionsGameInstanceSubsystem::SetVolume(const OptionsVolumes& OptionVolume
 			break;
 		}
 	}
+}
+
+void UOptionsGameInstanceSubsystem::SetWindowMode(const EWindowMode::Type& InWindowMode)
+{
+	WindowMode = InWindowMode;
+	
+	UGameUserSettings* GameUserSettings = GEngine->GetGameUserSettings();
+	
+	if (!IsValid(GameUserSettings))
+	{
+		UEchoDebug::Log(EEchoSystem::Options, EEchoMessageType::Error, "Failed to set window mode: invalid GameUserSettings");
+		return;
+	}
+	
+	GameUserSettings->SetFullscreenMode(WindowMode);
+	GameUserSettings->ApplyResolutionSettings(false);
 }
