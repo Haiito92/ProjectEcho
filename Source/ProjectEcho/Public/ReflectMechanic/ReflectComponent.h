@@ -9,6 +9,11 @@
 
 class UReflectMechanicSettings;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReflectStartedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReflectStoppedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnObjectReflectedSignature);
+
+
 UCLASS(ClassGroup=(Custom), Blueprintable, BlueprintType, meta=(BlueprintSpawnableComponent))
 class PROJECTECHO_API UReflectComponent : public UActorComponent
 {
@@ -40,6 +45,15 @@ public:
 	void SetCastStartLocation(const FVector& InCastStartLocation);
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="InCastDirection"))
 	void SetCastDirection(const FVector& InCastDirection);
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnReflectStartedSignature OnReflectStarted;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnReflectStoppedSignature OnReflectStopped;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnObjectReflectedSignature OnObjectReflected;
 	
 protected:
 	UFUNCTION(BlueprintCallable)
