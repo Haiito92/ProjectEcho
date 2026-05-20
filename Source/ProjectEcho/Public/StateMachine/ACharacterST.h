@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "PlayerInterface.h"
 #include "GameFramework/Character.h"
+#include "GrabMechanic/GrabberActorInterface.h"
 #include "KillMechanic/Killable.h"
 #include "LaserMechanic/Laserizable.h"
 #include "PropulseMechanic/Propulsable.h"
@@ -22,14 +23,13 @@ class UStateMachine;
 class UEnhancedInputLocalPlayerSubsystem;
 
 UCLASS()
-class PROJECTECHO_API ACharacterST : public ACharacter, public IKillable, public IReflectable, public IPropulsable, public IRecordHandlerInterface, public IPlayerInterface, public ILaserizable
+class PROJECTECHO_API ACharacterST : public ACharacter, public IKillable, public IReflectable, public IPropulsable, public IRecordHandlerInterface, public IPlayerInterface, public ILaserizable, public IGrabberActorInterface
 {
 	GENERATED_BODY()
 
 public:
 	ACharacterST();
 	virtual void BeginPlay() override;
-public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
@@ -149,6 +149,11 @@ public:
 	
 	UFUNCTION()
 	bool ConsumeShouldRestoreReflect();
+	
+	virtual void ForceRelease_Implementation() override;
+	
+	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="InRespawnTransform"))
+	void SetRespawnTransform(const FTransform& InRespawnTransform);
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
 	UPROPERTY(BlueprintAssignable)
@@ -300,9 +305,17 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
 	
+	UPROPERTY()
 	bool bCanBeReflected = false;
+	UPROPERTY()
 	bool bCanBePropulsed = false;
 	
+	UPROPERTY()
 	bool bShouldRestoreReflect = false;
+	UPROPERTY()
 	bool bReflectInputPressed = false;
+	
+	
+	UPROPERTY()
+	FTransform RespawnTransform;
 };

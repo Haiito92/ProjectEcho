@@ -25,6 +25,8 @@ public:
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="InCastStartLocation, InCastDirection"))
 	void StartReflect(const FVector& InCastStartLocation, const FVector& InCastDirection);
 	
+	void StartReflect();
+	
 	UFUNCTION(BlueprintCallable)
 	void StopReflect();
 	
