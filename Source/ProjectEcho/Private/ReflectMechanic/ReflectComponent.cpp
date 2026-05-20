@@ -58,10 +58,9 @@ void UReflectComponent::TickComponent(float DeltaTime, enum ELevelTick TickType,
 
 void UReflectComponent::StartReflect(const FVector& InCastStartLocation, const FVector& InCastDirection)
 {
-	bIsOn = true;
-	ResetCooldownTimer();
 	SetCastStartLocation(InCastStartLocation);
 	SetCastDirection(InCastDirection);
+	StartReflect();
 }
 
 void UReflectComponent::StartReflect()
