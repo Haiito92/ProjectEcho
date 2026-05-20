@@ -87,10 +87,13 @@ struct FEchoTimeline
 	void ActivateTimeline(bool bInIsActive);
 	
 	//Called by global timeline when rewind started
-	void HandleRewindStarted(const float& CurrentTimeKey);
+	void HandleRewindStarted(const float& CurrentTimeKey, bool bIsPlayerRewind);
 	
 	//Called by global timeline when rewind is finished
-	void HandleRewindStopped(const float& CurrentTimeKey);
+	void HandleRewindStopped(const float& CurrentTimeKey, bool bIsPlayerRewind);
+		
+	//Called by global timeline when Record is started
+	void HandleRecordStarted(const float& CurrentTimeKey);
 	
 	//Called when Timeline is being Destroyed
 	void OnDestroy();
@@ -137,11 +140,14 @@ struct FGlobalTimeline
 	void DestroyTimeline(int TimelineIndex, TArray<TObjectPtr<AEchoActor>>& OutEchoActorPool);
 	
 	// Called by Record Manager when rewind started
-	void HandleRewindStarted(const float& CurrentTimeKey);
+	void HandleRewindStarted(const float& CurrentTimeKey, bool bIsPlayerRewind = false);
 	
 	// Called by Record Manager when rewind stopped
-	void HandleRewindStopped(const float& CurrentTimeKey);
-};
+	void HandleRewindStopped(const float& CurrentTimeKey, bool bIsPlayerRewind = false);
+	
+	// Called by Record Manager when record started
+	void HandleRecordStarted(const float& CurrentTimeKey);
+};	
 
 #pragma endregion
 
@@ -179,10 +185,10 @@ public:
 	void StopPlayerRewind();
 	
 	UFUNCTION()
-	void StartRewind();
+	void StartRewind(bool bIsPlayerRewind = false);
 	
 	UFUNCTION()
-	void StopRewind();
+	void StopRewind(bool bIsPlayerRewind = false);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsRecording();

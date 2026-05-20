@@ -35,8 +35,13 @@ bool UGrabbingComponent::TryGrab(const FRotator& ControlRotation)
 		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Grab, EEchoMessageType::Error,"GrabSettings not found, Can't Grab !", FColor::White, 3.f);
 		return false;
 	}
+	
+	
 	FHitResult HitResult;
-	FVector CastLocation = GetOwner()->GetActorLocation() + GrabMechanicSettings->SphereTraceBaseLocationOffset + (ControlRotation.RotateVector(FVector(GrabMechanicSettings->SphereTraceDistance, 0.f, 0.f)));
+	
+	FVector CastStartLocation = GetOwner()->GetActorLocation() + GrabMechanicSettings->SphereTraceBaseLocationOffset + (ControlRotation.RotateVector(FVector(1.f, 0.f, 0.f)));
+	FVector CastEndLocation = CastStartLocation + ControlRotation.RotateVector(FVector(GrabMechanicSettings->SphereTraceDistance, 0.f, 0.f));
+	
 	FCollisionQueryParams TraceParams = FCollisionQueryParams::DefaultQueryParam;
 	TraceParams.bTraceComplex = true;
 	//TraceParams.bTraceAsyncScene = true;
@@ -45,14 +50,15 @@ bool UGrabbingComponent::TryGrab(const FRotator& ControlRotation)
 
 	GetWorld()->SweepSingleByChannel(
 		HitResult,
-		CastLocation,
-		CastLocation,
+		CastStartLocation,
+		CastEndLocation,
 		ControlRotation.Quaternion(),
 		ECC_WorldDynamic,
 		FCollisionShape::MakeSphere(GrabMechanicSettings->SphereTraceRadius), 
 		TraceParams);
 	
-	UEchoDebug::DrawSphere(GetWorld(), EEchoSystem::Grab, CastLocation, GrabMechanicSettings->SphereTraceRadius, 12, FColor::White, 3.f);
+	UEchoDebug::DrawSphere(GetWorld(), EEchoSystem::Grab, CastStartLocation, GrabMechanicSettings->SphereTraceRadius, 12, FColor::White, 3.f);
+	UEchoDebug::DrawSphere(GetWorld(), EEchoSystem::Grab, CastEndLocation, GrabMechanicSettings->SphereTraceRadius, 12, FColor::White, 3.f);
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Grab, EEchoMessageType::Log, (HitResult.bBlockingHit ? "Try Grabbing Actor : " + HitResult.GetActor()->GetName() : "Failed to Grab at current Location"), FColor::White, 3.f);
 	
 	if (HitResult.bBlockingHit)
@@ -117,7 +123,7 @@ void UGrabbingComponent::ForceGrab(AActor* Actor)
 			GrabbedActor = Actor;
 			FAttachmentTransformRules AttachmentTransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
 			GrabbedActor->AttachToComponent(this, AttachmentTransformRules);
-			IGrabbableInterface::Execute_OnObjectForceGrabbed(GrabbedActor);
+			IGrabbableInterface::Execute_OnObjectForceGrabbed(GrabbedActor, this->GetOwner());
 		}
 	}
 }
@@ -156,7 +162,7 @@ void UGrabbingComponent::TryForceGrabHeldCube()
 			IGrabbableInterface::Execute_OnObjectBeforeForceGrabbed(GrabbedActor);
 			FAttachmentTransformRules AttachmentTransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
 			GrabbedActor->AttachToComponent(this, AttachmentTransformRules);
-			IGrabbableInterface::Execute_OnObjectForceGrabbed(GrabbedActor);
+			IGrabbableInterface::Execute_OnObjectForceGrabbed(GrabbedActor, this->GetOwner());
 		}
 	}
 	else
