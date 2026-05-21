@@ -43,6 +43,7 @@ void UState::Enter()
 	Character->OnIncrementSlot.AddDynamic(this, &UState::OnIncrementSlot);
 	Character->OnDecrementSlot.AddDynamic(this, &UState::OnDecrementSlot);
 	Character->OnDeath.AddDynamic(this, &UState::OnDeath);
+	Character->OnDeathInRecord.AddDynamic(this, &UState::OnDeathInRecord);
 	Character->OnInteract.AddDynamic(this, &UState::OnInteract);
 	Character->OnStartPropulse.AddDynamic(this, &UState::OnPropulseInputStarted);
 	Character->OnStopPropulse.AddDynamic(this, &UState::OnPropulseInputStopped);
@@ -70,6 +71,11 @@ void UState::Tick(float DeltaTime)
 	}
 }
 
+void UState::OnDeathInRecord()
+{
+	StopRecord();
+}
+
 void UState::Exit()
 {
 	Character->OnGrabbingStarted.RemoveDynamic(this, &UState::OnGrabbingStarted);
@@ -79,6 +85,7 @@ void UState::Exit()
 	Character->OnIncrementSlot.RemoveDynamic(this, &UState::OnIncrementSlot);
 	Character->OnDecrementSlot.RemoveDynamic(this, &UState::OnDecrementSlot);
 	Character->OnDeath.RemoveDynamic(this, &UState::OnDeath);
+	Character->OnDeathInRecord.RemoveDynamic(this, &UState::OnDeathInRecord);
 	Character->OnInteract.RemoveDynamic(this, &UState::OnInteract);
 	Character->OnStartPropulse.RemoveDynamic(this, &UState::OnPropulseInputStarted);
 	Character->OnStopPropulse.RemoveDynamic(this, &UState::OnPropulseInputStopped);
@@ -188,25 +195,40 @@ void UState::OnRecord()
 	if (CanUseRecord())
 	{
 		if (RecordManagerSubsystem->IsRecording())
-			RecordManagerSubsystem->StopRecord();
+			StopRecord();
 		else
 		{
-			Character->OnStartRecord.Broadcast();
-
-			//Actions Played only on first Replay
-			TArray<FRecordedAction> RestoreStateActions;
-
-			//Actions Played at the beginning of each replay
-			TArray<FRecordedAction> FirstActions;
-
-			//Force Grab to Restore Grab State
-			if (GrabbingComponent->IsGrabbing()) RestoreStateActions.Add(FRecordedAction(ERecordedAction::ForceGrab));
-			if (IsValid(ReflectComponent) && ReflectComponent->IsOn()) FirstActions.Add(
-				FRecordedAction(ERecordedAction::StartReflect));
-
-			RecordManagerSubsystem->StartRecord(Character, RestoreStateActions, FirstActions);
+			StartRecord();
 		}
 	}
+}
+
+void UState::StartRecord()
+{
+	Character->OnStartRecord.Broadcast();
+
+	//Actions Played only on first Replay
+	TArray<FRecordedAction> RestoreStateActions;
+
+	//Actions Played at the beginning of each replay
+	TArray<FRecordedAction> FirstActions;
+
+	//Force Grab to Restore Grab State
+	if (GrabbingComponent->IsGrabbing()) RestoreStateActions.Add(FRecordedAction(ERecordedAction::ForceGrab));
+	if (IsValid(ReflectComponent) && ReflectComponent->IsOn())
+	{
+		Character->OnValidReflect.Broadcast();
+		FirstActions.Add(
+		FRecordedAction(ERecordedAction::StartReflect));
+	}
+		
+
+	RecordManagerSubsystem->StartRecord(Character, RestoreStateActions, FirstActions);
+}
+
+void UState::StopRecord()
+{
+	RecordManagerSubsystem->StopRecord();
 }
 
 void UState::OnIncrementSlot()

@@ -86,6 +86,12 @@ protected:
 	void OnRecord();
 	
 	UFUNCTION()
+	void StartRecord();
+	
+	UFUNCTION()
+	void StopRecord();
+	
+	UFUNCTION()
 	void OnIncrementSlot();
 	
 	UFUNCTION()
@@ -96,6 +102,9 @@ protected:
 	
 	UFUNCTION()
 	void OnDeath();
+	
+	UFUNCTION()
+	void OnDeathInRecord();
 	
 	UFUNCTION()
 	void OnInteract();
