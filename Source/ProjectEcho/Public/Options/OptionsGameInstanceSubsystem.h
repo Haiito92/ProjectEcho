@@ -26,20 +26,33 @@ public:
 	EWindowMode::Type GetWindowMode() const;
 	UFUNCTION(BlueprintCallable)
 	FString GetWindowModeAsString() const;
-	
 	UFUNCTION(BlueprintCallable)
 	const TMap<FString, TEnumAsByte<EWindowMode::Type>>& GetAvailableWindowModes() const;
 	
+	UFUNCTION(BlueprintCallable)
+	const FIntPoint& GetScreenResolution() const;
+	UFUNCTION(BlueprintCallable)
+	FString GetScreenResolutionAsString() const;
+	UFUNCTION(BlueprintCallable)
+	const TMap<FString, FIntPoint>& GetAvailableResolutions() const;
+	
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="OptionVolumeType"))
-	void SetVolume(const OptionsVolumes& OptionVolumeType, float Volume);
-	
+	bool SetVolume(const OptionsVolumes& OptionVolumeType, float Volume);
 	
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="InWindowMode"))
-	void SetWindowModeByString(const FString& InWindowMode);
+	bool SetWindowModeByString(const FString& InWindowMode);
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="InWindowMode"))
-	void SetWindowMode(const EWindowMode::Type& InWindowMode);
+	bool SetWindowMode(const EWindowMode::Type& InWindowMode);
+	
+	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="InResolution"))
+	bool SetResolutionByString(const FString& InResolution);
+	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="InResolution"))
+	bool SetResolution(const FIntPoint& InResolution);
 
 private:
+	UFUNCTION()
+	FString IntPointToString(const FIntPoint& InIntPoint) const;
+	
 	UPROPERTY()
 	TObjectPtr<USoundSubmix> MasterSubmix;
 	UPROPERTY()
@@ -61,10 +74,12 @@ private:
 	UPROPERTY()
 	TEnumAsByte<EWindowMode::Type> WindowMode = EWindowMode::WindowedFullscreen;
 	UPROPERTY()
-	TMap<FString, TEnumAsByte<EWindowMode::Type>> WindowModesMap;
+	TMap<FString, TEnumAsByte<EWindowMode::Type>> AvailableWindowModes;
 	
 	UPROPERTY()
 	FIntPoint ScreenResolution = FIntPoint::ZeroValue;
+	UPROPERTY()
+	TMap<FString, FIntPoint> AvailableResolutions;
 	
 	UPROPERTY()
 	TObjectPtr<UGameUserSettings> GameUserSettings;

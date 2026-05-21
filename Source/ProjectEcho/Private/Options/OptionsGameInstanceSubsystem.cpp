@@ -42,12 +42,20 @@ void UOptionsGameInstanceSubsystem::InitializeSubsystem()
 	
 	WindowMode = GameUserSettings->GetFullscreenMode();
 	
-	WindowModesMap.Add(LexToString(EWindowMode::Windowed), EWindowMode::Windowed);
-	WindowModesMap.Add(LexToString(EWindowMode::WindowedFullscreen), EWindowMode::WindowedFullscreen);
-	WindowModesMap.Add(LexToString(EWindowMode::Fullscreen), EWindowMode::Fullscreen);
+	AvailableWindowModes.Add(LexToString(EWindowMode::Windowed), EWindowMode::Windowed);
+	AvailableWindowModes.Add(LexToString(EWindowMode::WindowedFullscreen), EWindowMode::WindowedFullscreen);
+	AvailableWindowModes.Add(LexToString(EWindowMode::Fullscreen), EWindowMode::Fullscreen);
 	
 	ScreenResolution = GameUserSettings->GetScreenResolution();
 	
+	FScreenResolutionArray Resolutions;
+	RHIGetAvailableResolutions(Resolutions, true);
+	
+	for (const FScreenResolutionRHI& ResolutionRHI : Resolutions)
+	{
+		FIntPoint Resolution(ResolutionRHI.Width, ResolutionRHI.Height);
+		AvailableResolutions.Add(IntPointToString(Resolution), Resolution);
+	}
 }
 
 float UOptionsGameInstanceSubsystem::GetVolume(const OptionsVolumes& OptionVolumeType) const
@@ -88,13 +96,28 @@ FString UOptionsGameInstanceSubsystem::GetWindowModeAsString() const
 	return FString(LexToString(GetWindowMode())); 
 }
 
+const FIntPoint& UOptionsGameInstanceSubsystem::GetScreenResolution() const
+{
+	return ScreenResolution;
+}
+
+FString UOptionsGameInstanceSubsystem::GetScreenResolutionAsString() const
+{
+	return IntPointToString(GetScreenResolution());
+}
+
+const TMap<FString, FIntPoint>& UOptionsGameInstanceSubsystem::GetAvailableResolutions() const
+{
+	return AvailableResolutions;
+}
+
 const TMap<FString, TEnumAsByte<EWindowMode::Type>>& UOptionsGameInstanceSubsystem::GetAvailableWindowModes() const
 {
-	return WindowModesMap;
+	return AvailableWindowModes;
 }
 
 
-void UOptionsGameInstanceSubsystem::SetVolume(const OptionsVolumes& OptionVolumeType, float Volume)
+bool UOptionsGameInstanceSubsystem::SetVolume(const OptionsVolumes& OptionVolumeType, float Volume)
 {
 	float ClampedVolume = FMath::Clamp(Volume, 0.0f, 1.0f);
 
@@ -102,7 +125,7 @@ void UOptionsGameInstanceSubsystem::SetVolume(const OptionsVolumes& OptionVolume
 	if (!IsValid(World))
 	{
 		UEchoDebug::Log(EEchoSystem::Options, EEchoMessageType::Error, "Failed to set volume: invalid World");
-		return;
+		return false;
 	}
 	
 	switch (OptionVolumeType)
@@ -156,31 +179,68 @@ void UOptionsGameInstanceSubsystem::SetVolume(const OptionsVolumes& OptionVolume
 			break;
 		}
 	}
+	
+	return true;
 }
 
-void UOptionsGameInstanceSubsystem::SetWindowModeByString(const FString& InWindowMode)
+bool UOptionsGameInstanceSubsystem::SetWindowModeByString(const FString& InWindowMode)
 {
-	TEnumAsByte<EWindowMode::Type>* FoundWindowMode = WindowModesMap.Find(InWindowMode);
+	TEnumAsByte<EWindowMode::Type>* FoundWindowMode = AvailableWindowModes.Find(InWindowMode);
 	
 	if (!FoundWindowMode)
 	{
 		UEchoDebug::Log(EEchoSystem::Options, EEchoMessageType::Error, "Failed to set window mode by string: invalid string");
-		return;
+		return false;
 	}
 	
-	SetWindowMode(FoundWindowMode->GetValue());
+	return SetWindowMode(FoundWindowMode->GetValue());
 }
 
-void UOptionsGameInstanceSubsystem::SetWindowMode(const EWindowMode::Type& InWindowMode)
+bool UOptionsGameInstanceSubsystem::SetWindowMode(const EWindowMode::Type& InWindowMode)
 {
-	WindowMode = InWindowMode;
-	
 	if (!IsValid(GameUserSettings))
 	{
 		UEchoDebug::Log(EEchoSystem::Options, EEchoMessageType::Error, "Failed to set window mode: invalid GameUserSettings");
-		return;
+		return false;
 	}
+	WindowMode = InWindowMode;
 	
 	GameUserSettings->SetFullscreenMode(WindowMode);
 	GameUserSettings->ApplyResolutionSettings(false);
+	
+	return true;
+}
+
+bool UOptionsGameInstanceSubsystem::SetResolutionByString(const FString& InResolution)
+{
+	FIntPoint* FoundResolution = AvailableResolutions.Find(InResolution);
+	
+	if (!FoundResolution)
+	{
+		UEchoDebug::Log(EEchoSystem::Options, EEchoMessageType::Error, "Failed to set resolution by string: invalid string");
+		return false;
+	}
+	
+	return SetResolution(*FoundResolution);
+}
+
+bool UOptionsGameInstanceSubsystem::SetResolution(const FIntPoint& InResolution)
+{
+	if (!IsValid(GameUserSettings))
+	{
+		UEchoDebug::Log(EEchoSystem::Options, EEchoMessageType::Error, "Failed to set resolution: invalid GameUserSettings");
+		return false;
+	}
+	
+	ScreenResolution = InResolution;
+	
+	GameUserSettings->SetScreenResolution(ScreenResolution);
+	GameUserSettings->ApplyResolutionSettings(false);
+	
+	return true;
+}
+
+FString UOptionsGameInstanceSubsystem::IntPointToString(const FIntPoint& InIntPoint) const
+{
+	return FString::FromInt(InIntPoint.X) + "x" + FString::FromInt(InIntPoint.Y);
 }
