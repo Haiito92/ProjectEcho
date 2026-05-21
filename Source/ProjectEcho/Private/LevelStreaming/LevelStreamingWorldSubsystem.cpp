@@ -22,7 +22,7 @@ void ULevelStreamingWorldSubsystem::InitializeLevelStreamingSubsystem()
 		StreamingLevelInfo.Path = StreamLevel->GetWorldAssetPackageName();
 
 		FString LevelNameString = FPaths::GetBaseFilename(StreamingLevelInfo.Path);
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Add stream level id for name: " + LevelNameString, FColor::Orange, 3.0f);
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::LevelStreaming, EEchoMessageType::Log, "Add stream level id for name: " + LevelNameString, FColor::Orange, 3.0f);
 		LevelNameString.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
 		
 		StreamingLevelInfo.ShortName = FName(LevelNameString);
@@ -33,7 +33,7 @@ void ULevelStreamingWorldSubsystem::InitializeLevelStreamingSubsystem()
 
 void ULevelStreamingWorldSubsystem::LoadStreamLevel(const FName& LevelName)
 {
-	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Try Load Stream Level", FColor::Magenta, 3.0f);
+	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::LevelStreaming, EEchoMessageType::Log, "Try Load Stream Level", FColor::Magenta, 3.0f);
 	
 	FStreamingLevelInfo* LoadedStreamLevelInfo = StreamLevelInfos.FindByPredicate([&](const FStreamingLevelInfo& StreamLevelInfo)
 	{
@@ -41,7 +41,7 @@ void ULevelStreamingWorldSubsystem::LoadStreamLevel(const FName& LevelName)
 	});
 	if (!LoadedStreamLevelInfo)
 	{
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Can't load stream level: LevelStreamingInfo invalid", FColor::Red, 3.0f);
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::LevelStreaming, EEchoMessageType::Log, "Can't load stream level: LevelStreamingInfo invalid", FColor::Red, 3.0f);
 		return;
 	}
 	
@@ -56,7 +56,7 @@ void ULevelStreamingWorldSubsystem::LoadStreamLevel(const FName& LevelName)
 
 void ULevelStreamingWorldSubsystem::UnloadStreamLevel(const FName& LevelName)
 {
-	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Try Unload Stream Level", FColor::Magenta, 3.0f);
+	UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::LevelStreaming, EEchoMessageType::Log, "Try Unload Stream Level", FColor::Magenta, 3.0f);
 	
 	FStreamingLevelInfo* LoadedStreamLevelInfo = StreamLevelInfos.FindByPredicate([&](const FStreamingLevelInfo& StreamLevelInfo)
 	{
@@ -78,7 +78,7 @@ void ULevelStreamingWorldSubsystem::UnloadStreamLevel(const FName& LevelName)
 
 	if (!StreamLevel)
 	{
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Can't unload stream level: LevelStreaming invalid", FColor::Red, 3.0f);
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::LevelStreaming, EEchoMessageType::Log, "Can't unload stream level: LevelStreaming invalid", FColor::Red, 3.0f);
 		return;
 	}
 
@@ -86,7 +86,7 @@ void ULevelStreamingWorldSubsystem::UnloadStreamLevel(const FName& LevelName)
 
 	if (!Level)
 	{
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Can't unload stream level: Level invalid", FColor::Red, 3.0f);
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::LevelStreaming, EEchoMessageType::Log, "Can't unload stream level: Level invalid", FColor::Red, 3.0f);
 		return;
 	}
 
@@ -121,7 +121,7 @@ void ULevelStreamingWorldSubsystem::OnStreamLevelLoaded(int32 Linkage)
 
 	if (!StreamLevel)
 	{
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "On load stream level: LevelStreaming invalid", FColor::Red, 3.0f);
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::LevelStreaming, EEchoMessageType::Log, "On load stream level: LevelStreaming invalid", FColor::Red, 3.0f);
 		return;
 	}
 
@@ -129,7 +129,7 @@ void ULevelStreamingWorldSubsystem::OnStreamLevelLoaded(int32 Linkage)
 
 	if (!Level)
 	{
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "On load stream level: Level invalid", FColor::Red, 3.0f);
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::LevelStreaming, EEchoMessageType::Log, "On load stream level: Level invalid", FColor::Red, 3.0f);
 		return;
 	}
 

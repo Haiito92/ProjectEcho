@@ -6,6 +6,7 @@
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
+#include "LevelStreaming/LevelStreamingWorldSubsystem.h"
 #include "RecordManager/EchoActor.h"
 #include "RecordManager/RecordableComponent.h"
 #include "RecordManager/RecordableInterface.h"
@@ -399,7 +400,6 @@ TStatId URecordManagerSubsystem::GetStatId() const
 
 void URecordManagerSubsystem::InitRecordManager(const int& NbTimelineSlot)
 {
-	
 	CurrentTimeKey = 0.0f;
 	GlobalTimeline.Initiate(NbTimelineSlot);
 	RecordManagerSettings = GetDefault<UDataAssetDeveloperSettings>()->RecordManagerSettings.LoadSynchronous();
@@ -436,6 +436,15 @@ void URecordManagerSubsystem::InitRecordManager(const int& NbTimelineSlot)
 	}
 	
 	UGameplayStatics::GetAllActorsWithInterface(GetWorld(), URecordListener::StaticClass(), RecordListeners);
+	
+	//Bind to LevelStreaming Functions : 
+
+	ULevelStreamingWorldSubsystem* LevelStreamingWorldSubsystem = GetWorld()->GetSubsystem<ULevelStreamingWorldSubsystem>();
+	if (LevelStreamingWorldSubsystem != nullptr)
+	{
+		LevelStreamingWorldSubsystem->StreamLevelLoaded.AddDynamic(this, &URecordManagerSubsystem::OnNewLevelLoaded);
+		LevelStreamingWorldSubsystem->StreamLevelUnloaded.AddDynamic(this, &URecordManagerSubsystem::OnLevelUnloaded);
+	}
 }
 
 void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<FRecordedAction>& RestoreStateAction,  const TArray<FRecordedAction>& FirstActions)
@@ -674,6 +683,51 @@ FTimelineUIInfo URecordManagerSubsystem::GetRecordingTimelineUIInfo()
 	}
 	
 	return Info;
+}
+
+void URecordManagerSubsystem::OnNewLevelLoaded(const TArray<AActor*>& Actors)
+{
+	for (AActor* Actor : Actors)
+	{
+		if (Actor->Implements<URecordableInterface>())
+		{
+			if (URecordableComponent* RecordableComponent = Actor->GetComponentByClass<URecordableComponent>(); RecordableComponent != nullptr)
+			{
+				UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::LevelStreaming, EEchoMessageType::Log, "Added Recordable to List : " + RecordableComponent->GetOwner()->GetName(), FColor::Magenta, 3.0f);
+				RecordableComponents.Add(RecordableComponent);
+				RecordableComponent->OnInteracted.AddDynamic(this, &URecordManagerSubsystem::OnRecordableInteractedWith);
+			}
+		}
+		if (Actor->Implements<URecordListener>())
+		{
+			UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::LevelStreaming, EEchoMessageType::Log, "Added RecordListener to List : " + Actor->GetName(), FColor::Magenta, 3.0f);
+			RecordListeners.Add(Actor);
+		}
+	}
+}
+
+void URecordManagerSubsystem::OnLevelUnloaded(const TArray<AActor*>& Actors)
+{
+	//Removing Record Listeners from Unloaded Level
+	RecordListeners.RemoveAll([Actors](const AActor* RecordListener)
+	{
+		return Actors.Contains(RecordListener);
+	});
+	
+	//Removing Recordable Components from Unloaded Level
+	for (URecordableComponent* Recordable : RecordableComponents)
+	{
+		if (IsValid(Recordable) && Actors.Contains(Recordable->GetOwner()))
+		{
+			Recordable->StopRecording(true);
+			Recordable->OnInteracted.RemoveDynamic(this, &URecordManagerSubsystem::OnRecordableInteractedWith);
+		}
+	}
+	
+	RecordableComponents.RemoveAll([Actors](const URecordableComponent* RecordableComponent)
+	{
+		return !IsValid(RecordableComponent) || Actors.Contains(RecordableComponent->GetOwner());
+	});
 }
 
 void URecordManagerSubsystem::Tick(float DeltaTime)

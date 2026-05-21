@@ -286,6 +286,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FTimelineUIInfo GetRecordingTimelineUIInfo();
 	
+	//Level Streaming Functions 
+	
+	UFUNCTION()
+	void OnNewLevelLoaded(const TArray<AActor*>& Actors);
+	
+	UFUNCTION()
+	void OnLevelUnloaded(const TArray<AActor*>& Actors);
+	
 private:
 	virtual void Tick(float DeltaTime) override;
 	
