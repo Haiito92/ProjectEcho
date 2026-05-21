@@ -3,9 +3,11 @@
 
 #include "DataAssetDeveloperSettings.h"
 #include "EchoSystem.h"
+#include "ProjectEcho.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
+#include "LevelStreaming/LevelStreamingWorldSubsystem.h"
 #include "RecordManager/EchoActor.h"
 #include "RecordManager/RecordableComponent.h"
 #include "RecordManager/RecordableInterface.h"
@@ -19,7 +21,7 @@ const FRecordTransformKey* FEchoTimeline::GetNextTransformKey(const float& TimeK
 {
 	for (const FRecordTransformKey& TransformKey : TransformKeys)
 	{
-		if (TransformKey.TimeKey >= TimeKey)
+		if (TransformKey.TimeKey > TimeKey)
 		{
 			return &TransformKey;
 		}
@@ -44,8 +46,9 @@ const FRecordTransformKey* FEchoTimeline::GetPreviousTransformKey(const float& T
 	return key;
 }
 
-const float& FEchoTimeline::GetLastTimeKey() const
+float FEchoTimeline::GetLastTimeKey() const
 {
+	if (TransformKeys.IsEmpty()) return 0;
 	return TransformKeys[TransformKeys.Num() - 1].TimeKey;
 }
 
@@ -104,6 +107,39 @@ void FEchoTimeline::RecordTransformKey(AActor* RecordedActor, const float& Curre
 	});
 }
 
+void FEchoTimeline::ReplaceTransformKey(AActor* RecordedActor, const float& CurrentTimeKey, bool bRecordIfNotFound, const FRotator* OverrideControlRotation)
+{
+	FRecordTransformKey* FoundTransformKey = TransformKeys.FindByPredicate([CurrentTimeKey](const FRecordTransformKey& TransformKey)
+	{
+		return TransformKey.TimeKey == CurrentTimeKey;
+	});
+	if (FoundTransformKey == nullptr)
+	{
+		if (bRecordIfNotFound) RecordTransformKey(RecordedActor, CurrentTimeKey);
+		return;
+	}
+	FoundTransformKey->Position = RecordedActor->GetActorLocation();
+	FoundTransformKey->Rotation = RecordedActor->GetActorRotation();
+	FoundTransformKey->Scale = RecordedActor->GetActorScale();
+	if (OverrideControlRotation != nullptr)
+	{
+		FoundTransformKey->ControlRotation = *OverrideControlRotation;
+	}
+	else if (RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass()))
+	{
+		FoundTransformKey->ControlRotation = IRecordHandlerInterface::Execute_GetToRecordControlRotation(RecordedActor);
+	}
+}
+
+bool FEchoTimeline::HasTransformKey(const float& CurrentTimeKey) const
+{
+	const FRecordTransformKey* FoundTransformKey = TransformKeys.FindByPredicate([CurrentTimeKey](const FRecordTransformKey& TransformKey)
+	{
+		return TransformKey.TimeKey == CurrentTimeKey;
+	});
+	return FoundTransformKey != nullptr;
+}
+
 void FEchoTimeline::RecordActionKey(AActor* RecordedActor, const float& CurrentTimeKey)
 {
 	if (!RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass())) return;
@@ -136,17 +172,7 @@ void FEchoTimeline::PlayReplay(const float& PreviousKey,const float& CurrentTime
 	if (!IsValid(EchoActor)) return;
 	if (GetLastTimeKey() < CurrentTimeKey) return;
 	
-	//Play Transform Key (Lerp between two closest Keys)
-	const FRecordTransformKey* PreviousTransformKey = GetPreviousTransformKey(CurrentTimeKey);
-	const FRecordTransformKey* NextTransformKey = GetNextTransformKey(CurrentTimeKey);
-	if (NextTransformKey == nullptr || PreviousTransformKey == nullptr) return;
-	
-	//Place Actor according to previous and next TransformKey 
-	float lerpValue = (CurrentTimeKey - PreviousTransformKey->TimeKey) / (NextTransformKey->TimeKey - PreviousTransformKey->TimeKey);
-	EchoActor->SetActorLocation(FMath::Lerp(PreviousTransformKey->Position, NextTransformKey->Position, lerpValue));
-	EchoActor->SetActorRotation(FMath::Lerp(PreviousTransformKey->Rotation, NextTransformKey->Rotation, lerpValue));
-	EchoActor->SetActorScale3D(FMath::Lerp(PreviousTransformKey->Scale, NextTransformKey->Scale, lerpValue));
-	EchoActor->SetControlRotation(FMath::Lerp(PreviousTransformKey->ControlRotation, NextTransformKey->ControlRotation, lerpValue));
+	PlayTransformKeys(CurrentTimeKey);
 	
 	//Play Action Keys
 	TArray<FRecordActionKey> CurrentActionKeys;
@@ -158,6 +184,41 @@ void FEchoTimeline::PlayReplay(const float& PreviousKey,const float& CurrentTime
 			EchoActor->HandleActionKey(ActionKey.Action);
 		}
 	}
+}
+
+void FEchoTimeline::PlayTransformKeys(const float& CurrentTimeKey)
+{
+	//Play Transform Key (Lerp between two closest Keys)
+	const FRecordTransformKey* PreviousTransformKey = GetPreviousTransformKey(CurrentTimeKey);
+	const FRecordTransformKey* NextTransformKey = GetNextTransformKey(CurrentTimeKey);
+	if (PreviousTransformKey == nullptr) return;
+	if (NextTransformKey == nullptr)
+	{
+		EchoActor->SetActorLocation(PreviousTransformKey->Position);
+		EchoActor->SetActorRotation(PreviousTransformKey->Rotation);
+		EchoActor->SetActorScale3D(PreviousTransformKey->Scale);
+		EchoActor->SetControlRotation(PreviousTransformKey->ControlRotation);
+		return;
+	};
+	
+	//Place Actor according to previous and next TransformKey 
+	float lerpValue = (CurrentTimeKey - PreviousTransformKey->TimeKey) / (NextTransformKey->TimeKey - PreviousTransformKey->TimeKey);
+	EchoActor->SetActorLocation(FMath::Lerp(PreviousTransformKey->Position, NextTransformKey->Position, lerpValue));
+	EchoActor->SetActorRotation(FMath::Lerp(PreviousTransformKey->Rotation, NextTransformKey->Rotation, lerpValue));
+	EchoActor->SetActorScale3D(FMath::Lerp(PreviousTransformKey->Scale, NextTransformKey->Scale, lerpValue));
+	EchoActor->SetControlRotation(FMath::Lerp(PreviousTransformKey->ControlRotation, NextTransformKey->ControlRotation, lerpValue));
+}
+
+FRotator FEchoTimeline::GetControlRotationOfCurrentKey(const float& CurrentTimeKey)
+{
+	const FRecordTransformKey* PreviousTransformKey = GetPreviousTransformKey(CurrentTimeKey);
+	const FRecordTransformKey* NextTransformKey = GetNextTransformKey(CurrentTimeKey);
+	
+	if (PreviousTransformKey == nullptr) return FRotator();
+	if (NextTransformKey == nullptr) return PreviousTransformKey->ControlRotation;
+
+	float lerpValue = (CurrentTimeKey - PreviousTransformKey->TimeKey) / (NextTransformKey->TimeKey - PreviousTransformKey->TimeKey);
+	return FMath::Lerp(PreviousTransformKey->ControlRotation, NextTransformKey->ControlRotation, lerpValue);
 }
 
 void FEchoTimeline::PlayFirstKey(TArray<FRecordedAction> RestoreFirstStateAction)
@@ -399,7 +460,6 @@ TStatId URecordManagerSubsystem::GetStatId() const
 
 void URecordManagerSubsystem::InitRecordManager(const int& NbTimelineSlot)
 {
-	
 	CurrentTimeKey = 0.0f;
 	GlobalTimeline.Initiate(NbTimelineSlot);
 	RecordManagerSettings = GetDefault<UDataAssetDeveloperSettings>()->RecordManagerSettings.LoadSynchronous();
@@ -436,6 +496,15 @@ void URecordManagerSubsystem::InitRecordManager(const int& NbTimelineSlot)
 	}
 	
 	UGameplayStatics::GetAllActorsWithInterface(GetWorld(), URecordListener::StaticClass(), RecordListeners);
+	
+	//Bind to LevelStreaming Functions : 
+
+	ULevelStreamingWorldSubsystem* LevelStreamingWorldSubsystem = GetWorld()->GetSubsystem<ULevelStreamingWorldSubsystem>();
+	if (LevelStreamingWorldSubsystem != nullptr)
+	{
+		LevelStreamingWorldSubsystem->StreamLevelLoaded.AddDynamic(this, &URecordManagerSubsystem::OnNewLevelLoaded);
+		LevelStreamingWorldSubsystem->StreamLevelUnloaded.AddDynamic(this, &URecordManagerSubsystem::OnLevelUnloaded);
+	}
 }
 
 void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<FRecordedAction>& RestoreStateAction,  const TArray<FRecordedAction>& FirstActions)
@@ -674,6 +743,51 @@ FTimelineUIInfo URecordManagerSubsystem::GetRecordingTimelineUIInfo()
 	}
 	
 	return Info;
+}
+
+void URecordManagerSubsystem::OnNewLevelLoaded(const TArray<AActor*>& Actors)
+{
+	for (AActor* Actor : Actors)
+	{
+		if (Actor->Implements<URecordableInterface>())
+		{
+			if (URecordableComponent* RecordableComponent = Actor->GetComponentByClass<URecordableComponent>(); RecordableComponent != nullptr)
+			{
+				UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::LevelStreaming, EEchoMessageType::Log, "Added Recordable to List : " + RecordableComponent->GetOwner()->GetName(), FColor::Magenta, 3.0f);
+				RecordableComponents.Add(RecordableComponent);
+				RecordableComponent->OnInteracted.AddDynamic(this, &URecordManagerSubsystem::OnRecordableInteractedWith);
+			}
+		}
+		if (Actor->Implements<URecordListener>())
+		{
+			UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::LevelStreaming, EEchoMessageType::Log, "Added RecordListener to List : " + Actor->GetName(), FColor::Magenta, 3.0f);
+			RecordListeners.Add(Actor);
+		}
+	}
+}
+
+void URecordManagerSubsystem::OnLevelUnloaded(const TArray<AActor*>& Actors)
+{
+	//Removing Record Listeners from Unloaded Level
+	RecordListeners.RemoveAll([Actors](const AActor* RecordListener)
+	{
+		return Actors.Contains(RecordListener);
+	});
+	
+	//Removing Recordable Components from Unloaded Level
+	for (URecordableComponent* Recordable : RecordableComponents)
+	{
+		if (IsValid(Recordable) && Actors.Contains(Recordable->GetOwner()))
+		{
+			Recordable->StopRecording(true);
+			Recordable->OnInteracted.RemoveDynamic(this, &URecordManagerSubsystem::OnRecordableInteractedWith);
+		}
+	}
+	
+	RecordableComponents.RemoveAll([Actors](const URecordableComponent* RecordableComponent)
+	{
+		return !IsValid(RecordableComponent) || Actors.Contains(RecordableComponent->GetOwner());
+	});
 }
 
 void URecordManagerSubsystem::Tick(float DeltaTime)

@@ -47,6 +47,7 @@ protected:
 	virtual void BeginPlay() override;
 	
 public:
+	UFUNCTION()
 	void HandleActionKey(const FRecordedAction& Action);
 	
 	virtual void ForceRelease_Implementation() override;
@@ -78,6 +79,10 @@ public:
 	
 	UFUNCTION()
 	virtual void Laserize_Implementation() override;
+	
+	//Called to Get Control Rotation
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, BlueprintPure)
+	FRotator GetEchoControlRotation();
 	
 protected:
 	UFUNCTION(BlueprintImplementableEvent)

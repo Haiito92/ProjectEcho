@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "StandaloneEchoesHandler.generated.h"
 
+enum class ERecordedAction : uint8;
+struct FRecordedAction;
 class AEchoActor;
 class URecordManagerSettings;
 struct FEchoTimeline;
@@ -34,16 +36,59 @@ public:
 	UFUNCTION()
 	void Play(const float& PreviousTimeKey, const float& TimeKey, bool bIsInRewind, bool& bOutHasReachedEnd);
 	
+	//Play In Editor Current Key (Will Only play Transform Keys)
+	UFUNCTION(BlueprintCallable)
+	TMap<int /*TimelineIndex*/, FRotator /*ControlRotation*/> PlayInEditor(const float& GlobalTimeKey);
+	
 	UFUNCTION(BlueprintCallable)
 	void CreateTimelineFromEcho(AEchoActor* EchoActor);
 	
 	UFUNCTION(BlueprintCallable)
 	int GetTimelineIndexFromEcho(AEchoActor* EchoActor);
 	
-protected:
+#pragma region TransformKey
+	
+	UFUNCTION(BlueprintCallable)
+	int CreateTransformKey(int TimelineIndex, const float& LocalTimeKey);
+	
+	UFUNCTION(BlueprintCallable)
+	void ReplaceTransformKey(int TimelineIndex, const float& LocalTimeKey, const FRotator& ControlRotation, bool bRecordIfNotFound = false);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool HasTransformKey(int TimelineIndex, const float& LocalTimeKey);
+	
+	UFUNCTION(BlueprintCallable)
+	int ModifyTransformKeyTimeKey(int TimelineIndex, const float& TimeKey, const float& NewTimeKey);
+	
+#pragma endregion
+	
+#pragma region Action
+	
+	UFUNCTION(BlueprintCallable)
+	int CreateActionKey(int TimelineIndex, const float& LocalTimeKey, const FRecordedAction& RecordedAction);
+	
+	UFUNCTION(BlueprintCallable)
+	int ModifyActionKeyTimeKey(int TimelineIndex, const int& KeyIndex, const float& NewTimeKey);
+	
+	UFUNCTION(BlueprintCallable)
+	void ModifyActionKeyAction(int TimelineIndex, const int& KeyIndex, const FRecordedAction& RecordedAction);
+	
+	UFUNCTION(BlueprintCallable)
+	void RecreateAllRewindActions(int TimelineIndex);
+#pragma endregion
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	float GetTimelinesLength();
+	
+	//Tool Setter Functions
+	
+	UFUNCTION(BlueprintCallable)
+	void SetStartTimeKey(int TimelineIndex, float StartTimeKey);
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FEchoTimeline> EchoTimelines;
 	
+protected:
 	UPROPERTY(BlueprintReadOnly)
 	float CurrentTimeKey = 0.0f;
 	
@@ -56,6 +101,6 @@ protected:
 	UPROPERTY()
 	TObjectPtr<URecordManagerSettings> RecordManagerSettings = nullptr;
 	
-private:
-	float GetTimelinesLength();
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TMap<ERecordedAction, ERecordedAction> RewindEquivalentActions;
 };
