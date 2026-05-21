@@ -31,6 +31,22 @@ void UOptionsGameInstanceSubsystem::InitializeSubsystem()
 	MusicSubmix = OptionsSettingsData->MusicSubmix;
 	SFXSubmix = OptionsSettingsData->SFXSubmix;
 	VoicesSubmix = OptionsSettingsData->VoicesSubmix;
+	
+	GameUserSettings = GEngine->GetGameUserSettings();
+	
+	if (!IsValid(GameUserSettings))
+	{
+		UEchoDebug::Log(EEchoSystem::Options, EEchoMessageType::Error, "Failed to init options subsystem: invalid GameUserSettings");
+		return;
+	}
+	
+	WindowMode = GameUserSettings->GetFullscreenMode();
+	WindowModesMap.Add("Windowed", EWindowMode::Windowed);
+	WindowModesMap.Add("WindowedFullscreen", EWindowMode::WindowedFullscreen);
+	WindowModesMap.Add("Fullscreen", EWindowMode::Fullscreen);
+	
+	ScreenResolution = GameUserSettings->GetScreenResolution();
+	
 }
 
 float UOptionsGameInstanceSubsystem::GetVolume(const OptionsVolumes& OptionVolumeType) const
@@ -63,6 +79,11 @@ float UOptionsGameInstanceSubsystem::GetVolume(const OptionsVolumes& OptionVolum
 EWindowMode::Type UOptionsGameInstanceSubsystem::GetWindowMode() const
 {
 	return WindowMode;
+}
+
+const TMap<FString, TEnumAsByte<EWindowMode::Type>>& UOptionsGameInstanceSubsystem::GetAvailableWindowModes() const
+{
+	return WindowModesMap;
 }
 
 
@@ -133,8 +154,6 @@ void UOptionsGameInstanceSubsystem::SetVolume(const OptionsVolumes& OptionVolume
 void UOptionsGameInstanceSubsystem::SetWindowMode(const EWindowMode::Type& InWindowMode)
 {
 	WindowMode = InWindowMode;
-	
-	UGameUserSettings* GameUserSettings = GEngine->GetGameUserSettings();
 	
 	if (!IsValid(GameUserSettings))
 	{

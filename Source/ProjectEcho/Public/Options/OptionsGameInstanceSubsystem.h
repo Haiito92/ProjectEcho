@@ -24,6 +24,8 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	EWindowMode::Type GetWindowMode() const;
+	UFUNCTION()
+	const TMap<FString, TEnumAsByte<EWindowMode::Type>>& GetAvailableWindowModes() const;
 	
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="OptionVolumeType"))
 	void SetVolume(const OptionsVolumes& OptionVolumeType, float Volume);
@@ -32,7 +34,6 @@ public:
 	void SetWindowMode(const EWindowMode::Type& InWindowMode);
 
 private:
-	
 	UPROPERTY()
 	TObjectPtr<USoundSubmix> MasterSubmix;
 	UPROPERTY()
@@ -53,4 +54,12 @@ private:
 	
 	UPROPERTY()
 	TEnumAsByte<EWindowMode::Type> WindowMode = EWindowMode::WindowedFullscreen;
+	UPROPERTY()
+	TMap<FString, TEnumAsByte<EWindowMode::Type>> WindowModesMap;
+	
+	UPROPERTY()
+	FIntPoint ScreenResolution = FIntPoint::ZeroValue;
+	
+	UPROPERTY()
+	TObjectPtr<UGameUserSettings> GameUserSettings;
 };
