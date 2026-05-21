@@ -24,7 +24,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	EWindowMode::Type GetWindowMode() const;
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	const TMap<FString, TEnumAsByte<EWindowMode::Type>>& GetAvailableWindowModes() const;
 	
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="OptionVolumeType"))

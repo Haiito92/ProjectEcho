@@ -41,9 +41,10 @@ void UOptionsGameInstanceSubsystem::InitializeSubsystem()
 	}
 	
 	WindowMode = GameUserSettings->GetFullscreenMode();
-	WindowModesMap.Add("Windowed", EWindowMode::Windowed);
-	WindowModesMap.Add("WindowedFullscreen", EWindowMode::WindowedFullscreen);
-	WindowModesMap.Add("Fullscreen", EWindowMode::Fullscreen);
+	
+	WindowModesMap.Add(LexToString(EWindowMode::Windowed), EWindowMode::Windowed);
+	WindowModesMap.Add(LexToString(EWindowMode::WindowedFullscreen), EWindowMode::WindowedFullscreen);
+	WindowModesMap.Add(LexToString(EWindowMode::Fullscreen), EWindowMode::Fullscreen);
 	
 	ScreenResolution = GameUserSettings->GetScreenResolution();
 	
