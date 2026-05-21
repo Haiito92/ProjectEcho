@@ -100,3 +100,8 @@ void AEchoActor::RegisterRecordable(TScriptInterface<IRecordableInterface> Recor
 	OnRegisterRecordable.Broadcast(Recordable);
 }
 
+FRotator AEchoActor::GetEchoControlRotation_Implementation()
+{
+	return FRotator::ZeroRotator;
+}
+

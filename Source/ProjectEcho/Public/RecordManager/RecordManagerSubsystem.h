@@ -22,29 +22,29 @@ enum class ERecordedAction : uint8;
 class URecordManagerSettings;
 
 #pragma region Timeline Struct
-USTRUCT(Blueprintable)
+USTRUCT(BlueprintType)
 struct FEchoTimeline
 {
 	GENERATED_BODY()
 	
 	//Actor used to show Replay of Timeline (Echo)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Echo")
 	TObjectPtr<AEchoActor> EchoActor = nullptr;
 	
 	//TimeKey of Start of Timeline (from Global Timeline)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Echo")
 	TArray<FRecordTransformKey> TransformKeys;
 	
 	//List of Action Keys
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Echo")
 	TArray<FRecordActionKey> ActionKeys;
 	
 	//List of Rewind ActionKeys
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Echo")
 	TArray<FRecordActionKey> RewindActionKeys;
 	
 	//TimeKey of Start of Timeline (from Global Timeline)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Echo")
 	float StartTimeKey;
 	
 	//Whether Timeline is currently active and showing a Replay (In Rewind or not)
@@ -58,7 +58,7 @@ struct FEchoTimeline
 	const FRecordTransformKey* GetPreviousTransformKey(const float& TimeKey) const;
 	
 	//Get Last Key of Timeline (End of Timeline, in Local Time)
-	const float& GetLastTimeKey() const;
+	float GetLastTimeKey() const;
 	
 	//Get All Action Keys between two Keys in given Array, returns true if has found ActionKeys
 	bool GetActionKeys(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind, TArray<FRecordActionKey>& OutActionKeys) const;
@@ -68,6 +68,12 @@ struct FEchoTimeline
 	
 	//Record current Transform into aTransformKey in Timeline List
 	void RecordTransformKey(AActor* RecordedActor, const float& CurrentTimeKey);
+	
+	//Replace Current Transform or Record Transform Key if none exist
+	void ReplaceTransformKey(AActor* RecordedActor, const float& CurrentTimeKey, bool bRecordIfNotFound = false, const FRotator* OverrideControlRotation = nullptr);
+	
+	//Returns true if Contains Transform Key for given Time Key
+	bool HasTransformKey(const float& CurrentTimeKey) const;
 	
 	//Record All Actions executed between last record and now into an ActionKey in Timeline List
 	void RecordActionKey(AActor* RecordedActor, const float& CurrentTimeKey);
@@ -79,6 +85,10 @@ struct FEchoTimeline
 	 * - Execute Actions that occured between previousTimeKey and currentTimeKey
 	 */
 	void PlayReplay(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind);
+	
+	void PlayTransformKeys(const float& CurrentTimeKey);
+	
+	FRotator GetControlRotationOfCurrentKey(const float& CurrentTimeKey);
 	
 	//Play First Key of Timeline and Play Given Actions (Used to restore a State)
 	void PlayFirstKey(TArray<FRecordedAction> RestoreFirstStateAction);
