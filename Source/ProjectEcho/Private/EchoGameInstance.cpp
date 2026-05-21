@@ -18,6 +18,18 @@ void UEchoGameInstance::Init()
 	}
 }
 
+void UEchoGameInstance::Shutdown()
+{
+	Super::Shutdown();
+	
+	UOptionsGameInstanceSubsystem* OptionsSubsystem = GetSubsystem<UOptionsGameInstanceSubsystem>();
+	
+	if (IsValid(OptionsSubsystem))
+	{
+		OptionsSubsystem->ResetResolutionToDefault();
+	}
+}
+
 void UEchoGameInstance::LoadMainMenuLevel()
 {
 	UGameplayStatics::OpenLevel(GetWorld(), MainMenuLevelName);

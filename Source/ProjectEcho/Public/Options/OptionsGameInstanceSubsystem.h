@@ -19,6 +19,7 @@ class PROJECTECHO_API UOptionsGameInstanceSubsystem : public UGameInstanceSubsys
 public:
 	void InitializeSubsystem();
 	
+	
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="OptionVolumeType"))
 	float GetVolume(const OptionsVolumes& OptionVolumeType) const;
 	
@@ -49,6 +50,8 @@ public:
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="InResolution"))
 	bool SetResolution(const FIntPoint& InResolution);
 
+	
+	void ResetResolutionToDefault();
 private:
 	UFUNCTION()
 	FString IntPointToString(const FIntPoint& InIntPoint) const;

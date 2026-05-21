@@ -56,6 +56,8 @@ void UOptionsGameInstanceSubsystem::InitializeSubsystem()
 		FIntPoint Resolution(ResolutionRHI.Width, ResolutionRHI.Height);
 		AvailableResolutions.Add(IntPointToString(Resolution), Resolution);
 	}
+	
+	
 }
 
 float UOptionsGameInstanceSubsystem::GetVolume(const OptionsVolumes& OptionVolumeType) const
@@ -238,6 +240,14 @@ bool UOptionsGameInstanceSubsystem::SetResolution(const FIntPoint& InResolution)
 	GameUserSettings->ApplyResolutionSettings(false);
 	
 	return true;
+}
+
+void UOptionsGameInstanceSubsystem::ResetResolutionToDefault()
+{
+	ScreenResolution = GameUserSettings->GetDesktopResolution();
+	
+	GameUserSettings->SetScreenResolution(ScreenResolution);
+	GameUserSettings->ApplyResolutionSettings(false);
 }
 
 FString UOptionsGameInstanceSubsystem::IntPointToString(const FIntPoint& InIntPoint) const
