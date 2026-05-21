@@ -25,11 +25,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	EWindowMode::Type GetWindowMode() const;
 	UFUNCTION(BlueprintCallable)
+	FString GetWindowModeAsString() const;
+	
+	UFUNCTION(BlueprintCallable)
 	const TMap<FString, TEnumAsByte<EWindowMode::Type>>& GetAvailableWindowModes() const;
 	
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="OptionVolumeType"))
 	void SetVolume(const OptionsVolumes& OptionVolumeType, float Volume);
 	
+	
+	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="InWindowMode"))
+	void SetWindowModeByString(const FString& InWindowMode);
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="InWindowMode"))
 	void SetWindowMode(const EWindowMode::Type& InWindowMode);
 

@@ -82,6 +82,12 @@ EWindowMode::Type UOptionsGameInstanceSubsystem::GetWindowMode() const
 	return WindowMode;
 }
 
+FString UOptionsGameInstanceSubsystem::GetWindowModeAsString() const
+{
+	
+	return FString(LexToString(GetWindowMode())); 
+}
+
 const TMap<FString, TEnumAsByte<EWindowMode::Type>>& UOptionsGameInstanceSubsystem::GetAvailableWindowModes() const
 {
 	return WindowModesMap;
@@ -150,6 +156,19 @@ void UOptionsGameInstanceSubsystem::SetVolume(const OptionsVolumes& OptionVolume
 			break;
 		}
 	}
+}
+
+void UOptionsGameInstanceSubsystem::SetWindowModeByString(const FString& InWindowMode)
+{
+	TEnumAsByte<EWindowMode::Type>* FoundWindowMode = WindowModesMap.Find(InWindowMode);
+	
+	if (!FoundWindowMode)
+	{
+		UEchoDebug::Log(EEchoSystem::Options, EEchoMessageType::Error, "Failed to set window mode by string: invalid string");
+		return;
+	}
+	
+	SetWindowMode(FoundWindowMode->GetValue());
 }
 
 void UOptionsGameInstanceSubsystem::SetWindowMode(const EWindowMode::Type& InWindowMode)
