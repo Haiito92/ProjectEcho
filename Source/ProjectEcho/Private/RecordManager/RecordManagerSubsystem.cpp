@@ -566,7 +566,7 @@ void URecordManagerSubsystem::StopRecord()
 		bIsRecording = false;
 		if (RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass()))
 		{
-			IRecordHandlerInterface::Execute_StartRecording(RecordedActor);
+			IRecordHandlerInterface::Execute_StopRecording(RecordedActor);
 		}
 		RecordingTimeline.RecordTransformKey(RecordedActor, CurrentTimeKey - RecordingTimeline.StartTimeKey);
 		OnStopRecording.Broadcast();
