@@ -33,6 +33,18 @@ void AEchoGameMode::InitializeGame()
 	}
 	else UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error, "Failed to initialize Record System", FColor::Red, 3.0f);
 
+	EchoPlayerStart = Cast<APlayerStart>(UGameplayStatics::GetActorOfClass(this, APlayerStart::StaticClass()));
+	
+	FTransform PlayerRespawnTransform = FTransform::Identity;
+	PlayerRespawnTransform.SetLocation(FVector(-1000000));
+	if (IsValid(EchoPlayerStart))
+	{
+		PlayerRespawnTransform.SetLocation(EchoPlayerStart->GetActorLocation());
+		PlayerRespawnTransform.SetRotation(EchoPlayerStart->GetActorRotation().Quaternion());
+	}
+	else UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error, "Failed to initialize Player Character", FColor::Red, 3.0f);
+	
+	
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 	if (IsValid(PlayerController))
 	{
@@ -43,18 +55,11 @@ void AEchoGameMode::InitializeGame()
 			EchoPlayerCharacter->InitPlayer();
 			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Successfully initialized Player Character", FColor::Green, 3.0f);
 			EchoPlayerCharacter->OnDeathEnd.AddDynamic(this, &AEchoGameMode::OnPlayerDeathEnd);
+			
+			if (PlayerRespawnTransform.GetLocation().Z != -1000000) EchoPlayerCharacter->SetRespawnTransform(PlayerRespawnTransform);
 		}
 		else UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error, "Failed to initialize Player Character", FColor::Red, 3.0f);
-	
-		
 	}
-
-	EchoPlayerStart = Cast<APlayerStart>(UGameplayStatics::GetActorOfClass(this, APlayerStart::StaticClass()));
-	
-	FTransform PlayerRespawnTransform;
-	PlayerRespawnTransform.SetLocation(EchoPlayerStart->GetActorLocation());
-	PlayerRespawnTransform.SetRotation(EchoPlayerStart->GetActorRotation().Quaternion());
-	EchoPlayerCharacter->SetRespawnTransform(PlayerRespawnTransform);
 }
 
 void AEchoGameMode::OnPlayerDeathEnd()
