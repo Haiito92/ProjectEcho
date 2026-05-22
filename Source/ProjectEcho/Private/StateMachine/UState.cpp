@@ -145,7 +145,9 @@ void UState::OnGrabbingStarted()
 		}
 		else
 		{
-			if (GrabbingComponent->TryGrab(Character->GetControlRotation()))
+			FGrabbingRules GrabbingRules = FGrabbingRules();
+			GrabbingRules.CollisionChannelsToIgnore.Add(ECC_Pawn);
+			if (GrabbingComponent->TryGrab(Character->GetControlRotation(), GrabbingRules))
 				Character->OnValidGrab.Broadcast();
 
 			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(

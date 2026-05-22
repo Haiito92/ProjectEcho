@@ -76,7 +76,7 @@ public:
 	UFUNCTION()
 	void HandleTimelineDestruction(const int& RecordTimelineIndex);
 	
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	//Stop Recording and Reset Keys Recorded
 	void StopRecording(bool bForceStopRecording = false);
 	
