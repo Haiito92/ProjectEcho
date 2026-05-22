@@ -19,6 +19,7 @@ enum class EEchoSystem : uint8
 	GameLoop,
 	Propulse,
 	Reflect,
+	Options,
 	LevelStreaming,
 	Count UMETA(Hidden)
 };
