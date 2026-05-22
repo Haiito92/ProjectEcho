@@ -27,7 +27,7 @@ public:
 	UInputAction* AGrab;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Actions")
-	UInputAction* AThrow;
+	UInputAction* AThrowOrReflect;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Actions")
 	UInputAction* ARecord;
@@ -46,9 +46,6 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Actions")
 	UInputAction* APropulse;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Actions")
-	UInputAction* AReflect;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Actions")
 	UInputAction* APause;

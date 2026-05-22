@@ -33,19 +33,19 @@ struct FEchoTimeline
 	
 	//TimeKey of Start of Timeline (from Global Timeline)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Echo")
-	TArray<FRecordTransformKey> TransformKeys;
+	TArray<FRecordTransformKey> TransformKeys = TArray<FRecordTransformKey>();
 	
 	//List of Action Keys
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Echo")
-	TArray<FRecordActionKey> ActionKeys;
+	TArray<FRecordActionKey> ActionKeys = TArray<FRecordActionKey>();
 	
 	//List of Rewind ActionKeys
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Echo")
-	TArray<FRecordActionKey> RewindActionKeys;
+	TArray<FRecordActionKey> RewindActionKeys = TArray<FRecordActionKey>();
 	
 	//TimeKey of Start of Timeline (from Global Timeline)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Echo")
-	float StartTimeKey;
+	float StartTimeKey = 0.0f;
 	
 	//Whether Timeline is currently active and showing a Replay (In Rewind or not)
 	UPROPERTY()
@@ -121,7 +121,7 @@ struct FGlobalTimeline
 	GENERATED_BODY()
 	
 	UPROPERTY()
-	TMap<int, FEchoTimeline> Timelines;
+	TMap<int, FEchoTimeline> Timelines = TMap<int, FEchoTimeline>();
 	
 	void Initiate(int InNbSlots);
 
@@ -355,18 +355,18 @@ private:
 	TObjectPtr<URecordManagerSettings> RecordManagerSettings = nullptr;
 	
 	UPROPERTY()
-	TArray<TObjectPtr<URecordableComponent>> RecordableComponents;
+	TArray<TObjectPtr<URecordableComponent>> RecordableComponents = TArray<TObjectPtr<URecordableComponent>>();
 	
 	UPROPERTY()
-	TArray<AActor*> RecordListeners;
+	TArray<AActor*> RecordListeners = TArray<AActor*>();
 	
 	UPROPERTY()
 	//Pool of EchoActor to display Timelines (avoid runtime Spawning)
-	TArray<TObjectPtr<AEchoActor>> EchoActorsPool;
+	TArray<TObjectPtr<AEchoActor>> EchoActorsPool = TArray<TObjectPtr<AEchoActor>>();
 	
 	UPROPERTY()
 	//Actions to Perform on Player Rewind finish to set Echo in correct Start State (Force Grab Cube when needed to start Timeline while grabbing a cube)
-	TArray<FRecordedAction> RecordingTimelineStartActions;
+	TArray<FRecordedAction> RecordingTimelineStartActions = TArray<FRecordedAction>();
 	
 	UPROPERTY()
 	float UIUpdateClock = 0.f;
