@@ -18,6 +18,7 @@ void UDeath::Tick(float DeltaTime)
 void UDeath::Enter()
 {
 	Character->OnRevive.AddDynamic(this, &UDeath::OnRevive);
+	
 	Character->DeathEnd();
 }
 

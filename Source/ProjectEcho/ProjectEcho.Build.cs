@@ -19,7 +19,8 @@ public class ProjectEcho : ModuleRules
 			"GameplayStateTreeModule",
 			"UMG",
 			"Slate",
-			"DeveloperSettings"
+			"DeveloperSettings",
+			"RHI"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
