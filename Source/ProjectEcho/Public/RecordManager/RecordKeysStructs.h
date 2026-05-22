@@ -98,3 +98,44 @@ struct FRecordInteractionKey
 	float TimeKey = 0;
 	int RecordTimelineIndex = 0;
 };
+
+UENUM(BlueprintType)
+enum class EAnimationValueReference : uint8
+{
+	None = 0,
+};
+
+USTRUCT(BlueprintType)
+//Key to Register a change in Animation Value
+struct FRecordAnimationKey
+{
+	GENERATED_BODY()
+	virtual ~FRecordAnimationKey() = default;
+	float TimeKey = 0;
+	EAnimationValueReference AnimationBooleanReference = EAnimationValueReference::None;
+	
+	virtual bool GetBoolValue() const { return false; }
+	
+	virtual float GetFloatValue() const { return 0; }
+};
+
+USTRUCT()
+struct FRecordAnimationBooleanKey : public FRecordAnimationKey
+{
+	GENERATED_BODY()
+	
+	bool BoolValue = 0;
+	
+	virtual bool GetBoolValue() const override { return BoolValue; }
+};
+
+USTRUCT()
+struct FRecordAnimationFloatKey : public FRecordAnimationKey
+{
+	GENERATED_BODY()
+	
+	bool FloatValue = 0;
+	
+	virtual float GetFloatValue() const override { return FloatValue; }
+};
+
