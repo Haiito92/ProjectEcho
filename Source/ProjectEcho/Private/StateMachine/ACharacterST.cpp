@@ -241,9 +241,15 @@ void ACharacterST::PlayerTakeDamage(int value)
 void ACharacterST::Kill_Implementation()
 {
 	IKillable::Kill_Implementation();
+	URecordManagerSubsystem * RecordManagerSubsystem = GetWorld()->GetSubsystem<URecordManagerSubsystem>();
 	
-	OnDeath.Broadcast();
-	Life = 0;
+	if (RecordManagerSubsystem && RecordManagerSubsystem->IsRecording())
+		OnDeathInRecord.Broadcast();
+	else
+	{
+		OnDeath.Broadcast();
+		Life = 0;
+	}
 }
 
 void ACharacterST::Laserize_Implementation()
