@@ -54,19 +54,19 @@ struct FRecordTransformKey
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float TimeKey;
+	float TimeKey = 0;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FVector Position;
+	FVector Position = FVector::ZeroVector;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FRotator Rotation;
+	FRotator Rotation = FRotator::ZeroRotator;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FVector Scale;
+	FVector Scale = FVector::ZeroVector;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FRotator ControlRotation;
+	FRotator ControlRotation = FRotator::ZeroRotator;
 };
 
 USTRUCT(BlueprintType)
@@ -75,9 +75,9 @@ struct FRecordActionKey
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float TimeKey;
+	float TimeKey = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FRecordedAction Action;
+	FRecordedAction Action = FRecordedAction();
 };
 
 USTRUCT(BlueprintType)
@@ -85,9 +85,9 @@ struct FRecordPhysicsKey
 {
 	GENERATED_BODY()
 	
-	float TimeKey;
-	FVector LinearVelocity;
-	FVector AngularVelocity;
+	float TimeKey = 0;
+	FVector LinearVelocity = FVector::ZeroVector;
+	FVector AngularVelocity = FVector::ZeroVector;
 };
 
 USTRUCT(BlueprintType)
@@ -95,6 +95,6 @@ USTRUCT(BlueprintType)
 struct FRecordInteractionKey
 {
 	GENERATED_BODY()
-	float TimeKey;
-	int RecordTimelineIndex;
+	float TimeKey = 0;
+	int RecordTimelineIndex = 0;
 };

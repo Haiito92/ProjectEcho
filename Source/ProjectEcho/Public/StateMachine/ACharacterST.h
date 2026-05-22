@@ -10,6 +10,7 @@
 #include "RecordManager/RecordHandlerInterface.h"
 #include "ACharacterST.generated.h"
 
+class UReflectComponent;
 class UGrabbingComponent;
 class URecordHandlerComponent;
 class UInputComponent;
@@ -60,9 +61,6 @@ public:
 	UFUNCTION()
 	void AGrabStarted(const FInputActionValue& Value);
 	
-	UFUNCTION()
-	void AThrowStarted(const FInputActionValue& Value);
-	
 	UFUNCTION(BlueprintCallable)
 	void IncrementSlot();
 	
@@ -85,10 +83,10 @@ public:
 	void AStopPropulse();
 	
 	UFUNCTION(BlueprintCallable)
-	void AStartReflect();
+	void AStartThrowOrReflect();
 	
 	UFUNCTION(BlueprintCallable)
-	void AStopReflect();
+	void AStopThrowOrReflect();
 	
 	UFUNCTION(BlueprintCallable)
 	void PlayerTakeDamage(int value);
@@ -305,6 +303,9 @@ public:
 	
 	UPROPERTY()
 	TObjectPtr<UGrabbingComponent> GrabbingComponent;
+	
+	UPROPERTY()
+	TObjectPtr<UReflectComponent> ReflectComponent;
 	
 	UPROPERTY()
 	UEnhancedInputLocalPlayerSubsystem* Subsystem;

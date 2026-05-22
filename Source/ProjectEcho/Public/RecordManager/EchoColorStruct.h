@@ -19,5 +19,5 @@ public:
 	
 	//Post Process Index
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int PostProcessIndex;
+	int PostProcessIndex = 0;
 };
