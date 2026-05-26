@@ -320,6 +320,12 @@ TArray<FRecordAnimationValue> ACharacterST::GetToRecordAnimationKeys()
 	return TArray<FRecordAnimationValue>();
 }
 
+TArray<FRecordAnimationValue> ACharacterST::GetDefaultAnimationValues()
+{
+	//Call BP Function
+	return ReceiveGetDefaultAnimationValues();
+}
+
 void ACharacterST::HandleRewindActionKey_Implementation(const FRecordedAction& RewindAction)
 {
 	switch (RewindAction.ActionEnum)

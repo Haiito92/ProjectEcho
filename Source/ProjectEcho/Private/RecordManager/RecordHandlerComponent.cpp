@@ -21,21 +21,21 @@ void URecordHandlerComponent::RegisterActionInRecord(const FRecordedAction& Acti
 	}
 }
 
-void URecordHandlerComponent::RegisterFloatAnimationKey(const EAnimationValueReference& AnimationValueRef,
-	const float& Value)
+void URecordHandlerComponent::RegisterFloatAnimationKey(EAnimationValueReference AnimationValueRef,
+	float Value)
 {
 	if (bIsRecording)
 	{
-		ToRecordAnimationKeys.Add(FRecordAnimationFloatValue(AnimationValueRef, Value));
+		ToRecordAnimationKeys.Add(FRecordAnimationValue(AnimationValueRef, Value));
 	}
 }
 
-void URecordHandlerComponent::RegisterBoolAnimationKey(const EAnimationValueReference& AnimationValueRef,
-	const bool& Value)
+void URecordHandlerComponent::RegisterBoolAnimationKey(EAnimationValueReference AnimationValueRef,
+	bool Value)
 {
 	if (bIsRecording)
 	{
-		ToRecordAnimationKeys.Add(FRecordAnimationBooleanValue(AnimationValueRef, Value));
+		ToRecordAnimationKeys.Add(FRecordAnimationValue(AnimationValueRef, Value));
 	}
 }
 

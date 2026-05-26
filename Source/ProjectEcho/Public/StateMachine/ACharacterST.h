@@ -127,6 +127,11 @@ public:
 	UFUNCTION()
 	virtual TArray<FRecordAnimationValue> GetToRecordAnimationKeys() override;
 	
+	UFUNCTION()
+	virtual TArray<FRecordAnimationValue> GetDefaultAnimationValues() override;
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	TArray<FRecordAnimationValue> ReceiveGetDefaultAnimationValues();
 	
 	UFUNCTION()
 	virtual void HandleRewindActionKey_Implementation(const FRecordedAction& RewindAction) override;
@@ -224,8 +229,6 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathEnd);
 	UPROPERTY(BlueprintAssignable)
 	FOnDeathEnd OnDeathEnd;
-	
-	
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRevive);
 	UPROPERTY(BlueprintAssignable)

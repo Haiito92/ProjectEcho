@@ -103,6 +103,28 @@ UENUM(BlueprintType)
 enum class EAnimationValueReference : uint8
 {
 	None = 0,
+	IsGrabbing = 1,
+	IsReleasing = 2,
+	IsThrowing = 3,
+	IsJumping = 4,
+	IsFalling = 5,
+	IsDead = 6,
+	IsReviving = 7,
+	IsMoving = 8,
+	Speed = 9,
+	IsRecording = 10,
+	IsReflect = 11,
+	OnRevive = 12,
+	IsHoldingReflect = 13,
+	IsNotReflect = 14,
+};
+
+UENUM()
+enum EAnimationValueType
+{
+	None = 0,
+	Bool = 1,
+	Float = 2,
 };
 
 USTRUCT(BlueprintType)
@@ -114,59 +136,36 @@ struct FRecordAnimationValue
 	FRecordAnimationValue()
 	{
 		this->AnimationValueReference = EAnimationValueReference::None;
-	}
-	
-	FRecordAnimationValue(EAnimationValueReference AnimationValueReference)
-	{
-		this->AnimationValueReference = AnimationValueReference;
-	}
-	
-	virtual ~FRecordAnimationValue() = default;
-	EAnimationValueReference AnimationValueReference = EAnimationValueReference::None;
-	
-	virtual bool GetBoolValue() const { return false; }
-	
-	virtual float GetFloatValue() const { return 0; }
-};
-
-USTRUCT()
-struct FRecordAnimationBooleanValue : public FRecordAnimationValue
-{
-	GENERATED_BODY()
-	
-	FRecordAnimationBooleanValue() : FRecordAnimationValue()
-	{
 		this->BoolValue = false;
-	}
-	
-	FRecordAnimationBooleanValue(EAnimationValueReference AnimationValueReference, bool Value) : FRecordAnimationValue(AnimationValueReference)
-	{
-		this->BoolValue = Value;
-	}
-
-	bool BoolValue = 0;
-	
-	virtual bool GetBoolValue() const override { return BoolValue; }
-};
-
-USTRUCT()
-struct FRecordAnimationFloatValue : public FRecordAnimationValue
-{
-	GENERATED_BODY()
-	
-	FRecordAnimationFloatValue() : FRecordAnimationValue()
-	{
 		this->FloatValue = 0;
 	}
 	
-	FRecordAnimationFloatValue(EAnimationValueReference AnimationValueReference, float Value) : FRecordAnimationValue(AnimationValueReference)
+	FRecordAnimationValue(EAnimationValueReference AnimationValueReference, bool BoolValue)
 	{
-		this->FloatValue = Value;
+		this->AnimationValueReference = AnimationValueReference;
+		AnimationValueType = EAnimationValueType::Bool;
+		this->BoolValue = BoolValue;
+		this->FloatValue = 0;
 	}
-
-	float FloatValue = 0;
 	
-	virtual float GetFloatValue() const override { return FloatValue; }
+	FRecordAnimationValue(EAnimationValueReference AnimationValueReference, float FloatValue)
+	{
+		this->AnimationValueReference = AnimationValueReference;
+		AnimationValueType = EAnimationValueType::Float;
+		this->FloatValue = FloatValue;
+		this->BoolValue = false;
+	}
+	
+	UPROPERTY(BlueprintReadWrite)
+	EAnimationValueReference AnimationValueReference = EAnimationValueReference::None;
+	
+	EAnimationValueType AnimationValueType = EAnimationValueType::None;
+	
+	UPROPERTY(BlueprintReadWrite)
+	bool BoolValue = false;
+	
+	UPROPERTY(BlueprintReadWrite)
+	float FloatValue = 0;
 };
 
 USTRUCT(BlueprintType)

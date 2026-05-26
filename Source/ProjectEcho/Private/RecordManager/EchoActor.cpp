@@ -28,10 +28,18 @@ void AEchoActor::HandleActionKey(const FRecordedAction& Action)
 	ReceiveHandleActionKey(Action.ActionEnum);
 }
 
-void AEchoActor::HandleAnimationKey(const FRecordAnimationValue& AnimationKey)
+void AEchoActor::HandleAnimationKey(const FRecordAnimationValue& AnimationValue)
 {
 	//Call BP Function
-	ReceiveHandleAnimationKey(AnimationKey);
+	switch (AnimationValue.AnimationValueType)
+	{
+	case Bool:
+		ReceiveHandleAnimationBooleanKey(AnimationValue.AnimationValueReference, AnimationValue.BoolValue);
+	case Float:
+		ReceiveHandleAnimationFloatKey(AnimationValue.AnimationValueReference, AnimationValue.FloatValue);
+	default:
+		break;
+	}
 }
 
 void AEchoActor::ForceRelease_Implementation()

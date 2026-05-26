@@ -20,10 +20,10 @@ public:
 	virtual void RegisterActionInRecord(const FRecordedAction& Action, const FRecordedAction& RewindAction = FRecordedAction());
 	
 	UFUNCTION(BlueprintCallable)
-	virtual void RegisterFloatAnimationKey(const EAnimationValueReference& AnimationValueRef, const float& Value);
+	virtual void RegisterFloatAnimationKey(EAnimationValueReference AnimationValueRef, float Value);
 	
 	UFUNCTION(BlueprintCallable)
-	virtual void RegisterBoolAnimationKey(const EAnimationValueReference& AnimationValueRef, const bool& Value);
+	virtual void RegisterBoolAnimationKey(EAnimationValueReference AnimationValueRef, bool Value);
 	
 	UFUNCTION(BlueprintCallable)
 	//Start Saving Actions in ToRecord List

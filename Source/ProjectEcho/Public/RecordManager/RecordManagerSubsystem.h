@@ -73,6 +73,11 @@ struct FEchoTimeline
 	//Get All Action Keys between two Keys in given Array, returns true if has found ActionKeys
 	bool GetAnimationKeys(const float& PreviousKey,const float& CurrentTimeKey, TArray<FRecordAnimationKey>& OutAnimationKeys) const;
 	
+	//Restore Animation Keys to Current Key
+	void RestoreAnimationKeys(const float& CurrentTimeKey);
+	
+	bool FindLastPlayedAnimationKey(const float& CurrentTimeKey, EAnimationValueReference AnimationValueReference, FRecordAnimationValue& AnimationValue) const;
+	
 	//Save Echo Actor for Replays
 	void RegisterEchoActor(AEchoActor* InEchoActor);
 	
@@ -126,6 +131,7 @@ struct FEchoTimeline
 	void RecordFirstActionKeys(const TArray<FRecordedAction>& FirstActions);
 	
 	//Record Default Animation Values 
+	void RecordDefaultAnimationValues(AActor* RecordedActor, const float& CurrentTimeKey);
 };
 #pragma endregion
 

@@ -56,4 +56,7 @@ public:
 	//Called to Handle Rewinds Action (Restore State to before Record)
 	UFUNCTION(BlueprintNativeEvent)
 	void HandleRewindActionKey(const FRecordedAction& RecordedAction);
+	
+	UFUNCTION()
+	virtual TArray<FRecordAnimationValue> GetDefaultAnimationValues() = 0;
 };
