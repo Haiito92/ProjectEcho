@@ -229,7 +229,7 @@ void ACharacterST::AStartThrowOrReflect()
 
 void ACharacterST::AStopThrowOrReflect()
 {
-	if (IsValid(ReflectComponent) && ReflectComponent->IsOn())
+	if (IsValid(ReflectComponent))
 	{
 		bReflectInputPressed = false;
 		SetShouldRestoreReflect(false);
