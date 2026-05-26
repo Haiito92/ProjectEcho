@@ -13,6 +13,9 @@ void AEchoGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	SpawnActors();
+	ReceiveSpawnActors();
+	
 	InitializeGame();
 	ReceiveInitializeGame();
 	
@@ -26,6 +29,11 @@ void AEchoGameModeBase::BeginPlay()
 void AEchoGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+}
+
+void AEchoGameModeBase::SpawnActors()
+{
+	
 }
 
 void AEchoGameModeBase::InitializeGame()
