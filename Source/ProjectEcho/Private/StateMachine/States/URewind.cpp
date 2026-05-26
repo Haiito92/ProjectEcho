@@ -2,6 +2,7 @@
 
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GrabMechanic/GrabbingComponent.h"
 #include "RecordManager/RecordManagerSubsystem.h"
 #include "ReflectMechanic/ReflectComponent.h"
 #include "StateMachine/ACharacterST.h"
@@ -29,6 +30,11 @@ void URewind::Enter()
 	if (ReflectComponent->IsOn())
 	{
 		ReflectComponent->StopReflect();
+	}
+	
+	if (GrabbingComponent->IsGrabbing())
+	{
+		GrabbingComponent->ForceRelease();
 	}
 }
 
