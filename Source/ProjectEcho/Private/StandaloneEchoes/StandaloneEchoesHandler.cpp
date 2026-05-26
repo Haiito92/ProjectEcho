@@ -38,10 +38,18 @@ void AStandaloneEchoesHandler::Tick(float DeltaTime)
 	if (bHasReachedEnd && !bIsRewind)
 	{
 		bIsRewind = true;
+		for (FEchoTimeline& EchoTimeline : EchoTimelines)
+		{
+			EchoTimeline.HandleRewindStarted(CurrentTimeKey, false);
+		}
 	}
 	else if (bIsRewind && CurrentTimeKey == 0)
 	{
 		bIsRewind = false;
+		for (FEchoTimeline& EchoTimeline : EchoTimelines)
+		{
+			EchoTimeline.HandleRewindStopped(CurrentTimeKey, false);
+		}
 	}
 }
 
