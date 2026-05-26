@@ -14,6 +14,7 @@
 #include "GrabMechanic/GrabbingComponent.h"
 #include "RecordManager/RecordHandlerComponent.h"
 #include "RecordManager/RecordManagerSubsystem.h"
+#include "ReflectMechanic/ReflectComponent.h"
 #include "StateMachine/UState.h"
 #include "StateMachine/Data/UInputDataConfig.h"
 #include "StateMachine/Data/UPlayerData.h"
@@ -96,8 +97,6 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	
 	Input->BindAction(InputActions->AGrab, ETriggerEvent::Started, this, &ACharacterST::AGrabStarted);
 	
-	Input->BindAction(InputActions->AThrow, ETriggerEvent::Started, this, &ACharacterST::AThrowStarted);
-	
 	Input->BindAction(InputActions->AIncrementSlot, ETriggerEvent::Started, this, &ACharacterST::IncrementSlot);
 	Input->BindAction(InputActions->ADecrementSlot, ETriggerEvent::Started, this, &ACharacterST::DecrementSlot);
 	Input->BindAction(InputActions->ARecord, ETriggerEvent::Started, this, &ACharacterST::Record);
@@ -107,14 +106,16 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Input->BindAction(InputActions->APropulse, ETriggerEvent::Started,this,&ACharacterST::AStartPropulse);
 	Input->BindAction(InputActions->APropulse, ETriggerEvent::Completed,this,&ACharacterST::AStopPropulse);
 	
-	Input->BindAction(InputActions->AReflect, ETriggerEvent::Started,this,&ACharacterST::AStartReflect);
-	Input->BindAction(InputActions->AReflect, ETriggerEvent::Completed,this,&ACharacterST::AStopReflect);
+	Input->BindAction(InputActions->AThrowOrReflect, ETriggerEvent::Started,this,&ACharacterST::AStartThrowOrReflect);
+	Input->BindAction(InputActions->AThrowOrReflect, ETriggerEvent::Completed,this,&ACharacterST::AStopThrowOrReflect);
 }
 
 void ACharacterST::InitPlayer()
 {
 	RecordHandlerComponent = FindComponentByClass<URecordHandlerComponent>();
 	GrabbingComponent = FindComponentByClass<UGrabbingComponent>();
+	ReflectComponent = FindComponentByClass<UReflectComponent>();
+	
 	InitStateMachine();
 	LoadData();
 }
@@ -178,11 +179,6 @@ void ACharacterST::AGrabStarted(const FInputActionValue& Value)
 	OnGrabbingStarted.Broadcast();
 }
 
-void ACharacterST::AThrowStarted(const FInputActionValue& Value)
-{
-	OnThrowingStarted.Broadcast();
-}
-
 void ACharacterST::IncrementSlot()
 {
 	OnIncrementSlot.Broadcast();
@@ -218,17 +214,27 @@ void ACharacterST::AStopPropulse()
 	OnStopPropulse.Broadcast();
 }
 
-void ACharacterST::AStartReflect()
+void ACharacterST::AStartThrowOrReflect()
 {
-	bReflectInputPressed = true;
-	OnReflectInputStarted.Broadcast();
+	if (IsValid(GrabbingComponent) && GrabbingComponent->IsGrabbing())
+	{
+		OnThrowingStarted.Broadcast();
+	}
+	else if (IsValid(ReflectComponent))
+	{
+		bReflectInputPressed = true;
+		OnReflectInputStarted.Broadcast();
+	}
 }
 
-void ACharacterST::AStopReflect()
+void ACharacterST::AStopThrowOrReflect()
 {
-	bReflectInputPressed = false;
-	SetShouldRestoreReflect(false);
-	OnReflectInputCompleted.Broadcast();
+	if (IsValid(ReflectComponent))
+	{
+		bReflectInputPressed = false;
+		SetShouldRestoreReflect(false);
+		OnReflectInputCompleted.Broadcast();
+	}
 }
 
 void ACharacterST::PlayerTakeDamage(int value)
