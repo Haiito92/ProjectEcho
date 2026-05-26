@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GrabbingRules.h"
 
 #include "GrabbingComponent.generated.h"
 
 
+struct FGrabbingRules;
 class UGrabMechanicSettings;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -20,7 +22,7 @@ public:
 
 	//Try to Grab Object in front of Player (According to Settings configurations)
 	UFUNCTION(BlueprintCallable)
-	virtual bool TryGrab(const FRotator& ControlRotation);
+	virtual bool TryGrab(const FRotator& ControlRotation, const FGrabbingRules& GrabbingRules = FGrabbingRules());
 	
 	//Try to Release Held Object
 	UFUNCTION(BlueprintCallable)
@@ -36,11 +38,11 @@ public:
 	
 	//Force Grab given Actor (might causes issues)
 	UFUNCTION(BLueprintCallable)
-	virtual void ForceGrab(AActor* Actor);
+	virtual void ForceGrab(AActor* Actor,const FGrabbingRules& GrabbingRules = FGrabbingRules());
 	
 	//Try Force Grab at Holding Position (Grabs Fakely Held Cube, used for Echoes in Rewind)
 	UFUNCTION(BLueprintCallable)
-	virtual void TryForceGrabHeldCube();
+	virtual void TryForceGrabHeldCube(const FGrabbingRules& GrabbingRules);
 	
 	//Has Object Currently Grabbed
 	UFUNCTION(BlueprintCallable, BlueprintPure)

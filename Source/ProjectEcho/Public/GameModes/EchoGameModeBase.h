@@ -17,9 +17,11 @@ class PROJECTECHO_API AEchoGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 	
 protected:
+	
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
+	virtual void SpawnActors();
 	virtual void InitializeGame();
 	virtual void InitializeUI();
 	
@@ -35,6 +37,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void ResumeGame();
 protected:
+	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive Spawn Actors")
+	void ReceiveSpawnActors();
+	
 	UFUNCTION(BlueprintImplementableEvent, DisplayName="Receive Initialize Game")
 	void ReceiveInitializeGame();
 	

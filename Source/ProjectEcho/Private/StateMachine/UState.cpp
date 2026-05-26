@@ -145,7 +145,9 @@ void UState::OnGrabbingStarted()
 		}
 		else
 		{
-			if (GrabbingComponent->TryGrab(Character->GetControlRotation()))
+			FGrabbingRules GrabbingRules = FGrabbingRules();
+			GrabbingRules.CollisionChannelsToIgnore.Add(ECC_Pawn);
+			if (GrabbingComponent->TryGrab(Character->GetControlRotation(), GrabbingRules))
 				Character->OnValidGrab.Broadcast();
 
 			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
@@ -306,7 +308,7 @@ void UState::OnPropulsed(const FVector& PropulseDirection, float PropulsePower)
 
 void UState::OnReflectInputStarted()
 {
-	if (CanUseReflect() && IsValid(ReflectComponent))
+	if (CanUseReflect() && IsValid(ReflectComponent) && !ReflectComponent->IsOn())
 	{
 		ReflectComponent->StartReflect(
 			Character->FirstPersonCameraComponent->GetComponentLocation(),
@@ -320,7 +322,7 @@ void UState::OnReflectInputStarted()
 
 void UState::OnReflectInputCompleted()
 {
-	if (CanUseReflect() && IsValid(ReflectComponent))
+	if (CanUseReflect() && IsValid(ReflectComponent) && ReflectComponent->IsOn())
 	{
 		ReflectComponent->StopReflect();
 
