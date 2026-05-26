@@ -28,7 +28,7 @@ void AEchoActor::HandleActionKey(const FRecordedAction& Action)
 	ReceiveHandleActionKey(Action.ActionEnum);
 }
 
-void AEchoActor::HandleAnimationKey(const FRecordAnimationKey& AnimationKey)
+void AEchoActor::HandleAnimationKey(const FRecordAnimationValue& AnimationKey)
 {
 	//Call BP Function
 	ReceiveHandleAnimationKey(AnimationKey);

@@ -52,7 +52,7 @@ public:
 	void HandleActionKey(const FRecordedAction& Action);
 	
 	UFUNCTION()
-	void HandleAnimationKey(const FRecordAnimationKey& AnimationKey);
+	void HandleAnimationKey(const FRecordAnimationValue& AnimationKey);
 	
 	virtual void ForceRelease_Implementation() override;
 	
@@ -93,7 +93,7 @@ protected:
 	void ReceiveHandleActionKey(ERecordedAction Action);
 	
 	UFUNCTION(BlueprintImplementableEvent)
-	void ReceiveHandleAnimationKey(FRecordAnimationKey AnimationKey);
+	void ReceiveHandleAnimationKey(FRecordAnimationValue AnimationKey);
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveSetControlRotation(const FRotator& ControlRotation);

@@ -314,10 +314,10 @@ TArray<FRecordedAction> ACharacterST::GetToRecordRewindActions()
 	return TArray<FRecordedAction>();
 }
 
-TArray<FRecordAnimationKey> ACharacterST::GetToRecordAnimationKeys()
+TArray<FRecordAnimationValue> ACharacterST::GetToRecordAnimationKeys()
 {
 	if (IsValid(RecordHandlerComponent)) return RecordHandlerComponent->GetToRecordAnimationKeys();
-	return TArray<FRecordAnimationKey>();
+	return TArray<FRecordAnimationValue>();
 }
 
 void ACharacterST::HandleRewindActionKey_Implementation(const FRecordedAction& RewindAction)

@@ -43,7 +43,7 @@ public:
 	
 	//Returns Copy of Current ToRecordList of AnimationKeys and Reset it 
 	UFUNCTION()
-	virtual TArray<FRecordAnimationKey> GetToRecordAnimationKeys();
+	virtual TArray<FRecordAnimationValue> GetToRecordAnimationKeys();
 
 private:
 	//Array of Actions to register in next Key Creation
@@ -56,7 +56,7 @@ private:
 	
 	//Array of AnimationKeys to register in next Key Creation
 	UPROPERTY()
-	TArray<FRecordAnimationKey> ToRecordAnimationKeys;
+	TArray<FRecordAnimationValue> ToRecordAnimationKeys;
 	
 	bool bIsRecording = false;
 };

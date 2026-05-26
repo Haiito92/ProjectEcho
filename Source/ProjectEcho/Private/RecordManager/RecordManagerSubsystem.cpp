@@ -81,14 +81,13 @@ bool FEchoTimeline::GetActionKeys(const float& PreviousKey,const float& CurrentT
 	return bHasAddedActionKeys;
 }
 
-bool FEchoTimeline::GetAnimationKeys(const float& PreviousKey, const float& CurrentTimeKey, bool bIsInRewind,
+bool FEchoTimeline::GetAnimationKeys(const float& PreviousKey, const float& CurrentTimeKey,
 	TArray<FRecordAnimationKey>& OutAnimationKeys) const
 {
 	bool bHasAddedAnimationKey = false;
 	for (const FRecordAnimationKey& AnimationKey : RecordAnimationKeys)
 	{
-		if (bIsInRewind ? AnimationKey.TimeKey < PreviousKey && AnimationKey.TimeKey >= CurrentTimeKey
-			: AnimationKey.TimeKey > PreviousKey && AnimationKey.TimeKey <= CurrentTimeKey)
+		if (AnimationKey.TimeKey > PreviousKey && AnimationKey.TimeKey <= CurrentTimeKey)
 		{
 			UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Previous Key : " + FString::SanitizeFloat(PreviousKey) + ", CurrentKey = " + FString::SanitizeFloat(CurrentTimeKey) + ", AnimationKey = " + FString::SanitizeFloat(AnimationKey.TimeKey), FColor::Turquoise, 1);
 			OutAnimationKeys.Add(AnimationKey);
@@ -190,11 +189,10 @@ void FEchoTimeline::RecordAnimationKey(AActor* RecordedActor, const float& Curre
 	IRecordHandlerInterface* RecordHandlerInterface = Cast<IRecordHandlerInterface>(RecordedActor);
 	if (RecordHandlerInterface == nullptr) return;
 	
-	TArray<FRecordAnimationKey> ToRecordAnimationKeys = RecordHandlerInterface->GetToRecordAnimationKeys();
-	for (FRecordAnimationKey& ToRecordAnimationKey : ToRecordAnimationKeys)
+	TArray<FRecordAnimationValue> ToRecordAnimationKeys = RecordHandlerInterface->GetToRecordAnimationKeys();
+	for (FRecordAnimationValue& ToRecordAnimationKey : ToRecordAnimationKeys)
 	{
-		ToRecordAnimationKey.TimeKey = CurrentTimeKey;
-		RecordAnimationKeys.Add(ToRecordAnimationKey);
+		RecordAnimationKeys.Add(FRecordAnimationKey(ToRecordAnimationKey, CurrentTimeKey));
 	}
 }
 
@@ -216,12 +214,15 @@ void FEchoTimeline::PlayReplay(const float& PreviousKey,const float& CurrentTime
 		}
 	}
 	
-	TArray<FRecordAnimationKey> CurrentAnimationKeys;
-	if (GetAnimationKeys(PreviousKey, CurrentTimeKey, bIsInRewind, CurrentAnimationKeys))
+	if (!bIsInRewind)
 	{
-		for (const FRecordAnimationKey& AnimationKey : CurrentAnimationKeys)
+		TArray<FRecordAnimationKey> CurrentAnimationKeys;
+		if (GetAnimationKeys(PreviousKey, CurrentTimeKey, CurrentAnimationKeys))
 		{
-			EchoActor->HandleAnimationKey(AnimationKey);
+			for (const FRecordAnimationKey& AnimationKey : CurrentAnimationKeys)
+			{
+				EchoActor->HandleAnimationKey(AnimationKey.RecordAnimationValue);
+			}
 		}
 	}
 }

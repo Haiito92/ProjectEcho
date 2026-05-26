@@ -125,7 +125,7 @@ public:
 	virtual TArray<FRecordedAction> GetToRecordRewindActions() override;
 	
 	UFUNCTION()
-	virtual TArray<FRecordAnimationKey> GetToRecordAnimationKeys() override;
+	virtual TArray<FRecordAnimationValue> GetToRecordAnimationKeys() override;
 	
 	
 	UFUNCTION()

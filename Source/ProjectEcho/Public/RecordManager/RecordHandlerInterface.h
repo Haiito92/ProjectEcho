@@ -9,7 +9,7 @@
 #pragma region ActionKeys Structs
 
 #pragma endregion
-struct FRecordAnimationKey;
+struct FRecordAnimationValue;
 struct FRecordedAction;
 // This class does not need to be modified.
 UINTERFACE()
@@ -43,7 +43,7 @@ public:
 	
 	//Called to get AnimationsKeys
 	UFUNCTION()
-	virtual TArray<FRecordAnimationKey> GetToRecordAnimationKeys() = 0;
+	virtual TArray<FRecordAnimationValue> GetToRecordAnimationKeys() = 0;
 	
 	//Called to Get Control Rotation
 	UFUNCTION(BlueprintNativeEvent)
