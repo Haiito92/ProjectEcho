@@ -81,6 +81,23 @@ bool FEchoTimeline::GetActionKeys(const float& PreviousKey,const float& CurrentT
 	return bHasAddedActionKeys;
 }
 
+bool FEchoTimeline::GetAnimationKeys(const float& PreviousKey, const float& CurrentTimeKey, bool bIsInRewind,
+	TArray<FRecordAnimationKey>& OutAnimationKeys) const
+{
+	bool bHasAddedAnimationKey = false;
+	for (const FRecordAnimationKey& AnimationKey : RecordAnimationKeys)
+	{
+		if (bIsInRewind ? AnimationKey.TimeKey < PreviousKey && AnimationKey.TimeKey >= CurrentTimeKey
+			: AnimationKey.TimeKey > PreviousKey && AnimationKey.TimeKey <= CurrentTimeKey)
+		{
+			UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Previous Key : " + FString::SanitizeFloat(PreviousKey) + ", CurrentKey = " + FString::SanitizeFloat(CurrentTimeKey) + ", AnimationKey = " + FString::SanitizeFloat(AnimationKey.TimeKey), FColor::Turquoise, 1);
+			OutAnimationKeys.Add(AnimationKey);
+			bHasAddedAnimationKey = true;
+		}
+	}
+	return bHasAddedAnimationKey;
+}
+
 void FEchoTimeline::RegisterEchoActor(AEchoActor* InEchoActor)
 {
 	EchoActor = InEchoActor;
@@ -167,6 +184,20 @@ void FEchoTimeline::RecordActionKey(AActor* RecordedActor, const float& CurrentT
 	}
 }
 
+void FEchoTimeline::RecordAnimationKey(AActor* RecordedActor, const float& CurrentTimeKey)
+{
+	if (!RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass())) return;
+	IRecordHandlerInterface* RecordHandlerInterface = Cast<IRecordHandlerInterface>(RecordedActor);
+	if (RecordHandlerInterface == nullptr) return;
+	
+	TArray<FRecordAnimationKey> ToRecordAnimationKeys = RecordHandlerInterface->GetToRecordAnimationKeys();
+	for (FRecordAnimationKey& ToRecordAnimationKey : ToRecordAnimationKeys)
+	{
+		ToRecordAnimationKey.TimeKey = CurrentTimeKey;
+		RecordAnimationKeys.Add(ToRecordAnimationKey);
+	}
+}
+
 void FEchoTimeline::PlayReplay(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind)
 {
 	if (!IsValid(EchoActor)) return;
@@ -182,6 +213,15 @@ void FEchoTimeline::PlayReplay(const float& PreviousKey,const float& CurrentTime
 		{
 			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Replaying Action : " + UEnum::GetDisplayValueAsText(ActionKey.Action.ActionEnum).ToString());
 			EchoActor->HandleActionKey(ActionKey.Action);
+		}
+	}
+	
+	TArray<FRecordAnimationKey> CurrentAnimationKeys;
+	if (GetAnimationKeys(PreviousKey, CurrentTimeKey, bIsInRewind, CurrentAnimationKeys))
+	{
+		for (const FRecordAnimationKey& AnimationKey : CurrentAnimationKeys)
+		{
+			EchoActor->HandleAnimationKey(AnimationKey);
 		}
 	}
 }

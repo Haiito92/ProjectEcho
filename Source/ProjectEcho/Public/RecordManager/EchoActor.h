@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "EchoColorStruct.h"
 #include "EchoInterface.h"
+#include "RecordKeysStructs.h"
 #include "GrabMechanic/GrabberActorInterface.h"
 #include "LaserMechanic/Laserizable.h"
 #include "ReflectMechanic/ReflectComponent.h"
@@ -50,6 +51,9 @@ public:
 	UFUNCTION()
 	void HandleActionKey(const FRecordedAction& Action);
 	
+	UFUNCTION()
+	void HandleAnimationKey(const FRecordAnimationKey& AnimationKey);
+	
 	virtual void ForceRelease_Implementation() override;
 	
 	//Take a Snapshot of all States to Restore
@@ -83,10 +87,13 @@ public:
 	//Called to Get Control Rotation
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, BlueprintPure)
 	FRotator GetEchoControlRotation();
-	
+
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveHandleActionKey(ERecordedAction Action);
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveHandleAnimationKey(FRecordAnimationKey AnimationKey);
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveSetControlRotation(const FRotator& ControlRotation);

@@ -110,9 +110,21 @@ USTRUCT(BlueprintType)
 struct FRecordAnimationKey
 {
 	GENERATED_BODY()
+	
+	FRecordAnimationKey()
+	{
+		this->TimeKey = 0;
+		this->AnimationValueReference = EAnimationValueReference::None;
+	}
+	
+	FRecordAnimationKey(EAnimationValueReference AnimationValueReference)
+	{
+		this->AnimationValueReference = AnimationValueReference;
+	}
+	
 	virtual ~FRecordAnimationKey() = default;
 	float TimeKey = 0;
-	EAnimationValueReference AnimationBooleanReference = EAnimationValueReference::None;
+	EAnimationValueReference AnimationValueReference = EAnimationValueReference::None;
 	
 	virtual bool GetBoolValue() const { return false; }
 	
@@ -124,6 +136,16 @@ struct FRecordAnimationBooleanKey : public FRecordAnimationKey
 {
 	GENERATED_BODY()
 	
+	FRecordAnimationBooleanKey() : FRecordAnimationKey()
+	{
+		this->BoolValue = false;
+	}
+	
+	FRecordAnimationBooleanKey(EAnimationValueReference AnimationValueReference, bool Value) : FRecordAnimationKey(AnimationValueReference)
+	{
+		this->BoolValue = Value;
+	}
+
 	bool BoolValue = 0;
 	
 	virtual bool GetBoolValue() const override { return BoolValue; }
@@ -134,7 +156,17 @@ struct FRecordAnimationFloatKey : public FRecordAnimationKey
 {
 	GENERATED_BODY()
 	
-	bool FloatValue = 0;
+	FRecordAnimationFloatKey() : FRecordAnimationKey()
+	{
+		this->FloatValue = 0;
+	}
+	
+	FRecordAnimationFloatKey(EAnimationValueReference AnimationValueReference, float Value) : FRecordAnimationKey(AnimationValueReference)
+	{
+		this->FloatValue = Value;
+	}
+
+	float FloatValue = 0;
 	
 	virtual float GetFloatValue() const override { return FloatValue; }
 };

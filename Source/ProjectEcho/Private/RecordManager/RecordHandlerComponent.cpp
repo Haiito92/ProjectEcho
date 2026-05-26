@@ -21,6 +21,24 @@ void URecordHandlerComponent::RegisterActionInRecord(const FRecordedAction& Acti
 	}
 }
 
+void URecordHandlerComponent::RegisterFloatAnimationKey(const EAnimationValueReference& AnimationValueRef,
+	const float& Value)
+{
+	if (bIsRecording)
+	{
+		ToRecordAnimationKeys.Add(FRecordAnimationFloatKey(AnimationValueRef, Value));
+	}
+}
+
+void URecordHandlerComponent::RegisterBoolAnimationKey(const EAnimationValueReference& AnimationValueRef,
+	const bool& Value)
+{
+	if (bIsRecording)
+	{
+		ToRecordAnimationKeys.Add(FRecordAnimationBooleanKey(AnimationValueRef, Value));
+	}
+}
+
 void URecordHandlerComponent::StartRecording()
 {
 	bIsRecording = true;
@@ -42,6 +60,13 @@ TArray<FRecordedAction> URecordHandlerComponent::GetToRecordRewindActions()
 {
 	TArray<FRecordedAction> CopyList = ToRecordRewindActions;
 	ToRecordRewindActions.Empty();
+	return CopyList;
+}
+
+TArray<FRecordAnimationKey> URecordHandlerComponent::GetToRecordAnimationKeys()
+{
+	TArray<FRecordAnimationKey> CopyList = ToRecordAnimationKeys;
+	ToRecordAnimationKeys.Empty();
 	return CopyList;
 }
 

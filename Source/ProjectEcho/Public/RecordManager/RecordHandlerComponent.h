@@ -20,6 +20,12 @@ public:
 	virtual void RegisterActionInRecord(const FRecordedAction& Action, const FRecordedAction& RewindAction = FRecordedAction());
 	
 	UFUNCTION(BlueprintCallable)
+	virtual void RegisterFloatAnimationKey(const EAnimationValueReference& AnimationValueRef, const float& Value);
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void RegisterBoolAnimationKey(const EAnimationValueReference& AnimationValueRef, const bool& Value);
+	
+	UFUNCTION(BlueprintCallable)
 	//Start Saving Actions in ToRecord List
 	virtual void StartRecording();
 	
@@ -34,6 +40,10 @@ public:
 	//Returns Copy of Current ToRecordList of Rewind Actions and Reset it
 	UFUNCTION()
 	virtual TArray<FRecordedAction> GetToRecordRewindActions();
+	
+	//Returns Copy of Current ToRecordList of AnimationKeys and Reset it 
+	UFUNCTION()
+	virtual TArray<FRecordAnimationKey> GetToRecordAnimationKeys();
 
 private:
 	//Array of Actions to register in next Key Creation
@@ -43,6 +53,10 @@ private:
 	//Array of Actions to register in next Key Creation
 	UPROPERTY()
 	TArray<FRecordedAction> ToRecordRewindActions;
+	
+	//Array of AnimationKeys to register in next Key Creation
+	UPROPERTY()
+	TArray<FRecordAnimationKey> ToRecordAnimationKeys;
 	
 	bool bIsRecording = false;
 };

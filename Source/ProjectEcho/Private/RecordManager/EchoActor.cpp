@@ -28,6 +28,12 @@ void AEchoActor::HandleActionKey(const FRecordedAction& Action)
 	ReceiveHandleActionKey(Action.ActionEnum);
 }
 
+void AEchoActor::HandleAnimationKey(const FRecordAnimationKey& AnimationKey)
+{
+	//Call BP Function
+	ReceiveHandleAnimationKey(AnimationKey);
+}
+
 void AEchoActor::ForceRelease_Implementation()
 {
 	if (IsValid(GrabbingComponent)) GrabbingComponent->ForceRelease();

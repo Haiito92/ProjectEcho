@@ -43,6 +43,10 @@ struct FEchoTimeline
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Echo")
 	TArray<FRecordActionKey> RewindActionKeys = TArray<FRecordActionKey>();
 	
+	//List of Animation Keys
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Echo")
+	TArray<FRecordAnimationKey> RecordAnimationKeys = TArray<FRecordAnimationKey>();
+	
 	//TimeKey of Start of Timeline (from Global Timeline)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Echo")
 	float StartTimeKey = 0.0f;
@@ -63,6 +67,9 @@ struct FEchoTimeline
 	//Get All Action Keys between two Keys in given Array, returns true if has found ActionKeys
 	bool GetActionKeys(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind, TArray<FRecordActionKey>& OutActionKeys) const;
 	
+	//Get All Action Keys between two Keys in given Array, returns true if has found ActionKeys
+	bool GetAnimationKeys(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind, TArray<FRecordAnimationKey>& OutAnimationKeys) const;
+	
 	//Save Echo Actor for Replays
 	void RegisterEchoActor(AEchoActor* InEchoActor);
 	
@@ -78,11 +85,15 @@ struct FEchoTimeline
 	//Record All Actions executed between last record and now into an ActionKey in Timeline List
 	void RecordActionKey(AActor* RecordedActor, const float& CurrentTimeKey);
 	
+	//Get All AnimationKeys executed between last record and now, also sets the TimeKey
+	void RecordAnimationKey(AActor* RecordedActor, const float& CurrentTimeKey);
+	
 	/* Replay Function
 	 * Play Current Frame of the Replay with given PreviousKey Played and CurrentTimeKey 
 	 * This function will : 
 	 * - Calculate the Transform of the Actor based on last and next TransformKey
 	 * - Execute Actions that occured between previousTimeKey and currentTimeKey
+	 * - Handle Animation Keys that occured between previousTimeKey and currentTimeKey
 	 */
 	void PlayReplay(const float& PreviousKey,const float& CurrentTimeKey, bool bIsInRewind);
 	
