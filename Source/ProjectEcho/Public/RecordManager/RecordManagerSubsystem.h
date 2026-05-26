@@ -47,6 +47,9 @@ struct FEchoTimeline
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Echo")
 	TArray<FRecordAnimationKey> RecordAnimationKeys = TArray<FRecordAnimationKey>();
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Echo")
+	TArray<FRecordAnimationValue> DefaultAnimationValues = TArray<FRecordAnimationValue>(); 
+	
 	//TimeKey of Start of Timeline (from Global Timeline)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Echo")
 	float StartTimeKey = 0.0f;
@@ -121,6 +124,8 @@ struct FEchoTimeline
 	
 	//Record First Action Key (Used when Starting to Record)
 	void RecordFirstActionKeys(const TArray<FRecordedAction>& FirstActions);
+	
+	//Record Default Animation Values 
 };
 #pragma endregion
 
