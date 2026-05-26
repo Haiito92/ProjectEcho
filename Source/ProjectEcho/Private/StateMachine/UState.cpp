@@ -308,7 +308,7 @@ void UState::OnPropulsed(const FVector& PropulseDirection, float PropulsePower)
 
 void UState::OnReflectInputStarted()
 {
-	if (CanUseReflect() && IsValid(ReflectComponent))
+	if (CanUseReflect() && IsValid(ReflectComponent) && !ReflectComponent->IsOn())
 	{
 		ReflectComponent->StartReflect(
 			Character->FirstPersonCameraComponent->GetComponentLocation(),
@@ -322,7 +322,7 @@ void UState::OnReflectInputStarted()
 
 void UState::OnReflectInputCompleted()
 {
-	if (CanUseReflect() && IsValid(ReflectComponent))
+	if (CanUseReflect() && IsValid(ReflectComponent) && ReflectComponent->IsOn())
 	{
 		ReflectComponent->StopReflect();
 
