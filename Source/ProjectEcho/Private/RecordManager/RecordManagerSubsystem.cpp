@@ -1024,7 +1024,7 @@ void URecordManagerSubsystem::DestroyTimeline(int TimelineIndex)
 	if (bIsInRewind) return; //Forbid Timeline Destruction during Rewind
 	if (!GlobalTimeline.Timelines.Contains(SelectedSlot)) return;
 	GlobalTimeline.DestroyTimeline(SelectedSlot, EchoActorsPool);
-	int DestroyedSlot = SelectedSlot;
+	int DestroyedSlot = TimelineIndex;
 	
 	if (TimelineIndex == SelectedSlot)
 	{
@@ -1035,7 +1035,7 @@ void URecordManagerSubsystem::DestroyTimeline(int TimelineIndex)
 	for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
 	{
 		if (!IsValid(RecordableComponent)) continue;
-		RecordableComponent->HandleTimelineDestruction(SelectedSlot);
+		RecordableComponent->HandleTimelineDestruction(DestroyedSlot);
 	}
 	
 	if (GlobalTimeline.Timelines.IsEmpty())
