@@ -38,10 +38,18 @@ void AStandaloneEchoesHandler::Tick(float DeltaTime)
 	if (bHasReachedEnd && !bIsRewind)
 	{
 		bIsRewind = true;
+		for (FEchoTimeline& EchoTimeline : EchoTimelines)
+		{
+			EchoTimeline.HandleRewindStarted(CurrentTimeKey, false);
+		}
 	}
 	else if (bIsRewind && CurrentTimeKey == 0)
 	{
 		bIsRewind = false;
+		for (FEchoTimeline& EchoTimeline : EchoTimelines)
+		{
+			EchoTimeline.HandleRewindStopped(CurrentTimeKey, false);
+		}
 	}
 }
 
@@ -50,6 +58,11 @@ void AStandaloneEchoesHandler::Init()
 	RecordManagerSettings = GetDefault<UDataAssetDeveloperSettings>()->RecordManagerSettings.LoadSynchronous();
 
 	RewindSpeed = GetTimelinesLength() / RecordManagerSettings->StandaloneGlobalRewindTime;
+	
+	EchoTimelines.RemoveAll([](const FEchoTimeline& EchoTimeline)
+	{
+		return EchoTimeline.EchoActor == nullptr;
+	});
 }
 
 void AStandaloneEchoesHandler::Play(const float& PreviousTimeKey, const float& TimeKey, bool bIsInRewind,
