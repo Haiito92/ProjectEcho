@@ -58,6 +58,11 @@ void AStandaloneEchoesHandler::Init()
 	RecordManagerSettings = GetDefault<UDataAssetDeveloperSettings>()->RecordManagerSettings.LoadSynchronous();
 
 	RewindSpeed = GetTimelinesLength() / RecordManagerSettings->StandaloneGlobalRewindTime;
+	
+	EchoTimelines.RemoveAll([](const FEchoTimeline& EchoTimeline)
+	{
+		return EchoTimeline.EchoActor == nullptr;
+	});
 }
 
 void AStandaloneEchoesHandler::Play(const float& PreviousTimeKey, const float& TimeKey, bool bIsInRewind,
