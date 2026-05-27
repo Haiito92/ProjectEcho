@@ -33,10 +33,12 @@ void AEchoActor::HandleAnimationKey(const FRecordAnimationValue& AnimationValue)
 	//Call BP Function
 	switch (AnimationValue.AnimationValueType)
 	{
-	case Bool:
+	case EAnimationValueType::Bool:
 		ReceiveHandleAnimationBooleanKey(AnimationValue.AnimationValueReference, AnimationValue.BoolValue);
-	case Float:
+		break;
+	case EAnimationValueType::Float:
 		ReceiveHandleAnimationFloatKey(AnimationValue.AnimationValueReference, AnimationValue.FloatValue);
+		break;
 	default:
 		break;
 	}

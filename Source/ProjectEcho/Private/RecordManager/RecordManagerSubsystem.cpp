@@ -307,6 +307,8 @@ void FEchoTimeline::PlayFirstKey(TArray<FRecordedAction> RestoreFirstStateAction
 	{
 		EchoActor->HandleActionKey(RecordedAction);
 	}
+	
+	RestoreAnimationKeys(0);
 }
 
 void FEchoTimeline::ActivateTimeline(bool bInIsActive)
@@ -625,6 +627,7 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<
 	RecordingTimeline.EchoActor = EchoActorsPool.Pop();
 	RecordingTimeline.RecordTransformKey(RecordedActor, 0);
 	RecordingTimeline.RecordFirstActionKeys(FirstActions);
+	RecordingTimeline.RecordDefaultAnimationValues(RecordedActor, 0);
 	OnStartRecording.Broadcast(CurrentTimeKey, CurrentRecordingTimelineIndex, RecordManagerSettings->EchoColors[CurrentRecordingTimelineIndex]);
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), RecordManagerSettings->TimeDilatationFactor);
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Start Recording", FColor::Turquoise, 3.f);

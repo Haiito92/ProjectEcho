@@ -119,8 +119,8 @@ enum class EAnimationValueReference : uint8
 	IsNotReflect = 14,
 };
 
-UENUM()
-enum EAnimationValueType
+UENUM(BlueprintType)
+enum class EAnimationValueType : uint8
 {
 	None = 0,
 	Bool = 1,
@@ -159,6 +159,7 @@ struct FRecordAnimationValue
 	UPROPERTY(BlueprintReadWrite)
 	EAnimationValueReference AnimationValueReference = EAnimationValueReference::None;
 	
+	UPROPERTY(BlueprintReadWrite)
 	EAnimationValueType AnimationValueType = EAnimationValueType::None;
 	
 	UPROPERTY(BlueprintReadWrite)
