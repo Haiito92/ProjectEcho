@@ -315,8 +315,7 @@ private:
 protected:
 	UPROPERTY()
 	FGlobalTimeline GlobalTimeline;
-
-	//Current Recording Timeline;
+	
 	UPROPERTY()
 	FEchoTimeline RecordingTimeline;
 	
