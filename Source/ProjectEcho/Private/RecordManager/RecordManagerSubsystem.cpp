@@ -904,6 +904,24 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 		PlayPlayerRewind(previousTimeKey - RecordingTimeline.StartTimeKey, CurrentTimeKey - RecordingTimeline.StartTimeKey);
 	}
 	
+	//--- Handle Replay ---
+	if (!GlobalTimeline.Timelines.IsEmpty())
+	{
+		bool bHasReachedEnd = false;
+		GlobalTimeline.Play(previousTimeKey, CurrentTimeKey, bIsInRewind, bHasReachedEnd);
+		
+		if (bHasReachedEnd && !bIsRecording && !bIsInRewind)
+		{
+			RewindSpeed = GlobalTimeline.GetLength() / RecordManagerSettings->GlobalRewindTime;
+			StartRewind();
+		}
+		else if (bIsInRewind && CurrentTimeKey <= 0)
+		{
+			CurrentTimeKey = 0;
+			StopRewind();
+		}
+	}
+	
 	//Handle Recordables
 	if (bIsInRewind)
 	{
@@ -934,24 +952,6 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 			{
 				RecordableComponent->RecordKey(CurrentTimeKey);
 			}
-		}
-	}
-	
-	//--- Handle Replay ---
-	if (!GlobalTimeline.Timelines.IsEmpty())
-	{
-		bool bHasReachedEnd = false;
-		GlobalTimeline.Play(previousTimeKey, CurrentTimeKey, bIsInRewind, bHasReachedEnd);
-		
-		if (bHasReachedEnd && !bIsRecording && !bIsInRewind)
-		{
-			RewindSpeed = GlobalTimeline.GetLength() / RecordManagerSettings->GlobalRewindTime;
-			StartRewind();
-		}
-		else if (bIsInRewind && CurrentTimeKey <= 0)
-		{
-			CurrentTimeKey = 0;
-			StopRewind();
 		}
 	}
 	
