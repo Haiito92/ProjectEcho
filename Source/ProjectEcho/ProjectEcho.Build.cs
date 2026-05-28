@@ -19,6 +19,7 @@ public class ProjectEcho : ModuleRules
 			"GameplayStateTreeModule",
 			"UMG",
 			"Slate",
+			"SlateCore",
 			"DeveloperSettings",
 			"RHI",
 			"RenderCore"
