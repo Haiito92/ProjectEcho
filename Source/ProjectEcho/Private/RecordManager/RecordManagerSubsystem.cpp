@@ -632,9 +632,10 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), RecordManagerSettings->TimeDilatationFactor);
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Start Recording", FColor::Turquoise, 3.f);
 	
+	EEchoColor ColorEnum = RecordManagerSettings->EchoColors[CurrentRecordingTimelineIndex].ColorEnum;
 	for (AActor* RecordListener : RecordListeners)
 	{
-		IRecordListener::Execute_ReactToRecordStart(RecordListener);
+		IRecordListener::Execute_ReactToRecordStart(RecordListener, CurrentRecordingTimelineIndex, ColorEnum);
 	}
 }
 
