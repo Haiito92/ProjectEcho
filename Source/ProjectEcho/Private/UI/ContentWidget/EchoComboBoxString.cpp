@@ -102,7 +102,7 @@ TSharedRef<SWidget> UEchoComboBoxString::RebuildWidget()
 	}
 PRAGMA_DISABLE_DEPRECATION_WARNINGS
 	MyComboBox =
-		SNew(SComboBox< TSharedPtr<FString> >)
+		SNew(SEchoComboBox< TSharedPtr<FString> >)
 		.ComboBoxStyle(&WidgetStyle)
 		.ItemStyle(&ItemStyle)
 		.ForegroundColor(ForegroundColor)
@@ -117,6 +117,8 @@ PRAGMA_DISABLE_DEPRECATION_WARNINGS
 		.OnComboBoxOpening(BIND_UOBJECT_DELEGATE(FOnComboBoxOpening, HandleOpening))
 	    .ScrollBarStyle(&ScrollBarStyle)
 		.IsFocusable(bIsFocusable)
+		.OnReceivedFocus_UObject(this, &ThisClass::SlateHandleOnReceivedFocus)
+		.OnLostFocus_UObject(this, &ThisClass::SlateHandleOnLostFocus)
 		[
 			SAssignNew(ComboBoxContent, SBox)
 		];
@@ -471,6 +473,26 @@ void UEchoComboBoxString::HandleSelectionChanged(TSharedPtr<FString> Item, ESele
 void UEchoComboBoxString::HandleOpening()
 {
 	OnOpening.Broadcast();
+}
+
+void UEchoComboBoxString::SlateHandleOnReceivedFocus()
+{
+	ReceivedFocus();
+	OnReceivedFocus.Broadcast();
+}
+
+void UEchoComboBoxString::SlateHandleOnLostFocus()
+{
+	LostFocus();
+	OnLostFocus.Broadcast();
+}
+
+void UEchoComboBoxString::ReceivedFocus_Implementation()
+{
+}
+
+void UEchoComboBoxString::LostFocus_Implementation()
+{
 }
 
 #if WITH_EDITOR

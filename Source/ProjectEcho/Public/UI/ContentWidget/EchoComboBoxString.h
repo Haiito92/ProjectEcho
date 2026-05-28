@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/Widget.h"
+#include "SEchoComboBox.h"
 #include "EchoComboBoxString.generated.h"
 
 /**
@@ -16,7 +17,9 @@ class PROJECTECHO_API UEchoComboBoxString : public UWidget
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSelectionChangedEvent, FString, SelectedItem, ESelectInfo::Type, SelectionType);
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOpeningEvent);
-
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnComboBoxStringReceivedFocusEvent);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnComboBoxStringLostFocusEvent);
+	
 	UEchoComboBoxString(const FObjectInitializer& ObjectInitializer);
 	
 private:
@@ -102,6 +105,11 @@ public: // Events
 	UPROPERTY(BlueprintAssignable, Category=Events)
 	FOnOpeningEvent OnOpening;
 
+	UPROPERTY(BlueprintAssignable, Category=Events)
+	FOnComboBoxStringReceivedFocusEvent OnReceivedFocus;
+	
+	UPROPERTY(BlueprintAssignable, Category=Events)
+	FOnComboBoxStringLostFocusEvent OnLostFocus;
 public:
 
 	UFUNCTION(BlueprintCallable, Category="ComboBox")
@@ -223,6 +231,14 @@ protected:
 	/** Called by slate when the underlying combobox is opening */
 	virtual void HandleOpening();
 
+	void SlateHandleOnReceivedFocus();
+	void SlateHandleOnLostFocus();
+	
+	UFUNCTION(BlueprintNativeEvent)
+	void ReceivedFocus();
+	UFUNCTION(BlueprintNativeEvent)
+	void LostFocus();
+	
 	//~ Begin UWidget Interface
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 	//~ End UWidget Interface
@@ -244,7 +260,7 @@ protected:
 	TArray< TSharedPtr<FString> > Options;
 
 	/** A shared pointer to the underlying slate combobox */
-	TSharedPtr< SComboBox< TSharedPtr<FString> > > MyComboBox;
+	TSharedPtr< SEchoComboBox< TSharedPtr<FString> > > MyComboBox;
 
 	/** A shared pointer to a container that holds the combobox content that is selected */
 	TSharedPtr< SBox > ComboBoxContent;
