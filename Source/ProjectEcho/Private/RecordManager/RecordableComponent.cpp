@@ -6,7 +6,9 @@
 
 #include <RecordManager/RecordManagerSubsystem.h>
 
+#include "EchoSystem.h"
 #include "RecordManager/RecordKeysStructs.h"
+#include "Tools/Debug/EchoDebug.h"
 
 URecordableComponent::URecordableComponent()
 {
@@ -79,6 +81,16 @@ void URecordableComponent::ReplayFirstKey()
 	GetOwner()->SetActorLocation(TransformKeys[0].Position);
 	GetOwner()->SetActorRotation(TransformKeys[0].Rotation);
 	GetOwner()->SetActorScale3D(TransformKeys[0].Scale);
+	if (bHandlePhysicsOfMesh)
+	{
+		if (PhysicsComponent->IsSimulatingPhysics())
+		{
+			PhysicsComponent->SetPhysicsLinearVelocity(FVector(0,0,0));
+			PhysicsComponent->SetPhysicsAngularVelocityInDegrees(FVector(0,0,0));
+		}
+	}
+	UEchoDebug::DrawSphere(GetWorld(), EEchoSystem::Record, TransformKeys[0].Position, 10, 12, FColor::Turquoise, 3, 1);
+	
 }
 
 void URecordableComponent::MarkAsCurrentlyInteracted()
@@ -145,7 +157,7 @@ void URecordableComponent::StartRecording(const FRecordInteractionKey& FirstInte
 }
 
 void URecordableComponent::RegisterInteractionKey(const FRecordInteractionKey& InteractionKey)
-{
+{ 
 	InteractionKeys.Add(InteractionKey);
 	InteractionKeys.Sort([](const FRecordInteractionKey& A, const FRecordInteractionKey& B)
 	{

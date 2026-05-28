@@ -64,7 +64,7 @@ protected:
 	UPROPERTY()
 	TObjectPtr<AEchoHUDBase> EchoHUD;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<AEchoPlayerControllerBase> EchoPlayerController;
 	
 	UPROPERTY()
