@@ -4,9 +4,11 @@
 #include "ReflectMechanic/ReflectComponent.h"
 
 #include "DataAssetDeveloperSettings.h"
+#include "Kismet/GameplayStatics.h"
 #include "ReflectMechanic/Reflectable.h"
 #include "ReflectMechanic/ReflectMechanicSettings.h"
 #include "Tools/Debug/EchoDebug.h"
+#include "WorldPartition/HLOD/HLODActor.h"
 
 
 // Sets default values for this component's properties
@@ -132,7 +134,9 @@ bool UReflectComponent::TryReflect()
 		FCollisionShape::MakeSphere(ReflectMechanicSettings->SphereTraceRadius),
 		QueryParams
 		);
-	
+
+	TArray<FVector> Path = GetReflectPredictionPath();
+
 	ReceiveTryReflect();
 
 	if (!HitResult.bBlockingHit)
@@ -173,5 +177,31 @@ bool UReflectComponent::TryReflect()
 	OnObjectReflected.Broadcast();
 	
 	return true;
+}
+
+TArray<FVector> UReflectComponent::GetReflectPredictionPath()
+{
+	TArray<FVector> path;
+	FPredictProjectilePathParams PredictParams;
+	PredictParams.StartLocation = CastStartLocation;
+	PredictParams.LaunchVelocity = CastDirection.GetSafeNormal() * ReflectMechanicSettings->ReflectPower;
+	PredictParams.bTraceWithCollision = true;
+	
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this->GetOwner());
+	PredictParams.ActorsToIgnore = ActorsToIgnore;
+	
+	PredictParams.SimFrequency = ReflectMechanicSettings->PredictionSimulationPointsFrequency;
+	PredictParams.MaxSimTime = ReflectMechanicSettings->PredictionSimulationTime;
+	
+	FPredictProjectilePathResult PredictResult;
+	UGameplayStatics::PredictProjectilePath(GetWorld(), PredictParams, PredictResult);
+	
+	for (const FPredictProjectilePathPointData& PathPoint : PredictResult.PathData)
+	{
+		path.Add(PathPoint.Location);
+		UEchoDebug::DrawSphere(GetWorld(), EEchoSystem::Reflect, PathPoint.Location, 10, 12, FColor::Purple, 0.1f, 2);
+	}
+	return path;
 }
 

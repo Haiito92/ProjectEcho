@@ -62,6 +62,9 @@ protected:
 	void ReceiveTryReflect();
 	
 private:
+	UFUNCTION()
+	TArray<FVector> GetReflectPredictionPath();
+	
 	UPROPERTY()
 	TObjectPtr<UReflectMechanicSettings> ReflectMechanicSettings;
 	

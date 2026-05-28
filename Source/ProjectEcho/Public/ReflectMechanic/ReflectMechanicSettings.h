@@ -34,4 +34,12 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Reflect", meta=(ClampMin=0.0f, ClampMax=90.0f))
 	float ReflectLiftAngleThreshold = 45.f;
+	
+	//Simulation Time of Prediction (How far the precision goes)
+	UPROPERTY(EditDefaultsOnly, Category="Prediction Feedback")
+	float PredictionSimulationTime = 1.0f;
+	
+	//Simulation Precision of Prediction (How many points are generated to make the precision)
+	UPROPERTY(EditDefaultsOnly, Category="Prediction Feedback")
+	float PredictionSimulationPointsFrequency = 20.0f;
 };
