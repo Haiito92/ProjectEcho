@@ -20,7 +20,8 @@ public class ProjectEcho : ModuleRules
 			"UMG",
 			"Slate",
 			"DeveloperSettings",
-			"RHI"
+			"RHI",
+			"RenderCore"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

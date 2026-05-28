@@ -9,6 +9,7 @@
 #pragma region ActionKeys Structs
 
 #pragma endregion
+struct FRecordAnimationValue;
 struct FRecordedAction;
 // This class does not need to be modified.
 UINTERFACE()
@@ -40,6 +41,10 @@ public:
 	UFUNCTION()
 	virtual TArray<FRecordedAction> GetToRecordRewindActions() = 0;
 	
+	//Called to get AnimationsKeys
+	UFUNCTION()
+	virtual TArray<FRecordAnimationValue> GetToRecordAnimationKeys() = 0;
+	
 	//Called to Get Control Rotation
 	UFUNCTION(BlueprintNativeEvent)
 	FRotator GetToRecordControlRotation();
@@ -51,4 +56,7 @@ public:
 	//Called to Handle Rewinds Action (Restore State to before Record)
 	UFUNCTION(BlueprintNativeEvent)
 	void HandleRewindActionKey(const FRecordedAction& RecordedAction);
+	
+	UFUNCTION()
+	virtual TArray<FRecordAnimationValue> GetDefaultAnimationValues() = 0;
 };
