@@ -7,7 +7,7 @@
 /**
  * 
  */
-UENUM()
+UENUM(BlueprintType)
 enum class MenuType : uint8
 {
 	MainMenu,

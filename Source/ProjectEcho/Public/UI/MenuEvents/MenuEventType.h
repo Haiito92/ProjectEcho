@@ -10,9 +10,9 @@
 UENUM(BlueprintType)
 enum class MenuEventType : uint8
 {
-	PlayPressed,
 	QuitPressed,
 	GoToMenuPressed,
 	ResumePressed,
-	GoToLevelPressed,
+	GoToGameLevelPressed,
+	GoToMenuLevelPressed,
 };

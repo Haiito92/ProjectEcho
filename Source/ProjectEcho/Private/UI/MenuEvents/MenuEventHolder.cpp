@@ -2,18 +2,12 @@
 
 
 #include "UI/MenuEvents/MenuEventHolder.h"
-
 #include "UI/MenuEvents/MenuEventType.h"
 
 void UMenuEventHolder::LaunchEvent(const MenuEventType& EventType, const MenuType& GoToMenuType)
 {
 	switch (EventType)
 	{
-		case MenuEventType::PlayPressed:
-			{
-				OnPlayPressed.Broadcast();
-				break;
-			}
 		case MenuEventType::QuitPressed:
 			{
 				OnQuitPressed.Broadcast();
@@ -29,9 +23,14 @@ void UMenuEventHolder::LaunchEvent(const MenuEventType& EventType, const MenuTyp
 				OnResumePressed.Broadcast();
 				break;
 			}
-		case MenuEventType::GoToLevelPressed:
+		case MenuEventType::GoToMenuLevelPressed:
 			{
-				OnGoToLevelPressed.Broadcast();
+				OnGoToMenuLevelPressed.Broadcast();
+				break;
+			}
+	case MenuEventType::GoToGameLevelPressed:
+			{
+				OnGoToGameLevelPressed.Broadcast();
 				break;
 			}
 		default:

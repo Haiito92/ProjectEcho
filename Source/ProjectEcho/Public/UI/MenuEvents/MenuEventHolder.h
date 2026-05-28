@@ -12,21 +12,18 @@ enum class MenuEventType : uint8;
  * 
  */
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayPressedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnQuitPressedSignature);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGoToMenuPressedSignature, const MenuType&, EventType);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGoToMenuPressedSignature, const MenuType&, GoToMenuType);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnResumePressedSignature);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGoToLevelPressedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGoToMenuLevelPressedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGoToGameLevelPressedSignature);
 
-UCLASS()
+UCLASS(BlueprintType, Blueprintable)
 class PROJECTECHO_API UMenuEventHolder : public UObject
 {
 	GENERATED_BODY()
 	
 public:
-	
-	UPROPERTY(BlueprintAssignable)
-	FOnPlayPressedSignature OnPlayPressed;
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnQuitPressedSignature OnQuitPressed;
@@ -38,7 +35,10 @@ public:
 	FOnResumePressedSignature OnResumePressed;
 	
 	UPROPERTY(BlueprintAssignable)
-	FOnGoToLevelPressedSignature OnGoToLevelPressed;
+	FOnGoToMenuLevelPressedSignature OnGoToMenuLevelPressed;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnGoToGameLevelPressedSignature OnGoToGameLevelPressed;
 	
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="EventType,GoToMenuType"))
 	void LaunchEvent(const MenuEventType& EventType, const MenuType& GoToMenuType);

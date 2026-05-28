@@ -6,8 +6,10 @@
 #include "HUDs/EchoHUDBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "PlayerControllers/EchoPlayerControllerBase.h"
+#include "RecordManager/EchoActor.h"
 #include "Tools/Debug/EchoDebug.h"
 #include "Tools/Debug/EchoMessageType.h"
+#include "UI/MenuEvents/MenuEventHolder.h"
 
 void AEchoGameModeBase::BeginPlay()
 {
@@ -33,7 +35,7 @@ void AEchoGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void AEchoGameModeBase::SpawnActors()
 {
-	
+	MenuEventHolder = NewObject<UMenuEventHolder>(this, UMenuEventHolder::StaticClass());
 }
 
 void AEchoGameModeBase::InitializeGame()
@@ -61,7 +63,7 @@ void AEchoGameModeBase::InitializeUI()
 
 		if (IsValid(EchoHUD))
 		{
-			EchoHUD->InitHUD();
+			EchoHUD->InitHUD(EchoPlayerController, MenuEventHolder);
 			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Successfully initialized HUD", FColor::Green, 3.0f);
 		}
 		else UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error, "Failed to initialize HUD", FColor::Red, 3.0f);
@@ -87,12 +89,10 @@ void AEchoGameModeBase::ToggleGamePause()
 	if (bIsGamePaused)
 	{
 		ResumeGame();
-		ReceiveResumeGame();
 	}
 	else
 	{
 		PauseGame();
-		ReceivePauseGame();
 	}
 }
 
@@ -104,6 +104,8 @@ void AEchoGameModeBase::PauseGame()
 	
 	UGameplayStatics::SetGamePaused(GetWorld(), true);
 	
+	ReceivePauseGame();
+	
 	EchoHUD->PauseHUD();
 }
 
@@ -112,6 +114,8 @@ void AEchoGameModeBase::ResumeGame()
 	if (!bIsGamePaused) return;
 	bIsGamePaused = false;
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Resume Game", FColor::Orange, 3.0f);
+
+	ReceiveResumeGame();
 	
 	EchoHUD->ResumeHUD();
 	
