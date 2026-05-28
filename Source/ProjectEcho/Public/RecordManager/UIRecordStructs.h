@@ -60,17 +60,17 @@ struct FGlobalTimelineUIInfo
 	GENERATED_BODY()
 	
 	UPROPERTY(BlueprintReadOnly)
-	TArray<FTimelineUIInfo> Timelines;
+	TArray<FTimelineUIInfo> Timelines = TArray<FTimelineUIInfo>();
 	
 	UPROPERTY(BlueprintReadOnly)
-	float CurrentTimeKey;
+	float CurrentTimeKey = 0;
 	
 	UPROPERTY(BlueprintReadOnly)
-	int SelectedTimelineIndex;
+	int SelectedTimelineIndex = 0;
 	
 	UPROPERTY(BlueprintReadOnly)
-	float Length;
+	float Length = 0;
 	
 	UPROPERTY(BlueprintReadOnly)
-	int NbSlots;
+	int NbSlots = 0;
 };

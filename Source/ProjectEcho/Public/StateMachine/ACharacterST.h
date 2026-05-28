@@ -125,6 +125,15 @@ public:
 	virtual TArray<FRecordedAction> GetToRecordRewindActions() override;
 	
 	UFUNCTION()
+	virtual TArray<FRecordAnimationValue> GetToRecordAnimationKeys() override;
+	
+	UFUNCTION()
+	virtual TArray<FRecordAnimationValue> GetDefaultAnimationValues() override;
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	TArray<FRecordAnimationValue> ReceiveGetDefaultAnimationValues();
+	
+	UFUNCTION()
 	virtual void HandleRewindActionKey_Implementation(const FRecordedAction& RewindAction) override;
 
 	UFUNCTION()
@@ -152,7 +161,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="InRespawnTransform"))
 	void SetRespawnTransform(const FTransform& InRespawnTransform);
-	
+
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
 	UPROPERTY(BlueprintAssignable)
 	FMovePressed OnMovePressed;
@@ -220,8 +229,6 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathEnd);
 	UPROPERTY(BlueprintAssignable)
 	FOnDeathEnd OnDeathEnd;
-	
-	
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRevive);
 	UPROPERTY(BlueprintAssignable)

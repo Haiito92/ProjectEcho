@@ -98,3 +98,96 @@ struct FRecordInteractionKey
 	float TimeKey = 0;
 	int RecordTimelineIndex = 0;
 };
+
+UENUM(BlueprintType)
+enum class EAnimationValueReference : uint8
+{
+	None = 0,
+	IsGrabbing = 1,
+	IsReleasing = 2,
+	IsThrowing = 3,
+	IsJumping = 4,
+	IsFalling = 5,
+	IsDead = 6,
+	IsReviving = 7,
+	IsMoving = 8,
+	Speed = 9,
+	IsRecording = 10,
+	IsReflect = 11,
+	OnRevive = 12,
+	IsHoldingReflect = 13,
+	IsNotReflect = 14,
+};
+
+UENUM(BlueprintType)
+enum class EAnimationValueType : uint8
+{
+	None = 0,
+	Bool = 1,
+	Float = 2,
+};
+
+USTRUCT(BlueprintType)
+//Reference to an Animation Value
+struct FRecordAnimationValue
+{
+	GENERATED_BODY()
+	
+	FRecordAnimationValue()
+	{
+		this->AnimationValueReference = EAnimationValueReference::None;
+		this->BoolValue = false;
+		this->FloatValue = 0;
+	}
+	
+	FRecordAnimationValue(EAnimationValueReference AnimationValueReference, bool BoolValue)
+	{
+		this->AnimationValueReference = AnimationValueReference;
+		AnimationValueType = EAnimationValueType::Bool;
+		this->BoolValue = BoolValue;
+		this->FloatValue = 0;
+	}
+	
+	FRecordAnimationValue(EAnimationValueReference AnimationValueReference, float FloatValue)
+	{
+		this->AnimationValueReference = AnimationValueReference;
+		AnimationValueType = EAnimationValueType::Float;
+		this->FloatValue = FloatValue;
+		this->BoolValue = false;
+	}
+	
+	UPROPERTY(BlueprintReadWrite)
+	EAnimationValueReference AnimationValueReference = EAnimationValueReference::None;
+	
+	UPROPERTY(BlueprintReadWrite)
+	EAnimationValueType AnimationValueType = EAnimationValueType::None;
+	
+	UPROPERTY(BlueprintReadWrite)
+	bool BoolValue = false;
+	
+	UPROPERTY(BlueprintReadWrite)
+	float FloatValue = 0;
+};
+
+USTRUCT(BlueprintType)
+//Key to Register a change in Animation Value
+struct FRecordAnimationKey
+{
+	GENERATED_BODY()
+	
+	FRecordAnimationKey()
+	{
+		this->TimeKey = 0;
+		this->RecordAnimationValue = FRecordAnimationValue();
+	}
+	
+	FRecordAnimationKey(const FRecordAnimationValue& AnimationValue, const float& TimeKey)
+	{
+		this->TimeKey = TimeKey;
+		this->RecordAnimationValue = AnimationValue;
+	}
+	
+	FRecordAnimationValue RecordAnimationValue = FRecordAnimationValue();
+	float TimeKey = 0;
+};
+
