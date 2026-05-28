@@ -7,6 +7,7 @@
 #include "Styling/SlateTypes.h"
 #include "Widgets/SWidget.h"
 #include "Components/Widget.h"
+#include "Components/Slider.h"
 #include "EchoSlider.generated.h"
 
 /**
@@ -14,13 +15,8 @@
  */
 class SEchoSlider;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMouseCaptureBeginEvent);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMouseCaptureEndEvent);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnControllerCaptureBeginEvent);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnControllerCaptureEndEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSliderReceivedFocusEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSliderLostFocusEvent);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFloatValueChangedEvent, float, Value);
 
 UCLASS()
 class PROJECTECHO_API UEchoSlider : public UWidget

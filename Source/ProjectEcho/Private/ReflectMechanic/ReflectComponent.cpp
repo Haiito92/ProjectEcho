@@ -128,7 +128,7 @@ bool UReflectComponent::TryReflect()
 		CastStartLocation,
 		CastEndLocation,
 		FQuat::Identity,
-		ECollisionChannel::ECC_WorldDynamic,
+		ECollisionChannel::ECC_GameTraceChannel2,
 		FCollisionShape::MakeSphere(ReflectMechanicSettings->SphereTraceRadius),
 		QueryParams
 		);

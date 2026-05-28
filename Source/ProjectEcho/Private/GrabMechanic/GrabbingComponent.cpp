@@ -52,7 +52,7 @@ bool UGrabbingComponent::TryGrab(const FRotator& ControlRotation, const FGrabbin
 		CastStartLocation,
 		CastEndLocation,
 		ControlRotation.Quaternion(),
-		ECC_WorldDynamic,
+		ECC_GameTraceChannel2,
 		FCollisionShape::MakeSphere(GrabMechanicSettings->SphereTraceRadius), 
 		TraceParams);
 	

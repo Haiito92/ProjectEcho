@@ -104,10 +104,6 @@ void AEchoGameModeBase::PauseGame()
 	
 	UGameplayStatics::SetGamePaused(GetWorld(), true);
 	
-	FInputModeGameAndUI InputMode;
-	EchoPlayerController->SetInputMode(InputMode);
-	EchoPlayerController->SetShowMouseCursor(true);
-	
 	EchoHUD->PauseHUD();
 }
 
@@ -116,10 +112,6 @@ void AEchoGameModeBase::ResumeGame()
 	if (!bIsGamePaused) return;
 	bIsGamePaused = false;
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Resume Game", FColor::Orange, 3.0f);
-	
-	FInputModeGameOnly InputMode;
-	EchoPlayerController->SetInputMode(InputMode);
-	EchoPlayerController->SetShowMouseCursor(false);
 	
 	EchoHUD->ResumeHUD();
 	
