@@ -12,7 +12,7 @@ class AEchoActor;
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType)
 class PROJECTECHO_API URecordManagerSettings : public UDataAsset
 {
 	GENERATED_BODY()

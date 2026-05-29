@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "EchoGameModeBase.generated.h"
 
+class UMenuEventHolder;
 class AEchoPlayerControllerBase;
 class AEchoHUDBase;
 /**
@@ -61,10 +62,13 @@ protected:
 	UFUNCTION()
 	void OnPauseInputStarted();
 	
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UMenuEventHolder> MenuEventHolder;
+	
 	UPROPERTY()
 	TObjectPtr<AEchoHUDBase> EchoHUD;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<AEchoPlayerControllerBase> EchoPlayerController;
 	
 	UPROPERTY()
