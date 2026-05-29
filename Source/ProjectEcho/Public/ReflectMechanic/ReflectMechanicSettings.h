@@ -42,4 +42,12 @@ public:
 	//Simulation Precision of Prediction (How many points are generated to make the precision)
 	UPROPERTY(EditDefaultsOnly, Category="Prediction Feedback")
 	float PredictionSimulationPointsFrequency = 20.0f;
+	
+	//Simulation Prediction Skip First points predicted before x simulated seconds
+	UPROPERTY(EditDefaultsOnly, Category="Prediction Feedback")
+	float PredictionSimulationSkipFirstPoints= 0.3f;
+	
+	//Simulation Prediction Position Offset (Starting from Push Position)
+	UPROPERTY(EditDefaultsOnly, Category="Prediction Feedback")
+	FVector PredictionSimulationOffset = FVector(0,0,0);
 };

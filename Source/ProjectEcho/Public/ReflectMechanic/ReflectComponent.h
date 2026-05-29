@@ -59,7 +59,13 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	bool TryReflect();
 	UFUNCTION(BlueprintImplementableEvent)
-	void ReceiveTryReflect();
+	void ReceiveTryReflect(const TArray<FVector>& PredictPathPositions);
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveStartReflect();
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveStopReflect();
+	
+	
 	
 private:
 	UFUNCTION()

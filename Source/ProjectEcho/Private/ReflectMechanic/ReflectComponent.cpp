@@ -70,12 +70,14 @@ void UReflectComponent::StartReflect()
 	bIsOn = true;
 	ResetCooldownTimer();
 	OnReflectStarted.Broadcast();
+	ReceiveStartReflect();
 }
 
 void UReflectComponent::StopReflect()
 {
 	bIsOn = false;
 	OnReflectStopped.Broadcast();
+	ReceiveStopReflect();
 }
 
 
@@ -135,9 +137,9 @@ bool UReflectComponent::TryReflect()
 		QueryParams
 		);
 
-	TArray<FVector> Path = GetReflectPredictionPath();
+	const TArray<FVector> Path = GetReflectPredictionPath();
 
-	ReceiveTryReflect();
+	ReceiveTryReflect(Path);
 
 	if (!HitResult.bBlockingHit)
 	{
@@ -183,7 +185,7 @@ TArray<FVector> UReflectComponent::GetReflectPredictionPath()
 {
 	TArray<FVector> path;
 	FPredictProjectilePathParams PredictParams;
-	PredictParams.StartLocation = CastStartLocation;
+	PredictParams.StartLocation = CastStartLocation + ReflectMechanicSettings->PredictionSimulationOffset * GetOwner()->GetActorForwardVector();
 	PredictParams.LaunchVelocity = CastDirection.GetSafeNormal() * ReflectMechanicSettings->ReflectPower;
 	PredictParams.bTraceWithCollision = true;
 	
@@ -197,10 +199,16 @@ TArray<FVector> UReflectComponent::GetReflectPredictionPath()
 	FPredictProjectilePathResult PredictResult;
 	UGameplayStatics::PredictProjectilePath(GetWorld(), PredictParams, PredictResult);
 	
+	//Debug
+	TArray<FColor> Colors = TArray<FColor>({FColor::Red, FColor::Orange, FColor::Yellow, FColor::Green, FColor::Cyan, FColor::Blue});
+	int i = 0;
+	
 	for (const FPredictProjectilePathPointData& PathPoint : PredictResult.PathData)
 	{
+		if (PathPoint.Time < ReflectMechanicSettings->PredictionSimulationSkipFirstPoints) continue;
 		path.Add(PathPoint.Location);
-		UEchoDebug::DrawSphere(GetWorld(), EEchoSystem::Reflect, PathPoint.Location, 10, 12, FColor::Purple, 0.1f, 2);
+		UEchoDebug::DrawSphere(GetWorld(), EEchoSystem::Reflect, PathPoint.Location, 10, 12, Colors[i % Colors.Num()], 0.1f, 2);
+		i++;
 	}
 	return path;
 }
