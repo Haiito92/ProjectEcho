@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "RecordListener.generated.h"
 
+enum class EEchoColor : uint8;
 // This class does not need to be modified.
 UINTERFACE()
 class URecordListener : public UInterface
@@ -23,7 +24,7 @@ class PROJECTECHO_API IRecordListener
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void ReactToRecordStart();
+	void ReactToRecordStart(int TimelineIndex, EEchoColor EchoColor);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ReactToRecordEnd();

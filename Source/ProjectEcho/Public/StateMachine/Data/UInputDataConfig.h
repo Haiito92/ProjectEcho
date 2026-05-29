@@ -4,6 +4,7 @@
 #include "UInputDataConfig.generated.h"
 
 class UInputAction;
+class UInputMappingContext;
 
 UCLASS()
 class UInputDataConfig : public UDataAsset
