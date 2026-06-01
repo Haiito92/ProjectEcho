@@ -117,6 +117,7 @@ enum class EAnimationValueReference : uint8
 	OnRevive = 12,
 	IsHoldingReflect = 13,
 	IsNotReflect = 14,
+	AnimTopBody = 15 
 };
 
 UENUM(BlueprintType)
