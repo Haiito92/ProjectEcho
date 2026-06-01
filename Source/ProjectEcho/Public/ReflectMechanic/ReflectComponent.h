@@ -77,6 +77,9 @@ private:
 	UPROPERTY()
 	bool bIsOn;
 	
+	UPROPERTY(EditDefaultsOnly, Category="Prediction Feedback")
+	bool bUsePlayerPredictionSettings = false;
+	
 	UPROPERTY()
 	float ReflectCooldown;
 	
