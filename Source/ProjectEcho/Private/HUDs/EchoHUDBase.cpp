@@ -2,10 +2,11 @@
 
 
 #include "HUDs/EchoHUDBase.h"
+#include "UI/MenuEvents/MenuEventHolder.h"
 
-void AEchoHUDBase::InitHUD()
+void AEchoHUDBase::InitHUD(AEchoPlayerControllerBase* InEchoPlayerController, UMenuEventHolder* InMenuEventHolder)
 {
-	InternalHUDInit();
+	InternalHUDInit(InEchoPlayerController, InMenuEventHolder);
 	
 	CreateWidgets();
 	
@@ -27,9 +28,12 @@ void AEchoHUDBase::ResumeHUD()
 	ReceiveResumeHUD();
 }
 
-void AEchoHUDBase::InternalHUDInit()
+void AEchoHUDBase::InternalHUDInit(AEchoPlayerControllerBase* InEchoPlayerController, UMenuEventHolder* InMenuEventHolder)
 {
-	ReceiveInternalHUDInit();
+	MenuEventHolder = InMenuEventHolder;
+	EchoPlayerController = InEchoPlayerController;
+	
+	ReceiveInternalHUDInit(InEchoPlayerController, InMenuEventHolder);
 }
 
 void AEchoHUDBase::CreateWidgets()
