@@ -635,6 +635,7 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<
 	EEchoColor ColorEnum = RecordManagerSettings->EchoColors[CurrentRecordingTimelineIndex].ColorEnum;
 	for (AActor* RecordListener : RecordListeners)
 	{
+		if (!IsValid(RecordListener)) continue;
 		IRecordListener::Execute_ReactToRecordStart(RecordListener, CurrentRecordingTimelineIndex, ColorEnum);
 	}
 }
@@ -668,6 +669,7 @@ void URecordManagerSubsystem::StopRecord()
 		
 		for (AActor* RecordListener : RecordListeners)
 		{
+			if (!IsValid(RecordListener)) continue;
 			IRecordListener::Execute_ReactToRecordEnd(RecordListener);
 		}
 	}
@@ -683,6 +685,7 @@ void URecordManagerSubsystem::StartPlayerRewind()
 	
 	for (AActor* RecordListener : RecordListeners)
 	{
+		if (!IsValid(RecordListener)) continue;
 		IRecordListener::Execute_ReactToPlayerRewindStart(RecordListener);
 	}
 }
@@ -710,6 +713,7 @@ void URecordManagerSubsystem::StopPlayerRewind()
 	
 	for (AActor* RecordListener : RecordListeners)
 	{
+		if (!IsValid(RecordListener)) continue;
 		IRecordListener::Execute_ReactToPlayerRewindEnd(RecordListener);
 	}
 }
@@ -730,6 +734,7 @@ void URecordManagerSubsystem::StartRewind(bool bIsPlayerRewind)
 	
 	for (AActor* RecordListener : RecordListeners)
 	{
+		if (!IsValid(RecordListener)) continue;
 		IRecordListener::Execute_ReactToRewindStart(RecordListener);
 	}
 }
@@ -750,6 +755,7 @@ void URecordManagerSubsystem::StopRewind(bool bIsPlayerRewind)
 	
 	for (AActor* RecordListener : RecordListeners)
 	{
+		if (!IsValid(RecordListener)) continue;
 		IRecordListener::Execute_ReactToRewindEnd(RecordListener);
 	}
 }
