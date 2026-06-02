@@ -8,6 +8,7 @@
 #include "Tools/Debug/DebugDataAsset.h"
 #include "DataAssetDeveloperSettings.generated.h"
 
+class UUISettingsData;
 class UOptionsSettingsData;
 class UInputDataConfig;
 class UPropulseMechanicSettings;
@@ -58,4 +59,7 @@ public:
 	
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Options Settings")
 	TSoftObjectPtr<UOptionsSettingsData> OptionsSettings;
+	
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="UI Settings")
+	TSoftObjectPtr<UUISettingsData> UISettings;
 };

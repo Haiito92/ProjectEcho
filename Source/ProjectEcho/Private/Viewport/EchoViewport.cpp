@@ -5,7 +5,7 @@
 
 #include "EchoSystem.h"
 #include "InputKeyEventArgs.h"
-#include "GameInstance/DeviceGameInstanceSubsystem.h"
+#include "Controls/DeviceGameInstanceSubsystem.h"
 #include "Tools/Debug/EchoDebug.h"
 #include "Tools/Debug/EchoMessageType.h"
 
