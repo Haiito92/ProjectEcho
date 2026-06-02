@@ -3,36 +3,46 @@
 
 #include "Viewport/EchoViewport.h"
 
-void UEchoViewport::InitializeViewport()
-{
-	
-}
+#include "EchoSystem.h"
+#include "InputKeyEventArgs.h"
+#include "GameInstance/DeviceGameInstanceSubsystem.h"
+#include "Tools/Debug/EchoDebug.h"
+#include "Tools/Debug/EchoMessageType.h"
 
+void UEchoViewport::Init(struct FWorldContext& WorldContext, UGameInstance* OwningGameInstance,
+	bool bCreateNewAudioDevice)
+{
+	Super::Init(WorldContext, OwningGameInstance, bCreateNewAudioDevice);
+	
+	DeviceSubsystem = GetGameInstance()->GetSubsystem<UDeviceGameInstanceSubsystem>();
+	
+	if (!IsValid(DeviceSubsystem)) UEchoDebug::Log(EEchoSystem::GameLoop, EEchoMessageType::Error, "Viewport: Device subsystem invalid");
+
+}
 bool UEchoViewport::InputKey(const FInputKeyEventArgs& EventArgs)
 {
-	return Super::InputKey(EventArgs);
+	ControlDeviceType NewControlDeviceType = ControlDeviceType::KeyboardAndMouse;
 	
 	if (EventArgs.IsGamepad())
 	{
-		// Set device to gamepad
-	}
-	else
-	{
-		// Set to keyboard
+		NewControlDeviceType = ControlDeviceType::Gamepad;
 	}
 	
+	if (IsValid(DeviceSubsystem)) DeviceSubsystem->SetCurrentControlDeviceType(NewControlDeviceType);
+	
+	return Super::InputKey(EventArgs);
 }
 
 bool UEchoViewport::InputAxis(const FInputKeyEventArgs& Args)
 {
-	return Super::InputAxis(Args);
+	ControlDeviceType NewControlDeviceType = ControlDeviceType::KeyboardAndMouse;
 	
 	if (Args.IsGamepad())
 	{
-		// Set device to gamepad
+		NewControlDeviceType = ControlDeviceType::Gamepad;
 	}
-	else
-	{
-		// Set to keyboard
-	}
+	
+	if (IsValid(DeviceSubsystem)) DeviceSubsystem->SetCurrentControlDeviceType(NewControlDeviceType);
+	
+	return Super::InputAxis(Args);
 }

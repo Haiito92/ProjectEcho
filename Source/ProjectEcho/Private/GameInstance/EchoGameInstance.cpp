@@ -3,9 +3,12 @@
 
 #include "Public/GameInstance/EchoGameInstance.h"
 
+#include "EchoSystem.h"
 #include "GameInstance/DeviceGameInstanceSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Options/OptionsGameInstanceSubsystem.h"
+#include "Tools/Debug/EchoDebug.h"
+#include "Tools/Debug/EchoMessageType.h"
 #include "Viewport/EchoViewport.h"
 
 void UEchoGameInstance::Init()
@@ -18,6 +21,7 @@ void UEchoGameInstance::Init()
 	{
 		OptionsSubsystem->InitializeSubsystem();
 	}
+	else UEchoDebug::Log(EEchoSystem::GameLoop, EEchoMessageType::Error, "Couldn't initialize OptionsSubsystem because it's invalid"); 
 	
 	UDeviceGameInstanceSubsystem* DeviceSubsystem = GetSubsystem<UDeviceGameInstanceSubsystem>();
 	
@@ -25,13 +29,7 @@ void UEchoGameInstance::Init()
 	{
 		DeviceSubsystem->InitializeSubsystem();
 	}
-	
-	UEchoViewport* Viewport = Cast<UEchoViewport>(GetGameViewportClient());
-	
-	if (IsValid(Viewport))
-	{
-		Viewport->InitializeViewport();
-	}
+	else UEchoDebug::Log(EEchoSystem::GameLoop, EEchoMessageType::Error, "Couldn't initialize DeviceSubsystem because it's invalid"); 
 }
 
 void UEchoGameInstance::Shutdown()
