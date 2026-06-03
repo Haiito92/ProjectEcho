@@ -24,4 +24,7 @@ class PROJECTECHO_API ILaserizable
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void Laserize();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveLaserize();
 };
