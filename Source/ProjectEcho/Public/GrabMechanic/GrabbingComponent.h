@@ -11,6 +11,11 @@
 struct FGrabbingRules;
 class UGrabMechanicSettings;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWillGrabActor, AActor*, GrabActor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActorGrabbedSignature, AActor*, GrabActor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnActorReleasedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnActorThrowedSignature);
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PROJECTECHO_API UGrabbingComponent : public USceneComponent
 {
@@ -52,9 +57,18 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	virtual AActor* GetGrabbedActor();
 	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWillGrabActor, AActor*, GrabActor);
 	UPROPERTY(BlueprintAssignable)
 	FOnWillGrabActor OnWillGrabActor;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnActorGrabbedSignature OnActorGrabbed;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnActorReleasedSignature OnActorReleased;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnActorThrowedSignature OnActorThrowed;
+	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
