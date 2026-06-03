@@ -108,6 +108,8 @@ void AEchoActor::Laserize_Implementation()
 {
 	ILaserizable::Laserize_Implementation();
 	
+	ReceiveLaserize();
+	
 	OnEchoDestroyed.Broadcast(EchoIndex);
 }
 
