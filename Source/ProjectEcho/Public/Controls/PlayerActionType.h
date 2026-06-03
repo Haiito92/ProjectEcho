@@ -7,8 +7,8 @@
 /**
  * 
  */
-UENUM()
-enum class PlayerActionType: uint16
+UENUM(BlueprintType)
+enum class PlayerActionType: uint8
 {
 	Move,
 	Jump

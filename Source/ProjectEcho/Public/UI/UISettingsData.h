@@ -22,7 +22,7 @@ public:
 	FInputUIData() = default;
 	~FInputUIData() = default;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<ControlDeviceType, TObjectPtr<UTexture2D>> Icons;
 };
 
