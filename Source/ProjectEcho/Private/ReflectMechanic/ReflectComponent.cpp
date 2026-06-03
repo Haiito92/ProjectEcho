@@ -187,6 +187,7 @@ TArray<FVector> UReflectComponent::GetReflectPredictionPath()
 	FPredictProjectilePathParams PredictParams;
 	PredictParams.StartLocation = CastStartLocation;
 	PredictParams.LaunchVelocity = CastDirection.GetSafeNormal() * ReflectMechanicSettings->ReflectPower;
+	PredictParams.OverrideGravityZ = ReflectMechanicSettings->PredictionOverrideGravityForce;
 	PredictParams.bTraceWithCollision = true;
 	
 	TArray<AActor*> ActorsToIgnore;
