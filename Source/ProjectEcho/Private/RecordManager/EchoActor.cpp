@@ -111,6 +111,12 @@ void AEchoActor::Laserize_Implementation()
 	OnEchoDestroyed.Broadcast(EchoIndex);
 }
 
+void AEchoActor::HandleFootstep_Implementation(bool bRightFoot)
+{
+	//Call BP Function
+	ReceiveHandleFootstep(bRightFoot);
+}
+
 void AEchoActor::RegisterRecordable(TScriptInterface<IRecordableInterface> Recordable)
 {
 	OnRegisterRecordable.Broadcast(Recordable);
