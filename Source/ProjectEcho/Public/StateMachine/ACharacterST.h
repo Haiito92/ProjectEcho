@@ -94,6 +94,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void Kill_Implementation() override;
 	
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveDeathOutOfRecord();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveDeathInRecord();
+	
 	UFUNCTION(BlueprintCallable)
 	virtual void Laserize_Implementation() override;
 	
