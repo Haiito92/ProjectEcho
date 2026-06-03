@@ -71,7 +71,7 @@ bool UGrabbingComponent::TryGrab(const FRotator& ControlRotation, const FGrabbin
 			GrabbedActor->AttachToComponent(this, AttachmentTransformRules);
 			IGrabbableInterface::Execute_OnGrabbed(GrabbedActor, this->GetOwner());
 			
-			OnWillGrabActor.Broadcast(GrabbedActor);
+			OnActorGrabbed.Broadcast(GrabbedActor);
 			
 			return true;
 		}
