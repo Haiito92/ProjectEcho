@@ -8,7 +8,7 @@
  * 
  */
 UENUM(BlueprintType)
-enum class ControlDeviceType: uint8
+enum class EControlDeviceType: uint8
 {
 	KeyboardAndMouse,
 	Gamepad

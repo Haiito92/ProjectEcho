@@ -10,8 +10,8 @@
  * 
 */
 
-enum class PlayerActionType : uint16;
-enum class ControlDeviceType : uint8;
+enum class PlayerActionType : uint8;
+enum class EControlDeviceType : uint8;
 
 USTRUCT(BlueprintType)
 struct FInputUIData
@@ -23,7 +23,7 @@ public:
 	~FInputUIData() = default;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TMap<ControlDeviceType, TObjectPtr<UTexture2D>> Icons;
+	TMap<EControlDeviceType, TObjectPtr<UTexture2D>> Icons;
 };
 
 UCLASS(BlueprintType)

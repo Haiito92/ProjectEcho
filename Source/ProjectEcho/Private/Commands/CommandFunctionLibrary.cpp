@@ -2,15 +2,27 @@
 
 
 #include "Commands/CommandFunctionLibrary.h"
-#include "Commands/Command.h"
 
-void UCommandFunctionLibrary::ExecuteCommandsWithContext(TArray<TObjectPtr<UCommand>> Commands,
-                                                         const FCommandContext& Context)
+#include "EchoSystem.h"
+#include "Commands/Command.h"
+#include "Tools/Debug/EchoDebug.h"
+#include "Tools/Debug/EchoMessageType.h"
+
+void UCommandFunctionLibrary::ExecuteCommandsWithContext(const TArray<UCommand*>& Commands, AActor* Instigator)
 {
-	if (Commands.IsEmpty()) return;
+	if (!IsValid(Instigator))
+	{
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Command, EEchoMessageType::Error, "Invalid Instigator", FColor::Red, 3.0f);
+		return;
+	}
 	
 	for (TObjectPtr<UCommand> Command : Commands)
 	{
-		Command->ExecuteWithContext(Context);		
+		if (!IsValid(Command))
+		{
+			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Command, EEchoMessageType::Error, "Invalid Command Pointer", FColor::Red, 3.0f);
+			continue;
+		}
+		Command->ExecuteWithContext({Instigator, Instigator->GetWorld()});		
 	}
 }

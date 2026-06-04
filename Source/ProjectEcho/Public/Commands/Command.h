@@ -10,20 +10,22 @@
  * 
  */
 
-USTRUCT()
+USTRUCT(BlueprintType, Blueprintable)
 struct FCommandContext
 {
 	GENERATED_BODY()
 	
 public:
-	FCommandContext();
-	~FCommandContext();
+	FCommandContext() = default;
+	FCommandContext(AActor* InInstigator);
+	FCommandContext(AActor* InInstigator, UWorld* InWorld);
+	~FCommandContext() = default;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<AActor> Instigator = nullptr;
 	
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<AActor> World = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UWorld> World = nullptr;
 };
 
 
@@ -41,5 +43,5 @@ public:
 	virtual void ExecuteWithContext(const FCommandContext& Context);
 	
 	UFUNCTION(BlueprintImplementableEvent)
-	virtual void ReceiveExecute();
+	void ReceiveExecute();
 };

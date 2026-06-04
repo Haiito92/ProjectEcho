@@ -8,12 +8,12 @@ void UDeviceGameInstanceSubsystem::InitializeSubsystem()
 	// Empty for now
 }
 
-const ControlDeviceType& UDeviceGameInstanceSubsystem::GetCurrentControlDeviceType() const
+const EControlDeviceType& UDeviceGameInstanceSubsystem::GetCurrentControlDeviceType() const
 {
 	return CurrentControlDeviceType;
 }
 
-void UDeviceGameInstanceSubsystem::SetCurrentControlDeviceType(const ControlDeviceType& InControlDeviceType)
+void UDeviceGameInstanceSubsystem::SetCurrentControlDeviceType(const EControlDeviceType& InControlDeviceType)
 {
 	if (CurrentControlDeviceType == InControlDeviceType) return;
 	

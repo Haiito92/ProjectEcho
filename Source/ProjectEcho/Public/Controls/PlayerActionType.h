@@ -10,6 +10,7 @@
 UENUM(BlueprintType)
 enum class PlayerActionType: uint8
 {
+	Unknow = 0,
 	Move,
 	Jump
 };

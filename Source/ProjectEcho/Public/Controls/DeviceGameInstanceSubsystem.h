@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ControlDeviceType.h"
+#include "EControlDeviceType.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "DeviceGameInstanceSubsystem.generated.h"
 
 /**
  * 
  */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnControlDeviceTypeChangedSignature, const ControlDeviceType&, NewControlDeviceType);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnControlDeviceTypeChangedSignature, const EControlDeviceType&, NewControlDeviceType);
 
 UCLASS()
 class PROJECTECHO_API UDeviceGameInstanceSubsystem : public UGameInstanceSubsystem
@@ -21,14 +21,14 @@ public:
 	void InitializeSubsystem();
 	
 	UFUNCTION(BlueprintCallable)
-	const ControlDeviceType& GetCurrentControlDeviceType() const;
+	const EControlDeviceType& GetCurrentControlDeviceType() const;
 	
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="InControlDeviceType"))
-	void SetCurrentControlDeviceType(const ControlDeviceType& InControlDeviceType);
+	void SetCurrentControlDeviceType(const EControlDeviceType& InControlDeviceType);
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnControlDeviceTypeChangedSignature OnControlDeviceTypeChanged;
 	
 private:
-	ControlDeviceType CurrentControlDeviceType;
+	EControlDeviceType CurrentControlDeviceType;
 };

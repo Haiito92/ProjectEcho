@@ -17,5 +17,6 @@ class PROJECTECHO_API UCommandFunctionLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 	
 public:
-	static void ExecuteCommandsWithContext(TArray<TObjectPtr<UCommand>> Commands, const FCommandContext& Context);
+	UFUNCTION(BlueprintCallable)
+	static void ExecuteCommandsWithContext(const TArray<UCommand*>& Commands, AActor* Instigator);
 };

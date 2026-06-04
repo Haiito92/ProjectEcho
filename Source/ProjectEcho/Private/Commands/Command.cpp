@@ -3,6 +3,16 @@
 
 #include "Commands/Command.h"
 
+FCommandContext::FCommandContext(AActor* InInstigator):FCommandContext(InInstigator, InInstigator->GetWorld())
+{
+}
+
+FCommandContext::FCommandContext(AActor* InInstigator, UWorld* InWorld)
+{
+	Instigator = InInstigator;
+	World = InWorld;
+}
+
 void UCommand::Execute()
 {
 	ReceiveExecute();
