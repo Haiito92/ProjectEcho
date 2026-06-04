@@ -26,5 +26,8 @@ public:
 	bool ShouldRecord();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool ShouldInteractionListenForRecord();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	int GetRecorderTimelineIndex();
 };
