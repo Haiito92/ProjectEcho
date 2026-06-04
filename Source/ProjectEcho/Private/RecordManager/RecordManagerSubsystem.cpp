@@ -616,7 +616,7 @@ void URecordManagerSubsystem::StartRecord(AActor* InRecordedActor, const TArray<
 	for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
 	{
 		if (!IsValid(RecordableComponent)) continue;
-		if (RecordableComponent->IsCurrentlyInteractedWith() && !RecordableComponent->IsRecording())
+		if (RecordableComponent->IsCurrentlyInteractedWith(true) && !RecordableComponent->IsRecording())
 		{
 			RecordableComponent->StartRecording(FRecordInteractionKey(CurrentTimeKey, CurrentRecordingTimelineIndex));
 		}
