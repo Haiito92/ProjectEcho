@@ -59,14 +59,26 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	bool TryReflect();
 	UFUNCTION(BlueprintImplementableEvent)
-	void ReceiveTryReflect();
+	void ReceiveTryReflect(const TArray<FVector>& PredictPathPositions);
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveStartReflect();
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveStopReflect();
+	
+	
 	
 private:
+	UFUNCTION()
+	TArray<FVector> GetReflectPredictionPath();
+	
 	UPROPERTY()
 	TObjectPtr<UReflectMechanicSettings> ReflectMechanicSettings;
 	
 	UPROPERTY()
 	bool bIsOn;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Prediction Feedback")
+	bool bUsePlayerPredictionSettings = false;
 	
 	UPROPERTY()
 	float ReflectCooldown;

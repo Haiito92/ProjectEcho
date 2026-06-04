@@ -87,6 +87,8 @@ public:
 	//Called to Get Control Rotation
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, BlueprintPure)
 	FRotator GetEchoControlRotation();
+	
+	virtual void HandleFootstep_Implementation(bool bRightFoot) override;
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
@@ -109,6 +111,9 @@ protected:
 	
 	UFUNCTION(BlueprintCallable)
 	void RegisterRecordable(TScriptInterface<IRecordableInterface> Recordable);
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveHandleFootstep(bool bIsRightFoot);
 	
 public:	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEchoDestroyedSignature, int, EchoIndex);

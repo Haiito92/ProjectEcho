@@ -19,7 +19,9 @@ class UEchoInterface : public UInterface
 class PROJECTECHO_API IEchoInterface
 {
 	GENERATED_BODY()
-
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
+
 public:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void HandleFootstep(bool bRightFoot);
 };

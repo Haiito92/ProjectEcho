@@ -9,6 +9,25 @@
 /**
  * 
  */
+
+USTRUCT(BlueprintType)
+struct FPredictParams
+{
+	GENERATED_BODY()
+	
+	//Simulation Time of Prediction (How far the precision goes)
+	UPROPERTY(EditDefaultsOnly)
+	float SimulationTime = 1.f;
+	
+	//Simulation Precision of Prediction (How many points are generated to make the precision)
+	UPROPERTY(EditDefaultsOnly)
+	float SimulationPointsFrequency = 20.0f;
+	
+	//Simulation Prediction Skip First points predicted before x simulated seconds
+	UPROPERTY(EditDefaultsOnly)
+	float SimulationSkipFirstPoints = 0.3f;
+};
+
 UCLASS()
 class PROJECTECHO_API UReflectMechanicSettings : public UDataAsset
 {
@@ -34,4 +53,16 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Reflect", meta=(ClampMin=0.0f, ClampMax=90.0f))
 	float ReflectLiftAngleThreshold = 45.f;
+	
+	//Prediction Gravity Overriding Value (Used to simulate friction of air)
+	UPROPERTY(EditDefaultsOnly, Category="Prediction Feedback")
+	float PredictionOverrideGravityForce = 0.f;
+	
+	//Parameters used for Prediction of Reflect with Player (First Person)
+	UPROPERTY(EditDefaultsOnly, Category="Prediction Feedback")
+	FPredictParams PlayerPredictionParameters = FPredictParams();
+	
+	//Parameters used for Prediction of Reflect with Echo (Third Person)
+	UPROPERTY(EditDefaultsOnly, Category="Prediction Feedback")
+	FPredictParams EchoPredictionParameters = FPredictParams();
 };

@@ -6,6 +6,8 @@
 #include "GameFramework/HUD.h"
 #include "EchoHUDBase.generated.h"
 
+class AEchoPlayerControllerBase;
+class UMenuEventHolder;
 /**
  * 
  */
@@ -15,7 +17,7 @@ class PROJECTECHO_API AEchoHUDBase : public AHUD
 	GENERATED_BODY()
 	
 public:
-	void InitHUD();
+	void InitHUD(AEchoPlayerControllerBase* InEchoPlayerController, UMenuEventHolder* InMenuEventHolder);
 	void StartHUD();
 	
 	UFUNCTION(BlueprintCallable)
@@ -24,13 +26,13 @@ public:
 	virtual void ResumeHUD();
 	
 private:
-	virtual void InternalHUDInit();
+	virtual void InternalHUDInit(AEchoPlayerControllerBase* InEchoPlayerController, UMenuEventHolder* InMenuEventHolder);
 	virtual void CreateWidgets();
 	virtual void InitializeWidgets();
 	
 protected:
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="Receive Internal HUD Init", ToolTip="First function called when HUD is initialized. Happens before widget creation and initialization."))
-	void ReceiveInternalHUDInit();
+	void ReceiveInternalHUDInit(AEchoPlayerControllerBase* InEchoPlayerController, UMenuEventHolder* InMenuEventHolder);
 	
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="Receive Create Widgets", ToolTip="Called after InternalHUDInit."))
 	void ReceiveCreateWidgets();
@@ -46,4 +48,10 @@ protected:
 	
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="Receive Resume HUD"))
 	void ReceiveResumeHUD();
+	
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UMenuEventHolder> MenuEventHolder;
+	
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<AEchoPlayerControllerBase> EchoPlayerController;
 };
