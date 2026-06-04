@@ -27,6 +27,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FColor Color = FColor::White;
 	
+	//Echo Footstep Color
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FColor FootstepColor = FColor::White;
+	
 	//Post Process Index
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int PostProcessIndex = 0;

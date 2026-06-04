@@ -70,6 +70,9 @@ bool UGrabbingComponent::TryGrab(const FRotator& ControlRotation, const FGrabbin
 			FAttachmentTransformRules AttachmentTransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
 			GrabbedActor->AttachToComponent(this, AttachmentTransformRules);
 			IGrabbableInterface::Execute_OnGrabbed(GrabbedActor, this->GetOwner());
+			
+			OnActorGrabbed.Broadcast(GrabbedActor);
+			
 			return true;
 		}
 	}
@@ -84,6 +87,9 @@ bool UGrabbingComponent::TryRelease()
 		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		IGrabbableInterface::Execute_OnObjectReleased(GrabbedActor);
 		GrabbedActor = nullptr;
+		
+		OnActorReleased.Broadcast();
+		
 		return true;
 	}
 	return false;
@@ -97,6 +103,9 @@ bool UGrabbingComponent::TryThrow(const FRotator& ControlRotation)
 		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		IGrabbableInterface::Execute_OnThrown(GrabbedActor, ControlRotation.Vector(), GrabMechanicSettings->ThrowStrength);
 		GrabbedActor = nullptr;
+		
+		OnActorThrowed.Broadcast();
+		
 		return true;
 	}
 	return false;

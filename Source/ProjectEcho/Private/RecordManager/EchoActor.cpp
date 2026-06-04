@@ -108,7 +108,15 @@ void AEchoActor::Laserize_Implementation()
 {
 	ILaserizable::Laserize_Implementation();
 	
+	ReceiveLaserize();
+	
 	OnEchoDestroyed.Broadcast(EchoIndex);
+}
+
+void AEchoActor::HandleFootstep_Implementation(bool bRightFoot)
+{
+	//Call BP Function
+	ReceiveHandleFootstep(bRightFoot);
 }
 
 void AEchoActor::RegisterRecordable(TScriptInterface<IRecordableInterface> Recordable)
