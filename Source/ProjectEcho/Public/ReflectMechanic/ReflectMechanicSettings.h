@@ -54,6 +54,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Reflect", meta=(ClampMin=0.0f, ClampMax=90.0f))
 	float ReflectLiftAngleThreshold = 45.f;
 	
+	//Prediction Gravity Overriding Value (Used to simulate friction of air)
+	UPROPERTY(EditDefaultsOnly, Category="Prediction Feedback")
+	float PredictionOverrideGravityForce = 0.f;
+	
 	//Parameters used for Prediction of Reflect with Player (First Person)
 	UPROPERTY(EditDefaultsOnly, Category="Prediction Feedback")
 	FPredictParams PlayerPredictionParameters = FPredictParams();

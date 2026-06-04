@@ -250,17 +250,23 @@ void ACharacterST::Kill_Implementation()
 	URecordManagerSubsystem * RecordManagerSubsystem = GetWorld()->GetSubsystem<URecordManagerSubsystem>();
 	
 	if (RecordManagerSubsystem && RecordManagerSubsystem->IsRecording())
+	{
+		ReceiveDeathInRecord();
 		OnDeathInRecord.Broadcast();
+	}
 	else
 	{
-		OnDeath.Broadcast();
 		Life = 0;
+		ReceiveDeathInRecord();
+		OnDeath.Broadcast();
 	}
 }
 
 void ACharacterST::Laserize_Implementation()
 {
 	ILaserizable::Laserize_Implementation();
+	
+	ReceiveLaserize();
 	
 	Execute_Kill(this);
 }
