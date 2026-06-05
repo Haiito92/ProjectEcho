@@ -316,6 +316,7 @@ void FEchoTimeline::ActivateTimeline(bool bInIsActive)
 	if (IsValid(EchoActor))
 	{
 		bIsActive = bInIsActive;
+		EchoActor->HandleTimelineActivation(bIsActive);
 		//EchoActor->SetActorHiddenInGame(!bInIsActive);
 	}
 }

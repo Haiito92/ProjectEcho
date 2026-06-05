@@ -98,6 +98,12 @@ void AEchoActor::HandleRecordStarted(const float& CurrentTimeKey)
 	TakeStateSnapshot();
 }
 
+void AEchoActor::HandleTimelineActivation(bool bIsActive)
+{
+	//Call BP Function
+	ReceiveHandleTimelineActivation(bIsActive);
+}
+
 void AEchoActor::OnTimelineDestroyed()
 {
 	//Call BP Function
