@@ -78,7 +78,6 @@ void UState::OnDeathInRecord()
 
 void UState::Exit()
 {
-	Character->OnGrabbingStarted.RemoveDynamic(this, &UState::OnGrabbingStarted);
 	Character->OnThrowingStarted.RemoveDynamic(this, &UState::OnThrowingStarted);
 	Character->OnRecord.RemoveDynamic(this, &UState::OnRecord);
 	Character->OnDestroySlot.RemoveDynamic(this, &UState::OnDestroySlot);

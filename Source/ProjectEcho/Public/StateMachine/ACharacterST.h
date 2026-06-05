@@ -74,7 +74,7 @@ public:
 	void Record();
 	
 	UFUNCTION(BlueprintCallable)
-	void AInteract();
+	void AInteractOrGrab();
 	
 	UFUNCTION(BlueprintCallable)
 	void AStartPropulse();
@@ -199,10 +199,6 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGrabStarted);
 	UPROPERTY(BlueprintAssignable)
 	FGrabStarted OnGrabbingStarted;
-	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReleaseStarted);
-	UPROPERTY(BlueprintAssignable)
-	FReleaseStarted OnReleaseStarted;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FThrowStarted);
 	UPROPERTY(BlueprintAssignable)

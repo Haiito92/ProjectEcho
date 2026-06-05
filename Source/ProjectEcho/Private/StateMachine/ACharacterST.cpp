@@ -95,13 +95,11 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	
 	Input->BindAction(InputActions->ALook, ETriggerEvent::Triggered, this, &ACharacterST::ALook);
 	
-	Input->BindAction(InputActions->AGrab, ETriggerEvent::Started, this, &ACharacterST::AGrabStarted);
-	
 	Input->BindAction(InputActions->AIncrementSlot, ETriggerEvent::Started, this, &ACharacterST::IncrementSlot);
 	Input->BindAction(InputActions->ADecrementSlot, ETriggerEvent::Started, this, &ACharacterST::DecrementSlot);
 	Input->BindAction(InputActions->ARecord, ETriggerEvent::Started, this, &ACharacterST::Record);
 	Input->BindAction(InputActions->ADestroySlot, ETriggerEvent::Started, this, &ACharacterST::DestroySlot);
-	Input->BindAction(InputActions->AInteract, ETriggerEvent::Started,this,&ACharacterST::AInteract);
+	Input->BindAction(InputActions->AInteractOrGrab, ETriggerEvent::Started,this,&ACharacterST::AInteractOrGrab);
 	
 	Input->BindAction(InputActions->APropulse, ETriggerEvent::Started,this,&ACharacterST::AStartPropulse);
 	Input->BindAction(InputActions->APropulse, ETriggerEvent::Completed,this,&ACharacterST::AStopPropulse);
@@ -173,12 +171,6 @@ void ACharacterST::ALook(const FInputActionValue& Value)
 	AddControllerPitchInput(-Input.Y);
 }
 
-void ACharacterST::AGrabStarted(const FInputActionValue& Value)
-{
-	OnReleaseStarted.Broadcast();
-	OnGrabbingStarted.Broadcast();
-}
-
 void ACharacterST::IncrementSlot()
 {
 	OnIncrementSlot.Broadcast();
@@ -199,7 +191,7 @@ void ACharacterST::Record()
 	OnRecord.Broadcast();
 }
 
-void ACharacterST::AInteract()
+void ACharacterST::AInteractOrGrab()
 {
 	OnInteract.Broadcast();
 }
