@@ -12,5 +12,13 @@ enum class PlayerActionType: uint8
 {
 	Unknow = 0,
 	Move,
-	Jump
+	Jump,
+	Interact,
+	Grab,
+	Release,
+	Throw, 
+	Reflect,
+	Record,
+	SelectTimeline,
+	DeleteTimeline
 };

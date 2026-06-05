@@ -43,5 +43,5 @@ public:
 	virtual void ExecuteWithContext(const FCommandContext& Context);
 	
 	UFUNCTION(BlueprintImplementableEvent)
-	void ReceiveExecute();
+	void ReceiveExecute(const FCommandContext& Context);
 };

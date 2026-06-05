@@ -15,10 +15,10 @@ FCommandContext::FCommandContext(AActor* InInstigator, UWorld* InWorld)
 
 void UCommand::Execute()
 {
-	ReceiveExecute();
+	ExecuteWithContext({nullptr, GetWorld()});
 }
 
 void UCommand::ExecuteWithContext(const FCommandContext& Context)
 {
-	ReceiveExecute();
+	ReceiveExecute(Context);
 }

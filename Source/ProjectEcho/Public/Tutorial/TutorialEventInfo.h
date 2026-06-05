@@ -28,6 +28,9 @@ public:
 	FTutorialEventInfo() = default;
 	~FTutorialEventInfo() = default;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ETutorialEvent Event = ETutorialEvent::Unknow;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	PlayerActionType PlayerActionType = PlayerActionType::Unknow;	
 };
