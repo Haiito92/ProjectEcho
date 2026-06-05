@@ -7,6 +7,14 @@
 
 #include "RecordableComponent.generated.h"
 
+UENUM()
+enum class ERecordInteractionType : uint8
+{
+	NotInteracted = 0,
+	Interacted = 1,
+	InteractedAndRecordListening = 2
+};
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PROJECTECHO_API URecordableComponent : public UActorComponent
 {
@@ -41,10 +49,7 @@ public:
 	void ReplayFirstKey();
 	
 	UFUNCTION(BlueprintCallable)
-	void MarkAsCurrentlyInteracted();
-	
-	UFUNCTION(BlueprintCallable)
-	void UnmarkAsCurrentlyInteracted();
+	void UpdateInteractionType(ERecordInteractionType InteractionType);
 	
 	UFUNCTION()
 	//Called to Set Actor in Rewind Mode (Has delegate for extra behaviour)
@@ -85,14 +90,14 @@ public:
 	
 	//Is Currently Interacted With (Can be Used to Start Record)
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool IsCurrentlyInteractedWith() const;
+	bool IsCurrentlyInteractedWith(bool bIsRecordListening) const;
 	
 	UFUNCTION()
 	float GetFirstInteractedKey() const;
 	
 protected:
 	UPROPERTY(BlueprintReadOnly)
-	bool bIsInteractedWith = false; 
+	ERecordInteractionType InteractionStatus = ERecordInteractionType::NotInteracted; 
 	
 private:
 	UPROPERTY()
