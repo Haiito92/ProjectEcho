@@ -157,16 +157,16 @@ struct FRecordAnimationValue
 		this->BoolValue = false;
 	}
 	
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EAnimationValueReference AnimationValueReference = EAnimationValueReference::None;
 	
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EAnimationValueType AnimationValueType = EAnimationValueType::None;
 	
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool BoolValue = false;
 	
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float FloatValue = 0;
 };
 
@@ -188,7 +188,10 @@ struct FRecordAnimationKey
 		this->RecordAnimationValue = AnimationValue;
 	}
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FRecordAnimationValue RecordAnimationValue = FRecordAnimationValue();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TimeKey = 0;
 };
 
