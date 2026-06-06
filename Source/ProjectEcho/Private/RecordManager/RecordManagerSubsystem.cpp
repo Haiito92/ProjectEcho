@@ -316,6 +316,7 @@ void FEchoTimeline::ActivateTimeline(bool bInIsActive)
 	if (IsValid(EchoActor))
 	{
 		bIsActive = bInIsActive;
+		EchoActor->HandleTimelineActivation(bIsActive);
 		//EchoActor->SetActorHiddenInGame(!bInIsActive);
 	}
 }
@@ -1029,8 +1030,8 @@ void URecordManagerSubsystem::DestroySelectedTimeline()
 void URecordManagerSubsystem::DestroyTimeline(int TimelineIndex)
 {
 	if (bIsInRewind) return; //Forbid Timeline Destruction during Rewind
-	if (!GlobalTimeline.Timelines.Contains(SelectedSlot)) return;
-	GlobalTimeline.DestroyTimeline(SelectedSlot, EchoActorsPool);
+	if (!GlobalTimeline.Timelines.Contains(TimelineIndex)) return;
+	GlobalTimeline.DestroyTimeline(TimelineIndex, EchoActorsPool);
 	int DestroyedSlot = TimelineIndex;
 	
 	if (TimelineIndex == SelectedSlot)
@@ -1051,6 +1052,25 @@ void URecordManagerSubsystem::DestroyTimeline(int TimelineIndex)
 	}
 	
 	OnTimelineDestroyed.Broadcast(DestroyedSlot);
+}
+
+void URecordManagerSubsystem::ForceDestroyAllTimelines()
+{
+	if (bIsRecording)
+	{
+		StopRecord();
+		return;
+	}
+	if (bIsInRewind)
+	{
+		if (bIsPlayerRewinding) StopPlayerRewind();
+		else StopRewind(bIsPlayerRewinding);
+	}
+	for (int i = 0; i < GlobalTimeline.NbSlots; ++i)
+	{
+		DestroyTimeline(i);
+	}
+	CurrentTimeKey = 0.0f;
 }
 
 void URecordManagerSubsystem::IncrementSelectedSlot()

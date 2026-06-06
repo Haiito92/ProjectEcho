@@ -233,6 +233,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void DestroyTimeline(int TimelineIndex);
 	
+	/* Destroys All Recorded Timelines of Global Timeline
+	 * If Is Recording, Stop Record and Cancel Force Destroy
+	 */
+	UFUNCTION(BlueprintCallable)
+	void ForceDestroyAllTimelines();
+	
     // Increment the Selected Slot Value, if reaches end, goes back to first Slot
     UFUNCTION(BlueprintCallable)
     void IncrementSelectedSlot();
