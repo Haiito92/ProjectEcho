@@ -266,7 +266,7 @@ void ACharacterST::Laserize_Implementation()
 {
 	ILaserizable::Laserize_Implementation();
 	
-	ReceiveLaserize();
+	Execute_ReceiveLaserize(this);
 	
 	Execute_Kill(this);
 }
