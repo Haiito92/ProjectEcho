@@ -21,6 +21,8 @@ enum class EEchoSystem : uint8
 	Reflect,
 	Options,
 	LevelStreaming,
+	Command,
+	Tutorial,
 	Count UMETA(Hidden)
 };
 ENUM_RANGE_BY_COUNT(EEchoSystem, EEchoSystem::Count)

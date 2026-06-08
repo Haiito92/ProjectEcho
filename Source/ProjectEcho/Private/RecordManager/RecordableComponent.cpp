@@ -93,14 +93,9 @@ void URecordableComponent::ReplayFirstKey()
 	
 }
 
-void URecordableComponent::MarkAsCurrentlyInteracted()
+void URecordableComponent::UpdateInteractionType(ERecordInteractionType InteractionType)
 {
-	bIsInteractedWith = true;
-}
-
-void URecordableComponent::UnmarkAsCurrentlyInteracted()
-{
-	bIsInteractedWith = false;
+	InteractionStatus = InteractionType;
 }
 
 void URecordableComponent::StartRewind()
@@ -120,7 +115,7 @@ void URecordableComponent::StopRewind(const float& CurrentTimeKey, bool bForceRe
 	{
 		if (CurrentTimeKey > InteractionKeys[0].TimeKey)
 		{
-			if (!bIsInteractedWith || bForceReset) PhysicsComponent->SetSimulatePhysics(true);
+			if (!IsCurrentlyInteractedWith(true) || bForceReset) PhysicsComponent->SetSimulatePhysics(true);
 			const FRecordPhysicsKey* NextPhysicsKey = FindNextPhysicsKey(CurrentTimeKey);
 			const FRecordPhysicsKey* PreviousPhysicsKey = FindPreviousPhysicsKey(CurrentTimeKey);
 			if (NextPhysicsKey != nullptr && PreviousPhysicsKey != nullptr)
@@ -135,7 +130,7 @@ void URecordableComponent::StopRewind(const float& CurrentTimeKey, bool bForceRe
 		}
 		else
 		{
-			if (!bIsInteractedWith || bForceReset) PhysicsComponent->SetSimulatePhysics(true);
+			if (!IsCurrentlyInteractedWith(true) || bForceReset) PhysicsComponent->SetSimulatePhysics(true);
 			PhysicsComponent->SetPhysicsLinearVelocity(FVector(0,0,0));
 			PhysicsComponent->SetPhysicsAngularVelocityInDegrees(FVector(0,0,0));
 		}
@@ -183,7 +178,7 @@ void URecordableComponent::HandleTimelineDestruction(const int& RecordTimelineIn
 
 void URecordableComponent::StopRecording(bool bForceStopRecording)
 {
-	if (!bIsInteractedWith || bForceStopRecording)
+	if (!IsCurrentlyInteractedWith(true) || bForceStopRecording)
 	{
 		bIsRecording = false;
 		InteractionKeys.Empty();
@@ -204,9 +199,10 @@ bool URecordableComponent::IsRecording() const
 	return bIsRecording;
 }
 
-bool URecordableComponent::IsCurrentlyInteractedWith() const
+bool URecordableComponent::IsCurrentlyInteractedWith(bool bIsRecordListening) const
 {
-	return bIsInteractedWith;
+	return bIsRecordListening ? InteractionStatus == ERecordInteractionType::InteractedAndRecordListening : 
+								InteractionStatus == ERecordInteractionType::Interacted;
 }
 
 float URecordableComponent::GetFirstInteractedKey() const
