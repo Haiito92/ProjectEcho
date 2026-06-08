@@ -58,9 +58,6 @@ public:
 	UFUNCTION()
 	void ALook(const FInputActionValue& Value);
 	
-	UFUNCTION()
-	void AGrabStarted(const FInputActionValue& Value);
-	
 	UFUNCTION(BlueprintCallable)
 	void IncrementSlot();
 	
