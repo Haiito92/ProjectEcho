@@ -294,7 +294,29 @@ void AStandaloneEchoesHandler::RecreateAllAnimationKeys(int TimelineIndex)
 #if WITH_EDITOR
 		this->Modify();
 #endif
-		EchoTimelines[TimelineIndex].RecordAnimationKeys.RemoveAll();
+		EchoTimelines[TimelineIndex].RecordAnimationKeys.RemoveAll([&](const FRecordAnimationKey& AnimationKey)
+		{
+			return !ManuallySetAnimationValues.Contains(AnimationKey.RecordAnimationValue.AnimationValueReference);
+		});
+
+		for (FRecordActionKey& RecordActionKey : EchoTimelines[TimelineIndex].ActionKeys)
+		{
+			if (RecordActionKey.Action.ActionEnum == ERecordedAction::StartReflect || RecordActionKey.Action.ActionEnum == ERecordedAction::StopReflect)
+			{
+				bool bValue = RecordActionKey.Action.ActionEnum == ERecordedAction::StartReflect;
+				FRecordAnimationValue AnimationValueReflect = FRecordAnimationValue(EAnimationValueReference::IsHoldingReflect, bValue);
+				FRecordAnimationValue AnimationValueTopBody = FRecordAnimationValue(EAnimationValueReference::AnimTopBody, bValue);
+				EchoTimelines[TimelineIndex].RecordAnimationKeys.Add(FRecordAnimationKey(AnimationValueReflect, RecordActionKey.TimeKey));
+				EchoTimelines[TimelineIndex].RecordAnimationKeys.Add(FRecordAnimationKey(AnimationValueTopBody, RecordActionKey.TimeKey));
+			}
+		}
+		if (EchoTimelines[TimelineIndex].TransformKeys.Num() <= 1) return;
+		for (int i = 0; i < EchoTimelines[TimelineIndex].TransformKeys.Num() - 1; ++i)
+		{
+			float distance = FVector::Distance(EchoTimelines[TimelineIndex].TransformKeys[i].Position, EchoTimelines[TimelineIndex].TransformKeys[i + 1].Position);
+			FRecordAnimationValue AnimationSpeedValue = FRecordAnimationValue(EAnimationValueReference::Speed, distance > MinDistanceRunning ? 600.f : 0.f);
+			EchoTimelines[TimelineIndex].RecordAnimationKeys.Add(FRecordAnimationKey(AnimationSpeedValue, FMath::Max(0.01, EchoTimelines[TimelineIndex].TransformKeys[i].TimeKey)));
+		}
 	}
 }
 

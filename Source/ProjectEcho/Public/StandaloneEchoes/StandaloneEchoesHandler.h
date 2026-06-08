@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "StandaloneEchoesHandler.generated.h"
 
+enum class EAnimationValueReference : uint8;
 enum class ERecordedAction : uint8;
 struct FRecordedAction;
 class AEchoActor;
@@ -105,9 +106,16 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	float RewindSpeed = 0.f;
 	
+	//Minimal Distance to be considered running between two frames
+	UPROPERTY(EditAnywhere)
+	float MinDistanceRunning = 5.f;
+	
 	UPROPERTY()
 	TObjectPtr<URecordManagerSettings> RecordManagerSettings = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TMap<ERecordedAction, ERecordedAction> RewindEquivalentActions;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<EAnimationValueReference> ManuallySetAnimationValues;
 };
