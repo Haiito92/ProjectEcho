@@ -20,7 +20,8 @@
 #include "StateMachine/Data/UPlayerData.h"
 #include "Tools/Debug/EchoDebug.h"
 #include "Tools/Debug/EchoMessageType.h"
-
+#include "Controls/EPlayerActionType.h"
+#include "StateMachine/Data/UStateMachineSettings.h"
 
 class UPlayerData;
 class UEnhancedInputLocalPlayerSubsystem;
@@ -50,6 +51,11 @@ ACharacterST::ACharacterST()
 	GetMesh()->FirstPersonPrimitiveType = EFirstPersonPrimitiveType::WorldSpaceRepresentation;
 
 	GetCapsuleComponent()->SetCapsuleSize(34.0f, 96.0f);
+
+	for (EPlayerActionType ActionType : TEnumRange<EPlayerActionType>())
+	{
+		LockedActions.Add(ActionType, false);
+	}
 }
 
 
@@ -193,7 +199,7 @@ void ACharacterST::Record()
 
 void ACharacterST::AInteractOrGrab()
 {
-	OnInteract.Broadcast();
+	OnInteractOrGrab.Broadcast();
 }
 
 void ACharacterST::AStartPropulse()
@@ -278,6 +284,17 @@ void ACharacterST::Revive()
 
 void ACharacterST::InitStateMachine()
 {
+	const UDataAssetDeveloperSettings* DevSettings = GetDefault<UDataAssetDeveloperSettings>();
+
+	UStateMachineSettings* StateMachineSettings = DevSettings->StateMachineData.LoadSynchronous();
+	if (IsValid(StateMachineSettings))
+	{
+		for (const TTuple<EPlayerActionType, bool>& pair : StateMachineSettings->StartingLockedActions)
+		{
+			LockedActions[pair.Key] = pair.Value;
+		}
+	}
+	
 	StateMachine = NewObject<UStateMachine>(this);
 	StateMachine->InitStates(this);
 }
@@ -381,4 +398,31 @@ void ACharacterST::ForceRelease_Implementation()
 void ACharacterST::SetRespawnTransform(const FTransform& InRespawnTransform)
 {
 	RespawnTransform = InRespawnTransform;
+}
+
+void ACharacterST::LockAction(const EPlayerActionType& PlayerAction)
+{
+	bool* locked = LockedActions.Find(PlayerAction);
+	
+	if (!locked) return;
+	
+	*locked = true;
+	
+	OnActionLocked.Broadcast(PlayerAction);
+}
+
+void ACharacterST::UnlockAction(const EPlayerActionType& PlayerAction)
+{
+	bool* locked = LockedActions.Find(PlayerAction);
+	
+	if (!locked) return;
+	
+	*locked = false;
+	
+	OnActionUnlocked.Broadcast(PlayerAction);
+}
+
+const TMap<EPlayerActionType, bool>& ACharacterST::GetLockedActions() const
+{
+	return LockedActions;
 }
