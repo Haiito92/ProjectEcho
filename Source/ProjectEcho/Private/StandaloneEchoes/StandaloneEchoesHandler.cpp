@@ -287,6 +287,17 @@ void AStandaloneEchoesHandler::RecreateAllRewindActions(int TimelineIndex)
 	}
 }
 
+void AStandaloneEchoesHandler::RecreateAllAnimationKeys(int TimelineIndex)
+{
+	if (EchoTimelines.IsValidIndex(TimelineIndex))
+	{
+#if WITH_EDITOR
+		this->Modify();
+#endif
+		EchoTimelines[TimelineIndex].RecordAnimationKeys.RemoveAll();
+	}
+}
+
 float AStandaloneEchoesHandler::GetTimelinesLength()
 {
 	float LastTimeKey = 0;

@@ -77,6 +77,13 @@ public:
 	void RecreateAllRewindActions(int TimelineIndex);
 #pragma endregion
 	
+#pragma region AnimationKey
+	
+	UFUNCTION(BlueprintCallable)
+	void RecreateAllAnimationKeys(int TimelineIndex);
+	
+#pragma endregion
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetTimelinesLength();
 	
