@@ -72,7 +72,7 @@ void AEchoActor::SetControlRotation(const FRotator& ControlRotation)
 	ReceiveSetControlRotation(ControlRotation);
 }
 
-void AEchoActor::InitEcho(const int& index, const FEchoColorStruct& EchoColor)
+void AEchoActor::InitEcho(const int& index, const FStandaloneEchoesJumpAnimation& EchoColor)
 {
 	EchoIndex = index;
 	ReceiveInitEcho(EchoColor);

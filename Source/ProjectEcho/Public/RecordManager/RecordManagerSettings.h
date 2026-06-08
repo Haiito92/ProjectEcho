@@ -51,8 +51,8 @@ public:
 	float StandaloneGlobalRewindTime = 0.5f;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Echo Actors")
-	TMap<int, FEchoColorStruct> EchoColors;
+	TMap<int, FStandaloneEchoesJumpAnimation> EchoColors;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Echo Actors")
-	FEchoColorStruct StandaloneEchoColor;
+	FStandaloneEchoesJumpAnimation StandaloneEchoColor;
 };

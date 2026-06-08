@@ -6,6 +6,7 @@
 #include "DataAssetDeveloperSettings.h"
 #include "RecordManager/EchoActor.h"
 #include "RecordManager/RecordManagerSubsystem.h"
+#include "StandaloneEchoes/StandaloneEchoesJumpAnimation.h"
 
 
 // Sets default values
@@ -294,11 +295,9 @@ void AStandaloneEchoesHandler::RecreateAllAnimationKeys(int TimelineIndex)
 #if WITH_EDITOR
 		this->Modify();
 #endif
-		EchoTimelines[TimelineIndex].RecordAnimationKeys.RemoveAll([&](const FRecordAnimationKey& AnimationKey)
-		{
-			return !ManuallySetAnimationValues.Contains(AnimationKey.RecordAnimationValue.AnimationValueReference);
-		});
+		EchoTimelines[TimelineIndex].RecordAnimationKeys.Empty();
 
+		//Setup Action Keys
 		for (FRecordActionKey& RecordActionKey : EchoTimelines[TimelineIndex].ActionKeys)
 		{
 			if (RecordActionKey.Action.ActionEnum == ERecordedAction::StartReflect || RecordActionKey.Action.ActionEnum == ERecordedAction::StopReflect)
@@ -310,13 +309,34 @@ void AStandaloneEchoesHandler::RecreateAllAnimationKeys(int TimelineIndex)
 				EchoTimelines[TimelineIndex].RecordAnimationKeys.Add(FRecordAnimationKey(AnimationValueTopBody, RecordActionKey.TimeKey));
 			}
 		}
-		if (EchoTimelines[TimelineIndex].TransformKeys.Num() <= 1) return;
-		for (int i = 0; i < EchoTimelines[TimelineIndex].TransformKeys.Num() - 1; ++i)
+		
+		//Setup Speed Animation Keys
+		if (EchoTimelines[TimelineIndex].TransformKeys.Num() >= 2)
 		{
-			float distance = FVector::Distance(EchoTimelines[TimelineIndex].TransformKeys[i].Position, EchoTimelines[TimelineIndex].TransformKeys[i + 1].Position);
-			FRecordAnimationValue AnimationSpeedValue = FRecordAnimationValue(EAnimationValueReference::Speed, distance > MinDistanceRunning ? 600.f : 0.f);
-			EchoTimelines[TimelineIndex].RecordAnimationKeys.Add(FRecordAnimationKey(AnimationSpeedValue, FMath::Max(0.01, EchoTimelines[TimelineIndex].TransformKeys[i].TimeKey)));
+			for (int i = 0; i < EchoTimelines[TimelineIndex].TransformKeys.Num() - 1; ++i)
+			{
+				float distance = FVector::Distance(EchoTimelines[TimelineIndex].TransformKeys[i].Position, EchoTimelines[TimelineIndex].TransformKeys[i + 1].Position);
+				FRecordAnimationValue AnimationSpeedValue = FRecordAnimationValue(EAnimationValueReference::Speed, distance > MinDistanceRunning ? 600.f : 0.f);
+				EchoTimelines[TimelineIndex].RecordAnimationKeys.Add(FRecordAnimationKey(AnimationSpeedValue, FMath::Max(0.01, EchoTimelines[TimelineIndex].TransformKeys[i].TimeKey)));
+			}
 		}
+		
+		//Setup Special Animation Keys
+		if (SpecialAnimations.Contains(TimelineIndex) && !SpecialAnimations[TimelineIndex].IsEmpty())
+		{
+			for (FStandaloneEchoesSpecialAnimation SpecialAnimation : SpecialAnimations[TimelineIndex])
+			{
+				switch (SpecialAnimation.SpecialAnimationEnum)
+				{
+				case ERecordedAction::StartReflect:
+					FStandaloneEchoesJumpAnimation JumpAnim = Cast<FStandaloneEchoesJumpAnimation>(SpecialAnimation[TimelineIndex]);
+					break;
+				default: 
+					break;
+				}
+			}
+		}
+		
 	}
 }
 

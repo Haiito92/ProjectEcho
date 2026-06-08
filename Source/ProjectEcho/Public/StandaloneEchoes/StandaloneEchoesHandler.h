@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "StandaloneEchoesHandler.generated.h"
 
+struct FStandaloneEchoesSpecialAnimation;
 enum class EAnimationValueReference : uint8;
 enum class ERecordedAction : uint8;
 struct FRecordedAction;
@@ -114,8 +115,8 @@ protected:
 	TObjectPtr<URecordManagerSettings> RecordManagerSettings = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TMap<ERecordedAction, ERecordedAction> RewindEquivalentActions;
+	TMap<ERecordedAction, ERecordedAction> RewindEquivalentActions = TMap<ERecordedAction, ERecordedAction>();
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TArray<EAnimationValueReference> ManuallySetAnimationValues;
+	TMap<int, TArray<FStandaloneEchoesSpecialAnimation>> SpecialAnimations = TMap<int, TArray<FStandaloneEchoesSpecialAnimation>>();
 };
