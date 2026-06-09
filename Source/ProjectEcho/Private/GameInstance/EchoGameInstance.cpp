@@ -9,7 +9,7 @@
 #include "Options/OptionsGameInstanceSubsystem.h"
 #include "Tools/Debug/EchoDebug.h"
 #include "Tools/Debug/EchoMessageType.h"
-#include "Viewport/EchoViewport.h"
+#include "Viewport/EchoGameViewportClient.h"
 
 void UEchoGameInstance::Init()
 {

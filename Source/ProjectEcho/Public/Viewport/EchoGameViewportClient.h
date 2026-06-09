@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameViewportClient.h"
-#include "EchoViewport.generated.h"
+#include "EchoGameViewportClient.generated.h"
 
 class UDeviceGameInstanceSubsystem;
 /**
@@ -13,7 +13,7 @@ class UDeviceGameInstanceSubsystem;
 struct FInputKeyEventArgs;
 
 UCLASS()
-class PROJECTECHO_API UEchoViewport : public UGameViewportClient
+class PROJECTECHO_API UEchoGameViewportClient : public UGameViewportClient
 {
 	GENERATED_BODY()
 	
@@ -24,7 +24,18 @@ public:
 	
 	virtual bool InputAxis(const FInputKeyEventArgs& Args) override;
 	
+	virtual void ReceivedFocus(FViewport* InViewport) override;
+	virtual void LostFocus(FViewport* InViewport) override;
+
 private:
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnViewportReceivedFocusSignature);
+	UPROPERTY(BlueprintAssignable)
+	FOnViewportReceivedFocusSignature OnViewportReceivedFocus;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnViewportLostFocusSignature);
+	UPROPERTY(BlueprintAssignable)
+	FOnViewportLostFocusSignature OnViewportLostFocus;
+	
 	UPROPERTY()
 	TObjectPtr<UDeviceGameInstanceSubsystem> DeviceSubsystem;
 };
