@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Controls/PlayerActionType.h"
+#include "Controls/EPlayerActionType.h"
 #include "TutorialEventInfo.generated.h"
 
 /**
@@ -32,5 +32,5 @@ public:
 	ETutorialEvent Event = ETutorialEvent::Unknow;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	PlayerActionType PlayerActionType = PlayerActionType::Unknow;	
+	EPlayerActionType PlayerActionType = EPlayerActionType::Unknow;	
 };
