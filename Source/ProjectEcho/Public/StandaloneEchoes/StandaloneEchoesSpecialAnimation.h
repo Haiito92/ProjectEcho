@@ -19,10 +19,10 @@ struct FStandaloneEchoesSpecialAnimation
 		TimeKey = LocalTimeKey;
 	}
 	
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EAnimationValueReference AnimationValueReference = EAnimationValueReference::None;
 	
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TimeKey = 0.f;
 };
 

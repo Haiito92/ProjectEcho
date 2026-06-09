@@ -292,6 +292,9 @@ int AStandaloneEchoesHandler::CreateSpecialAnimationKey(int TimelineIndex, const
 {
 	if (EchoTimelines.IsValidIndex(TimelineIndex))
 	{
+#if WITH_EDITOR
+		this->Modify();
+#endif
 		if (!SpecialAnimations.Contains(TimelineIndex))
 		{
 			SpecialAnimations.Add(TimelineIndex, FStandaloneEchoesAnimationArrayWrapper());
@@ -309,14 +312,20 @@ void AStandaloneEchoesHandler::ModifySpecialAnimationKeyTimeKey(int TimelineInde
 {
 	if (EchoTimelines.IsValidIndex(TimelineIndex) && SpecialAnimations.Contains(TimelineIndex) && SpecialAnimations[TimelineIndex].Animations.IsValidIndex(KeyIndex))
 	{
+#if WITH_EDITOR
+		this->Modify();
+#endif
 		SpecialAnimations[TimelineIndex].Animations[KeyIndex].TimeKey = NewTimeKey;
 	}
 }
 
-void AStandaloneEchoesHandler::ModifySpecialAnimationKeyAnimation(int TimelineIndex, const int& KeyIndex, EAnimationValueReference& InAnimationValueReference)
+void AStandaloneEchoesHandler::ModifySpecialAnimationKeyAnimation(int TimelineIndex, const int& KeyIndex, EAnimationValueReference InAnimationValueReference)
 {
 	if (EchoTimelines.IsValidIndex(TimelineIndex) && SpecialAnimations.Contains(TimelineIndex) && SpecialAnimations[TimelineIndex].Animations.IsValidIndex(KeyIndex))
 	{
+#if WITH_EDITOR
+		this->Modify();
+#endif
 		SpecialAnimations[TimelineIndex].Animations[KeyIndex].AnimationValueReference = InAnimationValueReference;
 	}
 }
@@ -328,9 +337,10 @@ void AStandaloneEchoesHandler::RecreateAllAnimationKeys(int TimelineIndex)
 #if WITH_EDITOR
 		this->Modify();
 #endif
+		
 		EchoTimelines[TimelineIndex].RecordAnimationKeys.Empty();
 
-		//Setup Action Keys
+		//Setup Action Animation Keys
 		for (FRecordActionKey& RecordActionKey : EchoTimelines[TimelineIndex].ActionKeys)
 		{
 			if (RecordActionKey.Action.ActionEnum == ERecordedAction::StartReflect || RecordActionKey.Action.ActionEnum == ERecordedAction::StopReflect)

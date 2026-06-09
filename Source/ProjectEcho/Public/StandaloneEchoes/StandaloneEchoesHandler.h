@@ -88,7 +88,7 @@ public:
 	void ModifySpecialAnimationKeyTimeKey(int TimelineIndex, const int& KeyIndex, const float& NewTimeKey);
 	
 	UFUNCTION(BlueprintCallable)
-	void ModifySpecialAnimationKeyAnimation(int TimelineIndex, const int& KeyIndex, EAnimationValueReference& InAnimationValueReference);
+	void ModifySpecialAnimationKeyAnimation(int TimelineIndex, const int& KeyIndex, EAnimationValueReference InAnimationValueReference);
 	
 	UFUNCTION(BlueprintCallable)
 	void RecreateAllAnimationKeys(int TimelineIndex);
@@ -126,6 +126,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TMap<ERecordedAction, ERecordedAction> RewindEquivalentActions = TMap<ERecordedAction, ERecordedAction>();
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<int32, FStandaloneEchoesAnimationArrayWrapper> SpecialAnimations = TMap<int32, FStandaloneEchoesAnimationArrayWrapper>();
 };
