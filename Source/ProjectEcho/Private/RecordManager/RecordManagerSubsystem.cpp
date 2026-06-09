@@ -801,6 +801,7 @@ FTimelineUIInfo URecordManagerSubsystem::GetTimelineUIInfo(int Index)
 		Info.EchoColorStruct = RecordManagerSettings->EchoColors[Index];
 		for (const FRecordActionKey& ActionKey : Timeline.ActionKeys)
 		{
+			if (RecordManagerSettings->ActionsSkippedInUI.Contains(ActionKey.Action.ActionEnum)) continue;
 			FUIActionKey ActionInfo = FUIActionKey(ActionKey.TimeKey, ActionKey.Action.ActionEnum);
 			Info.ActionKeys.Add(ActionInfo);
 		}
