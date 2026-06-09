@@ -19,6 +19,7 @@ enum class EPlayerActionType: uint8
 	Throw, 
 	Reflect,
 	Record,
+	StopRecord,
 	SelectTimeline,
 	DeleteTimeline,
 	Count UMETA(Hidden)
