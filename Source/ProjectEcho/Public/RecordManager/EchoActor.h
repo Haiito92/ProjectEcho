@@ -74,6 +74,7 @@ public:
 	void HandleRewindStarted(const float& CurrentTimeKey, bool bIsPlayerRewind);
 	void HandleRewindStopped(const float& CurrentTimeKey, bool bIsPlayerRewind); 
 	void HandleRecordStarted(const float& CurrentTimeKey);
+	void HandleTimelineActivation(bool bIsActive);
 	
 	UFUNCTION()
 	void OnTimelineDestroyed();
@@ -87,6 +88,8 @@ public:
 	//Called to Get Control Rotation
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, BlueprintPure)
 	FRotator GetEchoControlRotation();
+	
+	virtual void HandleFootstep_Implementation(bool bRightFoot) override;
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
@@ -107,8 +110,14 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, meta=(AutoCreateRefTerm="CurrentTimeKey"))
 	void ReceiveHandleRewindStopped(const float& CurrentTimeKey);
 	
+	UFUNCTION(BlueprintImplementableEvent, meta=(AutoCreateRefTerm="CurrentTimeKey"))
+	void ReceiveHandleTimelineActivation(bool bIsActive);
+	
 	UFUNCTION(BlueprintCallable)
 	void RegisterRecordable(TScriptInterface<IRecordableInterface> Recordable);
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveHandleFootstep(bool bIsRightFoot);
 	
 public:	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEchoDestroyedSignature, int, EchoIndex);

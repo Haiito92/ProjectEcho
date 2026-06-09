@@ -20,7 +20,8 @@
 #include "StateMachine/Data/UPlayerData.h"
 #include "Tools/Debug/EchoDebug.h"
 #include "Tools/Debug/EchoMessageType.h"
-
+#include "Controls/EPlayerActionType.h"
+#include "StateMachine/Data/UStateMachineSettings.h"
 
 class UPlayerData;
 class UEnhancedInputLocalPlayerSubsystem;
@@ -50,6 +51,11 @@ ACharacterST::ACharacterST()
 	GetMesh()->FirstPersonPrimitiveType = EFirstPersonPrimitiveType::WorldSpaceRepresentation;
 
 	GetCapsuleComponent()->SetCapsuleSize(34.0f, 96.0f);
+
+	for (EPlayerActionType ActionType : TEnumRange<EPlayerActionType>())
+	{
+		LockedActions.Add(ActionType, false);
+	}
 }
 
 
@@ -95,13 +101,11 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	
 	Input->BindAction(InputActions->ALook, ETriggerEvent::Triggered, this, &ACharacterST::ALook);
 	
-	Input->BindAction(InputActions->AGrab, ETriggerEvent::Started, this, &ACharacterST::AGrabStarted);
-	
 	Input->BindAction(InputActions->AIncrementSlot, ETriggerEvent::Started, this, &ACharacterST::IncrementSlot);
 	Input->BindAction(InputActions->ADecrementSlot, ETriggerEvent::Started, this, &ACharacterST::DecrementSlot);
 	Input->BindAction(InputActions->ARecord, ETriggerEvent::Started, this, &ACharacterST::Record);
 	Input->BindAction(InputActions->ADestroySlot, ETriggerEvent::Started, this, &ACharacterST::DestroySlot);
-	Input->BindAction(InputActions->AInteract, ETriggerEvent::Started,this,&ACharacterST::AInteract);
+	Input->BindAction(InputActions->AInteractOrGrab, ETriggerEvent::Started,this,&ACharacterST::AInteractOrGrab);
 	
 	Input->BindAction(InputActions->APropulse, ETriggerEvent::Started,this,&ACharacterST::AStartPropulse);
 	Input->BindAction(InputActions->APropulse, ETriggerEvent::Completed,this,&ACharacterST::AStopPropulse);
@@ -173,12 +177,6 @@ void ACharacterST::ALook(const FInputActionValue& Value)
 	AddControllerPitchInput(-Input.Y);
 }
 
-void ACharacterST::AGrabStarted(const FInputActionValue& Value)
-{
-	OnReleaseStarted.Broadcast();
-	OnGrabbingStarted.Broadcast();
-}
-
 void ACharacterST::IncrementSlot()
 {
 	OnIncrementSlot.Broadcast();
@@ -199,9 +197,9 @@ void ACharacterST::Record()
 	OnRecord.Broadcast();
 }
 
-void ACharacterST::AInteract()
+void ACharacterST::AInteractOrGrab()
 {
-	OnInteract.Broadcast();
+	OnInteractOrGrab.Broadcast();
 }
 
 void ACharacterST::AStartPropulse()
@@ -250,17 +248,23 @@ void ACharacterST::Kill_Implementation()
 	URecordManagerSubsystem * RecordManagerSubsystem = GetWorld()->GetSubsystem<URecordManagerSubsystem>();
 	
 	if (RecordManagerSubsystem && RecordManagerSubsystem->IsRecording())
+	{
+		ReceiveDeathInRecord();
 		OnDeathInRecord.Broadcast();
+	}
 	else
 	{
-		OnDeath.Broadcast();
 		Life = 0;
+		ReceiveDeathInRecord();
+		OnDeath.Broadcast();
 	}
 }
 
 void ACharacterST::Laserize_Implementation()
 {
 	ILaserizable::Laserize_Implementation();
+	
+	Execute_ReceiveLaserize(this);
 	
 	Execute_Kill(this);
 }
@@ -280,6 +284,17 @@ void ACharacterST::Revive()
 
 void ACharacterST::InitStateMachine()
 {
+	const UDataAssetDeveloperSettings* DevSettings = GetDefault<UDataAssetDeveloperSettings>();
+
+	UStateMachineSettings* StateMachineSettings = DevSettings->StateMachineData.LoadSynchronous();
+	if (IsValid(StateMachineSettings))
+	{
+		for (const TTuple<EPlayerActionType, bool>& pair : StateMachineSettings->StartingLockedActions)
+		{
+			LockedActions[pair.Key] = pair.Value;
+		}
+	}
+	
 	StateMachine = NewObject<UStateMachine>(this);
 	StateMachine->InitStates(this);
 }
@@ -383,4 +398,31 @@ void ACharacterST::ForceRelease_Implementation()
 void ACharacterST::SetRespawnTransform(const FTransform& InRespawnTransform)
 {
 	RespawnTransform = InRespawnTransform;
+}
+
+void ACharacterST::LockAction(const EPlayerActionType& PlayerAction)
+{
+	bool* locked = LockedActions.Find(PlayerAction);
+	
+	if (!locked) return;
+	
+	*locked = true;
+	
+	OnActionLocked.Broadcast(PlayerAction);
+}
+
+void ACharacterST::UnlockAction(const EPlayerActionType& PlayerAction)
+{
+	bool* locked = LockedActions.Find(PlayerAction);
+	
+	if (!locked) return;
+	
+	*locked = false;
+	
+	OnActionUnlocked.Broadcast(PlayerAction);
+}
+
+const TMap<EPlayerActionType, bool>& ACharacterST::GetLockedActions() const
+{
+	return LockedActions;
 }

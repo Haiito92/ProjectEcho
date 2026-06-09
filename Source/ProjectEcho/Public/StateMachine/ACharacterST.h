@@ -10,6 +10,8 @@
 #include "RecordManager/RecordHandlerInterface.h"
 #include "ACharacterST.generated.h"
 
+class UStateMachineSettings;
+enum class EPlayerActionType : uint8;
 class UReflectComponent;
 class UGrabbingComponent;
 class URecordHandlerComponent;
@@ -58,9 +60,6 @@ public:
 	UFUNCTION()
 	void ALook(const FInputActionValue& Value);
 	
-	UFUNCTION()
-	void AGrabStarted(const FInputActionValue& Value);
-	
 	UFUNCTION(BlueprintCallable)
 	void IncrementSlot();
 	
@@ -74,7 +73,7 @@ public:
 	void Record();
 	
 	UFUNCTION(BlueprintCallable)
-	void AInteract();
+	void AInteractOrGrab();
 	
 	UFUNCTION(BlueprintCallable)
 	void AStartPropulse();
@@ -93,6 +92,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void Kill_Implementation() override;
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveDeathOutOfRecord();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveDeathInRecord();
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void Laserize_Implementation() override;
@@ -162,6 +167,14 @@ public:
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="InRespawnTransform"))
 	void SetRespawnTransform(const FTransform& InRespawnTransform);
 
+	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="PlayerAction"))
+	void LockAction(const EPlayerActionType& PlayerAction);
+	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="PlayerAction"))
+	void UnlockAction(const EPlayerActionType& PlayerAction);
+	
+	UFUNCTION()
+	const TMap<EPlayerActionType, bool>& GetLockedActions() const;
+	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
 	UPROPERTY(BlueprintAssignable)
 	FMovePressed OnMovePressed;
@@ -193,10 +206,6 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGrabStarted);
 	UPROPERTY(BlueprintAssignable)
 	FGrabStarted OnGrabbingStarted;
-	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReleaseStarted);
-	UPROPERTY(BlueprintAssignable)
-	FReleaseStarted OnReleaseStarted;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FThrowStarted);
 	UPROPERTY(BlueprintAssignable)
@@ -236,7 +245,7 @@ public:
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInteract);
 	UPROPERTY(BlueprintAssignable)
-	FOnRevive OnInteract;
+	FOnRevive OnInteractOrGrab;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartPropulse);
 	UPROPERTY(BlueprintAssignable)
@@ -286,6 +295,14 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnEndRecord OnEndRecord;
 	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActionLocked, const EPlayerActionType&, ActionLocked);
+	UPROPERTY(BlueprintAssignable)
+	FOnActionLocked OnActionLocked;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActionUnlocked, const EPlayerActionType&, ActionUnlocked);
+	UPROPERTY(BlueprintAssignable)
+	FOnActionUnlocked OnActionUnlocked;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputDataConfig> InputActions;
 	UPROPERTY(EditDefaultsOnly,  Category = "Input")
@@ -333,7 +350,10 @@ public:
 	UPROPERTY()
 	bool bReflectInputPressed = false;
 	
-	
 	UPROPERTY()
 	FTransform RespawnTransform;
+	
+private:
+	UPROPERTY()
+	TMap<EPlayerActionType, bool> LockedActions;
 };

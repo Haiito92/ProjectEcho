@@ -70,6 +70,9 @@ bool UGrabbingComponent::TryGrab(const FRotator& ControlRotation, const FGrabbin
 			FAttachmentTransformRules AttachmentTransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
 			GrabbedActor->AttachToComponent(this, AttachmentTransformRules);
 			IGrabbableInterface::Execute_OnGrabbed(GrabbedActor, this->GetOwner());
+			
+			OnActorGrabbed.Broadcast(GrabbedActor);
+			
 			return true;
 		}
 	}
@@ -84,6 +87,9 @@ bool UGrabbingComponent::TryRelease()
 		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		IGrabbableInterface::Execute_OnObjectReleased(GrabbedActor);
 		GrabbedActor = nullptr;
+		
+		OnActorReleased.Broadcast();
+		
 		return true;
 	}
 	return false;
@@ -97,6 +103,9 @@ bool UGrabbingComponent::TryThrow(const FRotator& ControlRotation)
 		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		IGrabbableInterface::Execute_OnThrown(GrabbedActor, ControlRotation.Vector(), GrabMechanicSettings->ThrowStrength);
 		GrabbedActor = nullptr;
+		
+		OnActorThrowed.Broadcast();
+		
 		return true;
 	}
 	return false;
@@ -120,7 +129,7 @@ void UGrabbingComponent::ForceGrab(AActor* Actor, const FGrabbingRules& Grabbing
 		if (Actor->GetClass()->ImplementsInterface(UGrabbableInterface::StaticClass()) && IGrabbableInterface::Execute_CanBeGrabbed(Actor))
 		{
 			GrabbedActor = Actor;
-			IGrabbableInterface::Execute_OnObjectBeforeForceGrabbed(GrabbedActor, GrabbingRules);
+			IGrabbableInterface::Execute_OnObjectBeforeForceGrabbed(GrabbedActor, this->GetOwner(), GrabbingRules);
 			FAttachmentTransformRules AttachmentTransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
 			GrabbedActor->AttachToComponent(this, AttachmentTransformRules);
 			IGrabbableInterface::Execute_OnObjectForceGrabbed(GrabbedActor, this->GetOwner());
@@ -159,7 +168,7 @@ void UGrabbingComponent::TryForceGrabHeldCube(const FGrabbingRules& GrabbingRule
 		if (HitResult.GetActor()->GetClass()->ImplementsInterface(UGrabbableInterface::StaticClass()) && IGrabbableInterface::Execute_CanBeGrabbed(HitResult.GetActor()))
 		{
 			GrabbedActor = HitResult.GetActor();
-			IGrabbableInterface::Execute_OnObjectBeforeForceGrabbed(GrabbedActor, GrabbingRules);
+			IGrabbableInterface::Execute_OnObjectBeforeForceGrabbed(GrabbedActor, this->GetOwner(), GrabbingRules);
 			FAttachmentTransformRules AttachmentTransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
 			GrabbedActor->AttachToComponent(this, AttachmentTransformRules);
 			IGrabbableInterface::Execute_OnObjectForceGrabbed(GrabbedActor, this->GetOwner());

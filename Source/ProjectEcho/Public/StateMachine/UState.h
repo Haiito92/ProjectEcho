@@ -1,4 +1,5 @@
 #pragma once
+#include "ACharacterST.h"
 #include "InteractableMechanic/InteractorComponent.h"
 #include "ReflectMechanic/Reflectable.h"
 #include "PropulseMechanic/PropulseComponent.h"
@@ -107,14 +108,18 @@ protected:
 	void OnDeathInRecord();
 	
 	UFUNCTION()
-	void OnInteract();
+	void OnInteractOrGrab();
+	UFUNCTION()
+	bool TryGrab();
+	UFUNCTION()
+	bool TryInteract();
 	
-	UFUNCTION()
+	UFUNCTION(meta=(DeprecatedFunction))
 	void OnPropulseInputStarted();
-	UFUNCTION()
+	UFUNCTION(meta=(DeprecatedFunction))
 	void OnPropulseInputStopped();
 	
-	UFUNCTION()
+	UFUNCTION(meta=(DeprecatedFunction))
 	void OnPropulsed(const FVector& PropulseDirection, float PropulsePower);
 	
 	UFUNCTION()
@@ -125,6 +130,11 @@ protected:
 	
 	UFUNCTION()
 	void OnReflectInputCompleted();
+	
+	UFUNCTION()
+	void OnActionLocked(const EPlayerActionType& PlayerAction);
+	UFUNCTION()
+	void OnActionUnlocked(const EPlayerActionType& PlayerAction);
 	
 	UFUNCTION()
 	void CheckIsFalling() const;
