@@ -10,7 +10,7 @@
  * 
 */
 
-enum class PlayerActionType : uint8;
+enum class EPlayerActionType : uint8;
 enum class EControlDeviceType : uint8;
 
 USTRUCT(BlueprintType)
@@ -39,5 +39,5 @@ class PROJECTECHO_API UTutorialSettingsData : public UDataAsset
 	
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tutorial UI")
-	TMap<PlayerActionType, FActionTutorialUIData> ActionTutorialsInfo;
+	TMap<EPlayerActionType, FActionTutorialUIData> ActionTutorialsInfo;
 };
