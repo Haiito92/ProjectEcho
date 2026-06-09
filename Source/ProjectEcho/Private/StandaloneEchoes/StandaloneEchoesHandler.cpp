@@ -6,6 +6,7 @@
 #include "DataAssetDeveloperSettings.h"
 #include "RecordManager/EchoActor.h"
 #include "RecordManager/RecordManagerSubsystem.h"
+#include "StandaloneEchoes/StandaloneEchoesSpecialAnimation.h"
 
 
 // Sets default values
@@ -284,6 +285,97 @@ void AStandaloneEchoesHandler::RecreateAllRewindActions(int TimelineIndex)
 				EchoTimelines[TimelineIndex].RewindActionKeys.Add(RewindKey);
 			}
 		}
+	}
+}
+
+int AStandaloneEchoesHandler::CreateSpecialAnimationKey(int TimelineIndex, const float& LocalTimeKey)
+{
+	if (EchoTimelines.IsValidIndex(TimelineIndex))
+	{
+#if WITH_EDITOR
+		this->Modify();
+#endif
+		if (!SpecialAnimations.Contains(TimelineIndex))
+		{
+			SpecialAnimations.Add(TimelineIndex, FStandaloneEchoesAnimationArrayWrapper());
+		}
+		else
+		{
+			SpecialAnimations[TimelineIndex].Animations.Add(FStandaloneEchoesSpecialAnimation(EAnimationValueReference::None, LocalTimeKey));
+			return SpecialAnimations[TimelineIndex].Animations.Num() - 1; //Return Last Index
+		}
+	}
+	return -1;
+}
+
+void AStandaloneEchoesHandler::ModifySpecialAnimationKeyTimeKey(int TimelineIndex, const int& KeyIndex, const float& NewTimeKey)
+{
+	if (EchoTimelines.IsValidIndex(TimelineIndex) && SpecialAnimations.Contains(TimelineIndex) && SpecialAnimations[TimelineIndex].Animations.IsValidIndex(KeyIndex))
+	{
+#if WITH_EDITOR
+		this->Modify();
+#endif
+		SpecialAnimations[TimelineIndex].Animations[KeyIndex].TimeKey = NewTimeKey;
+	}
+}
+
+void AStandaloneEchoesHandler::ModifySpecialAnimationKeyAnimation(int TimelineIndex, const int& KeyIndex, EAnimationValueReference InAnimationValueReference)
+{
+	if (EchoTimelines.IsValidIndex(TimelineIndex) && SpecialAnimations.Contains(TimelineIndex) && SpecialAnimations[TimelineIndex].Animations.IsValidIndex(KeyIndex))
+	{
+#if WITH_EDITOR
+		this->Modify();
+#endif
+		SpecialAnimations[TimelineIndex].Animations[KeyIndex].AnimationValueReference = InAnimationValueReference;
+	}
+}
+
+void AStandaloneEchoesHandler::RecreateAllAnimationKeys(int TimelineIndex)
+{
+	if (EchoTimelines.IsValidIndex(TimelineIndex))
+	{
+#if WITH_EDITOR
+		this->Modify();
+#endif
+		
+		EchoTimelines[TimelineIndex].RecordAnimationKeys.Empty();
+
+		//Setup Action Animation Keys
+		for (FRecordActionKey& RecordActionKey : EchoTimelines[TimelineIndex].ActionKeys)
+		{
+			if (RecordActionKey.Action.ActionEnum == ERecordedAction::StartReflect || RecordActionKey.Action.ActionEnum == ERecordedAction::StopReflect)
+			{
+				bool bValue = RecordActionKey.Action.ActionEnum == ERecordedAction::StartReflect;
+				FRecordAnimationValue AnimationValueReflect = FRecordAnimationValue(EAnimationValueReference::IsHoldingReflect, bValue);
+				FRecordAnimationValue AnimationValueTopBody = FRecordAnimationValue(EAnimationValueReference::AnimTopBody, bValue);
+				EchoTimelines[TimelineIndex].RecordAnimationKeys.Add(FRecordAnimationKey(AnimationValueReflect, RecordActionKey.TimeKey));
+				EchoTimelines[TimelineIndex].RecordAnimationKeys.Add(FRecordAnimationKey(AnimationValueTopBody, RecordActionKey.TimeKey));
+			}
+		}
+		
+		//Setup Speed Animation Keys
+		if (EchoTimelines[TimelineIndex].TransformKeys.Num() >= 2)
+		{
+			for (int i = 0; i < EchoTimelines[TimelineIndex].TransformKeys.Num() - 1; ++i)
+			{
+				float distance = FVector::Distance(EchoTimelines[TimelineIndex].TransformKeys[i].Position, EchoTimelines[TimelineIndex].TransformKeys[i + 1].Position);
+				FRecordAnimationValue AnimationSpeedValue = FRecordAnimationValue(EAnimationValueReference::Speed, distance > MinDistanceRunning ? 600.f : 0.f);
+				EchoTimelines[TimelineIndex].RecordAnimationKeys.Add(FRecordAnimationKey(AnimationSpeedValue, FMath::Max(0.01, EchoTimelines[TimelineIndex].TransformKeys[i].TimeKey)));
+			}
+		}
+		
+		//Setup Special Animation Keys
+		if (SpecialAnimations.Contains(TimelineIndex) && !SpecialAnimations[TimelineIndex].Animations.IsEmpty())
+		{
+			for (const FStandaloneEchoesSpecialAnimation& SpecialAnimation : SpecialAnimations[TimelineIndex].Animations)
+			{
+				FRecordAnimationValue AnimationTurnOn = FRecordAnimationValue(SpecialAnimation.AnimationValueReference, true);
+				FRecordAnimationValue AnimationTurnOff = FRecordAnimationValue(SpecialAnimation.AnimationValueReference, false);
+				EchoTimelines[TimelineIndex].RecordAnimationKeys.Add(FRecordAnimationKey(AnimationTurnOn, FMath::Max(0.01, SpecialAnimation.TimeKey)));
+				EchoTimelines[TimelineIndex].RecordAnimationKeys.Add(FRecordAnimationKey(AnimationTurnOff, SpecialAnimation.TimeKey + 0.2));
+			}
+		}
+		
 	}
 }
 
