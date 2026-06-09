@@ -180,7 +180,7 @@ void UState::OnMoveReleased()
 
 void UState::OnRecord()
 {
-	if (!CanUseRecord() || Character->GetLockedActions()[EPlayerActionType::Record]) return;
+	if (!CanUseRecord()) return;
 	
 	if (RecordManagerSubsystem->IsRecording())
 		StopRecord();
@@ -190,6 +190,8 @@ void UState::OnRecord()
 
 void UState::StartRecord()
 {
+	if (Character->GetLockedActions()[EPlayerActionType::Record]) return;
+	
 	Character->OnStartRecord.Broadcast();
 
 	//Actions Played only on first Replay
@@ -213,6 +215,7 @@ void UState::StartRecord()
 
 void UState::StopRecord()
 {
+	if (Character->GetLockedActions()[EPlayerActionType::StopRecord]) return;
 	RecordManagerSubsystem->StopRecord();
 }
 
