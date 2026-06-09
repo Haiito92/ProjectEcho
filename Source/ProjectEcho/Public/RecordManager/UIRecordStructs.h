@@ -51,7 +51,7 @@ struct FTimelineUIInfo
 	TArray<FUIActionKey> ActionKeys = TArray<FUIActionKey>();
 	
 	UPROPERTY(BlueprintReadOnly)
-	FStandaloneEchoesJumpAnimation EchoColorStruct = FStandaloneEchoesJumpAnimation();
+	FEchoColorStruct EchoColorStruct = FEchoColorStruct();
 };
 
 USTRUCT(BlueprintType)

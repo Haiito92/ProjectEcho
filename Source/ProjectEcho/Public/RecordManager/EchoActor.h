@@ -66,10 +66,10 @@ public:
 	void SetControlRotation(const FRotator& ControlRotation);
 	
 	UFUNCTION()
-	void InitEcho(const int& index, const FStandaloneEchoesJumpAnimation& EchoColor);
+	void InitEcho(const int& index, const FEchoColorStruct& EchoColor);
 	
 	UFUNCTION(BlueprintImplementableEvent)
-	void ReceiveInitEcho(FStandaloneEchoesJumpAnimation EchoColor);
+	void ReceiveInitEcho(FEchoColorStruct EchoColor);
 	
 	void HandleRewindStarted(const float& CurrentTimeKey, bool bIsPlayerRewind);
 	void HandleRewindStopped(const float& CurrentTimeKey, bool bIsPlayerRewind); 

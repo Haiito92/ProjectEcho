@@ -3,10 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "StandaloneEchoesSpecialAnimation.h"
 #include "GameFramework/Actor.h"
 #include "StandaloneEchoesHandler.generated.h"
 
-struct FStandaloneEchoesSpecialAnimation;
 enum class EAnimationValueReference : uint8;
 enum class ERecordedAction : uint8;
 struct FRecordedAction;
@@ -82,6 +82,15 @@ public:
 #pragma region AnimationKey
 	
 	UFUNCTION(BlueprintCallable)
+	int CreateSpecialAnimationKey(int TimelineIndex, const float& LocalTimeKey);
+	
+	UFUNCTION(BlueprintCallable)
+	void ModifySpecialAnimationKeyTimeKey(int TimelineIndex, const int& KeyIndex, const float& NewTimeKey);
+	
+	UFUNCTION(BlueprintCallable)
+	void ModifySpecialAnimationKeyAnimation(int TimelineIndex, const int& KeyIndex, EAnimationValueReference& InAnimationValueReference);
+	
+	UFUNCTION(BlueprintCallable)
 	void RecreateAllAnimationKeys(int TimelineIndex);
 	
 #pragma endregion
@@ -118,5 +127,5 @@ protected:
 	TMap<ERecordedAction, ERecordedAction> RewindEquivalentActions = TMap<ERecordedAction, ERecordedAction>();
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TMap<int, TArray<FStandaloneEchoesSpecialAnimation>> SpecialAnimations = TMap<int, TArray<FStandaloneEchoesSpecialAnimation>>();
+	TMap<int32, FStandaloneEchoesAnimationArrayWrapper> SpecialAnimations = TMap<int32, FStandaloneEchoesAnimationArrayWrapper>();
 };

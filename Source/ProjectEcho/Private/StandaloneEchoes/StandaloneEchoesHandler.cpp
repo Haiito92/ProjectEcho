@@ -6,7 +6,7 @@
 #include "DataAssetDeveloperSettings.h"
 #include "RecordManager/EchoActor.h"
 #include "RecordManager/RecordManagerSubsystem.h"
-#include "StandaloneEchoes/StandaloneEchoesJumpAnimation.h"
+#include "StandaloneEchoes/StandaloneEchoesSpecialAnimation.h"
 
 
 // Sets default values
@@ -288,6 +288,39 @@ void AStandaloneEchoesHandler::RecreateAllRewindActions(int TimelineIndex)
 	}
 }
 
+int AStandaloneEchoesHandler::CreateSpecialAnimationKey(int TimelineIndex, const float& LocalTimeKey)
+{
+	if (EchoTimelines.IsValidIndex(TimelineIndex))
+	{
+		if (!SpecialAnimations.Contains(TimelineIndex))
+		{
+			SpecialAnimations.Add(TimelineIndex, FStandaloneEchoesAnimationArrayWrapper());
+		}
+		else
+		{
+			SpecialAnimations[TimelineIndex].Animations.Add(FStandaloneEchoesSpecialAnimation(EAnimationValueReference::None, LocalTimeKey));
+			return SpecialAnimations[TimelineIndex].Animations.Num() - 1; //Return Last Index
+		}
+	}
+	return -1;
+}
+
+void AStandaloneEchoesHandler::ModifySpecialAnimationKeyTimeKey(int TimelineIndex, const int& KeyIndex, const float& NewTimeKey)
+{
+	if (EchoTimelines.IsValidIndex(TimelineIndex) && SpecialAnimations.Contains(TimelineIndex) && SpecialAnimations[TimelineIndex].Animations.IsValidIndex(KeyIndex))
+	{
+		SpecialAnimations[TimelineIndex].Animations[KeyIndex].TimeKey = NewTimeKey;
+	}
+}
+
+void AStandaloneEchoesHandler::ModifySpecialAnimationKeyAnimation(int TimelineIndex, const int& KeyIndex, EAnimationValueReference& InAnimationValueReference)
+{
+	if (EchoTimelines.IsValidIndex(TimelineIndex) && SpecialAnimations.Contains(TimelineIndex) && SpecialAnimations[TimelineIndex].Animations.IsValidIndex(KeyIndex))
+	{
+		SpecialAnimations[TimelineIndex].Animations[KeyIndex].AnimationValueReference = InAnimationValueReference;
+	}
+}
+
 void AStandaloneEchoesHandler::RecreateAllAnimationKeys(int TimelineIndex)
 {
 	if (EchoTimelines.IsValidIndex(TimelineIndex))
@@ -322,18 +355,14 @@ void AStandaloneEchoesHandler::RecreateAllAnimationKeys(int TimelineIndex)
 		}
 		
 		//Setup Special Animation Keys
-		if (SpecialAnimations.Contains(TimelineIndex) && !SpecialAnimations[TimelineIndex].IsEmpty())
+		if (SpecialAnimations.Contains(TimelineIndex) && !SpecialAnimations[TimelineIndex].Animations.IsEmpty())
 		{
-			for (FStandaloneEchoesSpecialAnimation SpecialAnimation : SpecialAnimations[TimelineIndex])
+			for (const FStandaloneEchoesSpecialAnimation& SpecialAnimation : SpecialAnimations[TimelineIndex].Animations)
 			{
-				switch (SpecialAnimation.SpecialAnimationEnum)
-				{
-				case ERecordedAction::StartReflect:
-					FStandaloneEchoesJumpAnimation JumpAnim = Cast<FStandaloneEchoesJumpAnimation>(SpecialAnimation[TimelineIndex]);
-					break;
-				default: 
-					break;
-				}
+				FRecordAnimationValue AnimationTurnOn = FRecordAnimationValue(SpecialAnimation.AnimationValueReference, true);
+				FRecordAnimationValue AnimationTurnOff = FRecordAnimationValue(SpecialAnimation.AnimationValueReference, false);
+				EchoTimelines[TimelineIndex].RecordAnimationKeys.Add(FRecordAnimationKey(AnimationTurnOn, FMath::Max(0.01, SpecialAnimation.TimeKey)));
+				EchoTimelines[TimelineIndex].RecordAnimationKeys.Add(FRecordAnimationKey(AnimationTurnOff, SpecialAnimation.TimeKey + 0.2));
 			}
 		}
 		
