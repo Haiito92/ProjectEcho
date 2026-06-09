@@ -28,6 +28,7 @@ bool UEchoViewport::InputKey(const FInputKeyEventArgs& EventArgs)
 		NewControlDeviceType = EControlDeviceType::Gamepad;
 	}
 	
+	
 	if (IsValid(DeviceSubsystem)) DeviceSubsystem->SetCurrentControlDeviceType(NewControlDeviceType);
 	
 	return Super::InputKey(EventArgs);
