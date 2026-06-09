@@ -4,12 +4,12 @@
 #include "Public/GameInstance/EchoGameInstance.h"
 
 #include "EchoSystem.h"
-#include "GameInstance/DeviceGameInstanceSubsystem.h"
+#include "Controls/DeviceGameInstanceSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Options/OptionsGameInstanceSubsystem.h"
 #include "Tools/Debug/EchoDebug.h"
 #include "Tools/Debug/EchoMessageType.h"
-#include "Viewport/EchoViewport.h"
+#include "Viewport/EchoGameViewportClient.h"
 
 void UEchoGameInstance::Init()
 {

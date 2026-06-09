@@ -5,6 +5,7 @@
 #include "UStateMachineSettings.generated.h"
 
 class UState;
+enum class EPlayerActionType: uint8;
 
 UCLASS()
 class PROJECTECHO_API UStateMachineSettings : public UDataAsset
@@ -13,4 +14,7 @@ class PROJECTECHO_API UStateMachineSettings : public UDataAsset
 public:
 	UPROPERTY(BlueprintReadWrite,EditAnywhere)
 	TArray<TSubclassOf<UState>> InstantiateStates;
+	
+	UPROPERTY(BlueprintReadWrite,EditAnywhere)
+	TMap<EPlayerActionType, bool> StartingLockedActions;
 };

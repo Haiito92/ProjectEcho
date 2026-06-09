@@ -74,6 +74,7 @@ public:
 	void HandleRewindStarted(const float& CurrentTimeKey, bool bIsPlayerRewind);
 	void HandleRewindStopped(const float& CurrentTimeKey, bool bIsPlayerRewind); 
 	void HandleRecordStarted(const float& CurrentTimeKey);
+	void HandleTimelineActivation(bool bIsActive);
 	
 	UFUNCTION()
 	void OnTimelineDestroyed();
@@ -108,6 +109,9 @@ protected:
 	
 	UFUNCTION(BlueprintImplementableEvent, meta=(AutoCreateRefTerm="CurrentTimeKey"))
 	void ReceiveHandleRewindStopped(const float& CurrentTimeKey);
+	
+	UFUNCTION(BlueprintImplementableEvent, meta=(AutoCreateRefTerm="CurrentTimeKey"))
+	void ReceiveHandleTimelineActivation(bool bIsActive);
 	
 	UFUNCTION(BlueprintCallable)
 	void RegisterRecordable(TScriptInterface<IRecordableInterface> Recordable);
