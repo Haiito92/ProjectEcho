@@ -5,7 +5,7 @@
 
 #include "EchoSystem.h"
 #include "InputKeyEventArgs.h"
-#include "GameInstance/DeviceGameInstanceSubsystem.h"
+#include "Controls/DeviceGameInstanceSubsystem.h"
 #include "Tools/Debug/EchoDebug.h"
 #include "Tools/Debug/EchoMessageType.h"
 
@@ -21,12 +21,13 @@ void UEchoViewport::Init(struct FWorldContext& WorldContext, UGameInstance* Owni
 }
 bool UEchoViewport::InputKey(const FInputKeyEventArgs& EventArgs)
 {
-	ControlDeviceType NewControlDeviceType = ControlDeviceType::KeyboardAndMouse;
+	EControlDeviceType NewControlDeviceType = EControlDeviceType::KeyboardAndMouse;
 	
 	if (EventArgs.IsGamepad())
 	{
-		NewControlDeviceType = ControlDeviceType::Gamepad;
+		NewControlDeviceType = EControlDeviceType::Gamepad;
 	}
+	
 	
 	if (IsValid(DeviceSubsystem)) DeviceSubsystem->SetCurrentControlDeviceType(NewControlDeviceType);
 	
@@ -35,11 +36,11 @@ bool UEchoViewport::InputKey(const FInputKeyEventArgs& EventArgs)
 
 bool UEchoViewport::InputAxis(const FInputKeyEventArgs& Args)
 {
-	ControlDeviceType NewControlDeviceType = ControlDeviceType::KeyboardAndMouse;
+	EControlDeviceType NewControlDeviceType = EControlDeviceType::KeyboardAndMouse;
 	
 	if (Args.IsGamepad())
 	{
-		NewControlDeviceType = ControlDeviceType::Gamepad;
+		NewControlDeviceType = EControlDeviceType::Gamepad;
 	}
 	
 	if (IsValid(DeviceSubsystem)) DeviceSubsystem->SetCurrentControlDeviceType(NewControlDeviceType);
