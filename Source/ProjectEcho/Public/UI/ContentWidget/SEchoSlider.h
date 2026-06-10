@@ -99,7 +99,7 @@ public:
 	
 	virtual FReply OnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& InFocusEvent) override;
 	virtual void OnFocusLost(const FFocusEvent& InFocusEvent) override;
-	
+
 private:
 	FSimpleDelegate OnReceivedFocus;
 
