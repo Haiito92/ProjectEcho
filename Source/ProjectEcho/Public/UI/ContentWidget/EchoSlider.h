@@ -209,7 +209,7 @@ public:
 #if WITH_EDITOR
 	virtual const FText GetPaletteCategory() override;
 #endif
-
+	
 protected:
 	/** Native Slate Widget */
 	TSharedPtr<SEchoSlider> MySlider;
