@@ -145,11 +145,13 @@ void UState::OnThrowingStarted()
 {
 	if (!CanUseGrab() || Character->GetLockedActions()[EPlayerActionType::Throw]) return;
 	
-	if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
-		FRecordedAction(ERecordedAction::TryThrow), FRecordedAction(ERecordedAction::ForceGrab));
-
 	if (GrabbingComponent->TryThrow(Character->GetControlRotation()))
+	{
 		Character->OnValidThrow.Broadcast();
+		
+		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
+		FRecordedAction(ERecordedAction::TryThrow), FRecordedAction(ERecordedAction::ForceGrab));
+	}
 }
 
 void UState::OnRewindingStarted()
@@ -258,24 +260,30 @@ bool UState::TryGrab()
 	
 	if (GrabbingComponent->IsGrabbing())
 	{
-		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
-			FRecordedAction(ERecordedAction::TryRelease), FRecordedAction(ERecordedAction::ForceGrab));
-
 		if (GrabbingComponent->TryRelease())
+		{
 			Character->OnValidRelease.Broadcast();
+			
+			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
+			FRecordedAction(ERecordedAction::TryRelease), FRecordedAction(ERecordedAction::ForceGrab));
+		}
 		
 		return true; // We return true no matter what, because if if release fail, we still can't interact after
 	}
-	
-	if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
-		FRecordedAction(ERecordedAction::TryGrab), FRecordedAction(ERecordedAction::ForceRelease));
 	
 	FGrabbingRules GrabbingRules = FGrabbingRules();
 	GrabbingRules.CollisionChannelsToIgnore.Add(ECC_Pawn);
 	
 	bool TryGrab = GrabbingComponent->TryGrab(Character->GetControlRotation(), GrabbingRules); 
+	
 	if (TryGrab)
-		Character->OnValidGrab.Broadcast();
+	{
+		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
+			FRecordedAction(ERecordedAction::TryGrab), FRecordedAction(ERecordedAction::ForceRelease));
+	}
+	
+	Character->TryGrab(TryGrab);
+	
 	
 	return TryGrab;
 }
@@ -284,18 +292,21 @@ bool UState::TryInteract()
 {
 	if (!CanUseInteract() || GrabbingComponent->IsGrabbing() || !IsValid(InteractorComponent) || Character->GetLockedActions()[EPlayerActionType::Interact]) return false;
 	
-	if (IsValid(RecordHandlerComponent))
-	{
-		UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine, EEchoMessageType::Log,
-											"Valid Record Handler", FColor::Green, 3.0f);
-		RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::Interact));
-	}
-	
-	return IInteractor::Execute_TryInteract(
+	bool bTryInteract = IInteractor::Execute_TryInteract(
 		InteractorComponent,
 		Character->FirstPersonCameraComponent->GetComponentLocation(),
 		UKismetMathLibrary::GetForwardVector(Character->GetControlRotation())
 	);
+	
+	Character->TryInteract(bTryInteract);
+	
+	if (bTryInteract)
+	{
+		if (IsValid(RecordHandlerComponent))
+			RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::Interact));
+	}
+	
+	return bTryInteract;
 }
 
 void UState::OnPropulseInputStarted()

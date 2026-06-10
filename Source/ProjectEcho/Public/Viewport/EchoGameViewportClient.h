@@ -27,6 +27,8 @@ public:
 	virtual void ReceivedFocus(FViewport* InViewport) override;
 	virtual void LostFocus(FViewport* InViewport) override;
 
+	
+	virtual TOptional<bool> QueryShowFocus(const EFocusCause InFocusCause) const override;
 private:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnViewportReceivedFocusSignature);
 	UPROPERTY(BlueprintAssignable)
