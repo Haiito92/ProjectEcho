@@ -9,14 +9,12 @@ void UEchoButton::EchoSlateHandleOnReceivedFocus()
 {
 	ReceivedFocus();
 	OnReceivedFocus.Broadcast();
-	SlateHandleOnReceivedFocus();
 }
 
 void UEchoButton::EchoSlateHandleOnLostFocus()
 {
 	LostFocus();
 	OnLostFocus.Broadcast();
-	SlateHandleOnLostFocus();
 }
 
 void UEchoButton::ReceivedFocus_Implementation()
