@@ -274,8 +274,9 @@ bool UState::TryGrab()
 	GrabbingRules.CollisionChannelsToIgnore.Add(ECC_Pawn);
 	
 	bool TryGrab = GrabbingComponent->TryGrab(Character->GetControlRotation(), GrabbingRules); 
-	if (TryGrab)
-		Character->OnValidGrab.Broadcast();
+	
+	Character->TryGrab(TryGrab);
+	
 	
 	return TryGrab;
 }
@@ -291,11 +292,15 @@ bool UState::TryInteract()
 		RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::Interact));
 	}
 	
-	return IInteractor::Execute_TryInteract(
+	bool bTryInteract = IInteractor::Execute_TryInteract(
 		InteractorComponent,
 		Character->FirstPersonCameraComponent->GetComponentLocation(),
 		UKismetMathLibrary::GetForwardVector(Character->GetControlRotation())
 	);
+	
+	Character->TryInteract(bTryInteract);
+	
+	return bTryInteract;
 }
 
 void UState::OnPropulseInputStarted()
