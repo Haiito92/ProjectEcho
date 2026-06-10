@@ -13,7 +13,8 @@ UENUM(BlueprintType)
 enum class ETutorialEvent: uint8
 {
 	Unknow = 0,
-	ShowTutorialPrompt,
+	ShowActionTutorialPrompt,
+	ShowInfoTutorialPrompt,
 	HideTutorialPrompt,
 	LockInputAction,
 	UnlockInputAction,
@@ -33,4 +34,7 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EPlayerActionType PlayerActionType = EPlayerActionType::Unknow;	
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText InfoText = FText::GetEmpty();	
 };
