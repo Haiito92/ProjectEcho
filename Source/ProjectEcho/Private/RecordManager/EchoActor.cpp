@@ -8,6 +8,7 @@
 #include "RecordManager/RecordableInterface.h"
 #include "RecordManager/RecordManagerSubsystem.h"
 #include "ReflectMechanic/ReflectComponent.h"
+#include "WorldPartition/HLOD/DestructibleHLODComponent.h"
 
 AEchoActor::AEchoActor()
 {
