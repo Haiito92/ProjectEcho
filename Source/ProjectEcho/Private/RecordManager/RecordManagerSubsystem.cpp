@@ -3,8 +3,6 @@
 
 #include "DataAssetDeveloperSettings.h"
 #include "EchoSystem.h"
-#include "ProjectEcho.h"
-#include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "LevelStreaming/LevelStreamingWorldSubsystem.h"
@@ -72,7 +70,7 @@ bool FEchoTimeline::GetActionKeys(const float& PreviousKey,const float& CurrentT
 		{
 			if (ActionKey.TimeKey < PreviousKey && ActionKey.TimeKey >= CurrentTimeKey)
 			{
-				UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Previous Key : " + FString::SanitizeFloat(PreviousKey) + ", CurrentKey = " + FString::SanitizeFloat(CurrentTimeKey) + ", ActionKey = " + FString::SanitizeFloat(ActionKey.TimeKey), FColor::Turquoise, 1);
+				//UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Previous Key : " + FString::SanitizeFloat(PreviousKey) + ", CurrentKey = " + FString::SanitizeFloat(CurrentTimeKey) + ", ActionKey = " + FString::SanitizeFloat(ActionKey.TimeKey), FColor::Turquoise, 1);
 				OutActionKeys.Add(ActionKey);
 				bHasAddedActionKeys = true;
 			}
@@ -89,7 +87,7 @@ bool FEchoTimeline::GetAnimationKeys(const float& PreviousKey, const float& Curr
 	{
 		if (AnimationKey.TimeKey > PreviousKey && AnimationKey.TimeKey <= CurrentTimeKey)
 		{
-			UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Previous Key : " + FString::SanitizeFloat(PreviousKey) + ", CurrentKey = " + FString::SanitizeFloat(CurrentTimeKey) + ", AnimationKey = " + FString::SanitizeFloat(AnimationKey.TimeKey), FColor::Turquoise, 1);
+			//UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Previous Key : " + FString::SanitizeFloat(PreviousKey) + ", CurrentKey = " + FString::SanitizeFloat(CurrentTimeKey) + ", AnimationKey = " + FString::SanitizeFloat(AnimationKey.TimeKey), FColor::Turquoise, 1);
 			OutAnimationKeys.Add(AnimationKey);
 			bHasAddedAnimationKey = true;
 		}
@@ -195,7 +193,7 @@ void FEchoTimeline::RecordActionKey(AActor* RecordedActor, const float& CurrentT
 		RecordActionKey.TimeKey = CurrentTimeKey;
 		RecordActionKey.Action = ToRecordAction;
 		ActionKeys.Add(RecordActionKey);
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Recording Action : " + UEnum::GetDisplayValueAsText(ToRecordAction.ActionEnum).ToString());
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Recording Action : " + UEnum::GetDisplayValueAsText(ToRecordAction.ActionEnum).ToString(), FColor::Cyan, 1.f);
 	}
 	
 	TArray<FRecordedAction> ToRecordRewindActions = RecordHandlerInterface->GetToRecordRewindActions();
@@ -205,7 +203,7 @@ void FEchoTimeline::RecordActionKey(AActor* RecordedActor, const float& CurrentT
 		RecordActionKey.TimeKey = CurrentTimeKey;
 		RecordActionKey.Action = ToRecordAction;
 		RewindActionKeys.Add(RecordActionKey);
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Recording Rewind Action : " + UEnum::GetDisplayValueAsText(ToRecordAction.ActionEnum).ToString());
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Recording Rewind Action : " + UEnum::GetDisplayValueAsText(ToRecordAction.ActionEnum).ToString(), FColor::Cyan, 1.f);
 	}
 }
 
