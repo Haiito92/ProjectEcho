@@ -60,3 +60,8 @@ void UEchoGameViewportClient::LostFocus(FViewport* InViewport)
 	
 	OnViewportLostFocus.Broadcast();
 }
+
+TOptional<bool> UEchoGameViewportClient::QueryShowFocus(const EFocusCause InFocusCause) const
+{
+	return Super::QueryShowFocus(InFocusCause);
+}
