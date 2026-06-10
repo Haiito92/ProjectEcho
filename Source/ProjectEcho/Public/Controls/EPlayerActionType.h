@@ -3,22 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Misc/EnumRange.h"
 
 /**
  * 
  */
 UENUM(BlueprintType)
-enum class PlayerActionType: uint8
+enum class EPlayerActionType: uint8
 {
 	Unknow = 0,
 	Move,
 	Jump,
 	Interact,
-	Grab,
-	Release,
+	GrabOrRelease,
 	Throw, 
 	Reflect,
 	Record,
+	StopRecord,
 	SelectTimeline,
-	DeleteTimeline
+	DeleteTimeline,
+	Count UMETA(Hidden)
 };
+ENUM_RANGE_BY_COUNT(EPlayerActionType, EPlayerActionType::Count);

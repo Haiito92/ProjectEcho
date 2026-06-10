@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EchoColorStruct.h"
+#include "UIRecordStructs.h"
 
 #include "RecordManagerSettings.generated.h"
 
@@ -55,4 +56,7 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Echo Actors")
 	FEchoColorStruct StandaloneEchoColor;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	TArray<ERecordedAction> ActionsSkippedInUI;
 };

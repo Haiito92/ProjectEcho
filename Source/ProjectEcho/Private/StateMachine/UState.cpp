@@ -4,6 +4,7 @@
 #include "EchoSystem.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Controls/EPlayerActionType.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GrabMechanic/GrabbingComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -36,7 +37,6 @@ void UState::InitState(UStateMachine* InStateMachine, ACharacterST* InCharacter)
 
 void UState::Enter()
 {
-	Character->OnGrabbingStarted.AddDynamic(this, &UState::OnGrabbingStarted);
 	Character->OnThrowingStarted.AddDynamic(this, &UState::OnThrowingStarted);
 	Character->OnRecord.AddDynamic(this, &UState::OnRecord);
 	Character->OnDestroySlot.AddDynamic(this, &UState::OnDestroySlot);
@@ -44,13 +44,15 @@ void UState::Enter()
 	Character->OnDecrementSlot.AddDynamic(this, &UState::OnDecrementSlot);
 	Character->OnDeath.AddDynamic(this, &UState::OnDeath);
 	Character->OnDeathInRecord.AddDynamic(this, &UState::OnDeathInRecord);
-	Character->OnInteract.AddDynamic(this, &UState::OnInteract);
+	Character->OnInteractOrGrab.AddDynamic(this, &UState::OnInteractOrGrab);
 	Character->OnStartPropulse.AddDynamic(this, &UState::OnPropulseInputStarted);
 	Character->OnStopPropulse.AddDynamic(this, &UState::OnPropulseInputStopped);
 	Character->OnPropulsed.AddDynamic(this, &UState::OnPropulsed);
 	Character->OnReflectInputStarted.AddDynamic(this, &UState::OnReflectInputStarted);
 	Character->OnReflectInputCompleted.AddDynamic(this, &UState::OnReflectInputCompleted);
 	Character->OnReflected.AddDynamic(this, &UState::OnReflected);
+	Character->OnActionLocked.AddDynamic(this, &UState::OnActionLocked);
+	Character->OnActionUnlocked.AddDynamic(this, &UState::OnActionUnlocked);
 	RecordManagerSubsystem->OnStartPlayerRewinding.AddDynamic(this, &UState::OnRewindingStarted);
 
 	Character->bCanBeReflected = (StateSettings & EStateSettings::CanBeReflected) == EStateSettings::CanBeReflected;
@@ -78,7 +80,6 @@ void UState::OnDeathInRecord()
 
 void UState::Exit()
 {
-	Character->OnGrabbingStarted.RemoveDynamic(this, &UState::OnGrabbingStarted);
 	Character->OnThrowingStarted.RemoveDynamic(this, &UState::OnThrowingStarted);
 	Character->OnRecord.RemoveDynamic(this, &UState::OnRecord);
 	Character->OnDestroySlot.RemoveDynamic(this, &UState::OnDestroySlot);
@@ -86,13 +87,15 @@ void UState::Exit()
 	Character->OnDecrementSlot.RemoveDynamic(this, &UState::OnDecrementSlot);
 	Character->OnDeath.RemoveDynamic(this, &UState::OnDeath);
 	Character->OnDeathInRecord.RemoveDynamic(this, &UState::OnDeathInRecord);
-	Character->OnInteract.RemoveDynamic(this, &UState::OnInteract);
+	Character->OnInteractOrGrab.RemoveDynamic(this, &UState::OnInteractOrGrab);
 	Character->OnStartPropulse.RemoveDynamic(this, &UState::OnPropulseInputStarted);
 	Character->OnStopPropulse.RemoveDynamic(this, &UState::OnPropulseInputStopped);
 	Character->OnPropulsed.RemoveDynamic(this, &UState::OnPropulsed);
 	Character->OnReflectInputStarted.RemoveDynamic(this, &UState::OnReflectInputStarted);
 	Character->OnReflectInputCompleted.RemoveDynamic(this, &UState::OnReflectInputCompleted);
 	Character->OnReflected.RemoveDynamic(this, &UState::OnReflected);
+	Character->OnActionLocked.RemoveDynamic(this, &UState::OnActionLocked);
+	Character->OnActionUnlocked.RemoveDynamic(this, &UState::OnActionUnlocked);
 	RecordManagerSubsystem->OnStartPlayerRewinding.RemoveDynamic(this, &UState::OnRewindingStarted);
 
 	Character->bCanBeReflected = false;
@@ -126,6 +129,8 @@ bool UState::CanUseReflect()
 
 void UState::OnMovePressed(FVector2D InMoveInput)
 {
+	if (Character->GetLockedActions()[EPlayerActionType::Move]) return;
+	
 	FVector Dir = Character->GetActorForwardVector() * InMoveInput.Y + Character->GetActorRightVector() * InMoveInput.X;
 	Dir.Normalize();
 	Character->AddMovementInput(Dir);
@@ -133,38 +138,19 @@ void UState::OnMovePressed(FVector2D InMoveInput)
 
 void UState::OnGrabbingStarted()
 {
-	if (CanUseGrab())
-	{
-		if (GrabbingComponent->IsGrabbing())
-		{
-			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
-				FRecordedAction(ERecordedAction::TryRelease), FRecordedAction(ERecordedAction::ForceGrab));
-
-			if (GrabbingComponent->TryRelease())
-				Character->OnValidRelease.Broadcast();
-		}
-		else
-		{
-			FGrabbingRules GrabbingRules = FGrabbingRules();
-			GrabbingRules.CollisionChannelsToIgnore.Add(ECC_Pawn);
-			if (GrabbingComponent->TryGrab(Character->GetControlRotation(), GrabbingRules))
-				Character->OnValidGrab.Broadcast();
-
-			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
-				FRecordedAction(ERecordedAction::TryGrab), FRecordedAction(ERecordedAction::ForceRelease));
-		}
-	}
+	
 }
 
 void UState::OnThrowingStarted()
 {
-	if (CanUseGrab())
+	if (!CanUseGrab() || Character->GetLockedActions()[EPlayerActionType::Throw]) return;
+	
+	if (GrabbingComponent->TryThrow(Character->GetControlRotation()))
 	{
+		Character->OnValidThrow.Broadcast();
+		
 		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
-			FRecordedAction(ERecordedAction::TryThrow), FRecordedAction(ERecordedAction::ForceGrab));
-
-		if (GrabbingComponent->TryThrow(Character->GetControlRotation()))
-			Character->OnValidThrow.Broadcast();
+		FRecordedAction(ERecordedAction::TryThrow), FRecordedAction(ERecordedAction::ForceGrab));
 	}
 }
 
@@ -174,8 +160,6 @@ void UState::OnRewindingStarted()
 	StateMachine->ChangeState(EState::Rewind);
 }
 
-
-
 void UState::CheckIsFalling() const
 {
 	if (Character->GetCharacterMovement()->IsFalling())
@@ -184,29 +168,32 @@ void UState::CheckIsFalling() const
 
 void UState::OnJumpingStarted()
 {
+	if (Character->GetLockedActions()[EPlayerActionType::Jump]) return;
+	
 	StateMachine->ChangeState(EState::Jump);
 }
 
 void UState::OnMoveReleased()
 {
+	if (Character->GetLockedActions()[EPlayerActionType::Move]) return;
+	
 	StateMachine->ChangeState(EState::Idle);
 }
 
 void UState::OnRecord()
 {
-	if (CanUseRecord())
-	{
-		if (RecordManagerSubsystem->IsRecording())
-			StopRecord();
-		else
-		{
-			StartRecord();
-		}
-	}
+	if (!CanUseRecord()) return;
+	
+	if (RecordManagerSubsystem->IsRecording())
+		StopRecord();
+	else
+		StartRecord();
 }
 
 void UState::StartRecord()
 {
+	if (Character->GetLockedActions()[EPlayerActionType::Record]) return;
+	
 	Character->OnStartRecord.Broadcast();
 
 	//Actions Played only on first Replay
@@ -230,25 +217,28 @@ void UState::StartRecord()
 
 void UState::StopRecord()
 {
+	if (Character->GetLockedActions()[EPlayerActionType::StopRecord]) return;
 	RecordManagerSubsystem->StopRecord();
 }
 
 void UState::OnIncrementSlot()
 {
-	if (CanUseRecord())
-		RecordManagerSubsystem->IncrementSelectedSlot();
+	if (!CanUseRecord() || Character->GetLockedActions()[EPlayerActionType::SelectTimeline]) return;
+	
+	RecordManagerSubsystem->IncrementSelectedSlot();
 }
 
 void UState::OnDecrementSlot()
 {
-	if (CanUseRecord())
-		RecordManagerSubsystem->DecrementSelectedSlot();
+	if (!CanUseRecord() || Character->GetLockedActions()[EPlayerActionType::SelectTimeline]) return;
+	
+	RecordManagerSubsystem->DecrementSelectedSlot();
 }
 
 void UState::OnDestroySlot()
 {
-	if (CanUseRecord())
-		RecordManagerSubsystem->DestroySelectedTimeline();
+	if (!CanUseRecord() || Character->GetLockedActions()[EPlayerActionType::DeleteTimeline]) return;
+	RecordManagerSubsystem->DestroySelectedTimeline();
 }
 
 void UState::OnDeath()
@@ -256,23 +246,67 @@ void UState::OnDeath()
 	StateMachine->ChangeState(EState::Death);
 }
 
-void UState::OnInteract()
+void UState::OnInteractOrGrab()
 {
-	if (CanUseInteract() && !GrabbingComponent->IsGrabbing() && IsValid(InteractorComponent))
-	{
-		IInteractor::Execute_TryInteract(
-			InteractorComponent,
-			Character->FirstPersonCameraComponent->GetComponentLocation(),
-			UKismetMathLibrary::GetForwardVector(Character->GetControlRotation())
-		);
+	if (TryGrab())
+		return;
+	
+	TryInteract();
+}
 
-		if (IsValid(RecordHandlerComponent))
+bool UState::TryGrab()
+{
+	if (!CanUseGrab() || Character->GetLockedActions()[EPlayerActionType::GrabOrRelease]) return false;
+	
+	if (GrabbingComponent->IsGrabbing())
+	{
+		if (GrabbingComponent->TryRelease())
 		{
-			UEchoDebug::AddOnScreenDebugMessage(EEchoSystem::PlayerStateMachine, EEchoMessageType::Log,
-			                                    "Valid Record Handler", FColor::Green, 3.0f);
-			RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::Interact));
+			Character->OnValidRelease.Broadcast();
+			
+			if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
+			FRecordedAction(ERecordedAction::TryRelease), FRecordedAction(ERecordedAction::ForceGrab));
 		}
+		
+		return true; // We return true no matter what, because if if release fail, we still can't interact after
 	}
+	
+	FGrabbingRules GrabbingRules = FGrabbingRules();
+	GrabbingRules.CollisionChannelsToIgnore.Add(ECC_Pawn);
+	
+	bool TryGrab = GrabbingComponent->TryGrab(Character->GetControlRotation(), GrabbingRules); 
+	
+	if (TryGrab)
+	{
+		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
+			FRecordedAction(ERecordedAction::TryGrab), FRecordedAction(ERecordedAction::ForceRelease));
+	}
+	
+	Character->TryGrab(TryGrab);
+	
+	
+	return TryGrab;
+}
+
+bool UState::TryInteract()
+{
+	if (!CanUseInteract() || GrabbingComponent->IsGrabbing() || !IsValid(InteractorComponent) || Character->GetLockedActions()[EPlayerActionType::Interact]) return false;
+	
+	bool bTryInteract = IInteractor::Execute_TryInteract(
+		InteractorComponent,
+		Character->FirstPersonCameraComponent->GetComponentLocation(),
+		UKismetMathLibrary::GetForwardVector(Character->GetControlRotation())
+	);
+	
+	Character->TryInteract(bTryInteract);
+	
+	if (bTryInteract)
+	{
+		if (IsValid(RecordHandlerComponent))
+			RecordHandlerComponent->RegisterActionInRecord(FRecordedAction(ERecordedAction::Interact));
+	}
+	
+	return bTryInteract;
 }
 
 void UState::OnPropulseInputStarted()
@@ -308,26 +342,60 @@ void UState::OnPropulsed(const FVector& PropulseDirection, float PropulsePower)
 
 void UState::OnReflectInputStarted()
 {
-	if (CanUseReflect() && IsValid(ReflectComponent) && !ReflectComponent->IsOn())
-	{
-		ReflectComponent->StartReflect(
-			Character->FirstPersonCameraComponent->GetComponentLocation(),
-			UKismetMathLibrary::GetForwardVector(Character->GetControlRotation())
-		);
+	if (!CanUseReflect() || !IsValid(ReflectComponent) || ReflectComponent->IsOn() || Character->GetLockedActions()[EPlayerActionType::Reflect]) return;
+	
+	ReflectComponent->StartReflect(
+		Character->FirstPersonCameraComponent->GetComponentLocation(),
+		UKismetMathLibrary::GetForwardVector(Character->GetControlRotation())
+	);
 
-		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
-			FRecordedAction(ERecordedAction::StartReflect));
-	}
+	if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
+		FRecordedAction(ERecordedAction::StartReflect));
 }
 
 void UState::OnReflectInputCompleted()
 {
-	if (CanUseReflect() && IsValid(ReflectComponent) && ReflectComponent->IsOn())
-	{
-		ReflectComponent->StopReflect();
+	if (!CanUseReflect() || !IsValid(ReflectComponent) || !ReflectComponent->IsOn() || Character->GetLockedActions()[EPlayerActionType::Reflect]) return;
+	
+	ReflectComponent->StopReflect();
 
-		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
-			FRecordedAction(ERecordedAction::StopReflect));
+	if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
+		FRecordedAction(ERecordedAction::StopReflect));
+}
+
+void UState::OnActionLocked(const EPlayerActionType& PlayerAction)
+{
+	switch (PlayerAction)
+	{
+		case EPlayerActionType::Reflect:
+			{
+				if (ReflectComponent->IsOn())
+				{
+					ReflectComponent->StopReflect();
+					Character->SetShouldRestoreReflect(true);
+				}
+				break;
+			}
+		default:
+			{
+				break;
+			}
+	}
+}
+
+void UState::OnActionUnlocked(const EPlayerActionType& PlayerAction)
+{
+	switch (PlayerAction)
+	{
+	case EPlayerActionType::Reflect:
+		{
+			if (ReflectComponent->IsOn()) ReflectComponent->StopReflect();
+			break;
+		}
+	default:
+		{
+			break;
+		}
 	}
 }
 

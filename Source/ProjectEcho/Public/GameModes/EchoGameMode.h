@@ -23,8 +23,8 @@ protected:
 	UFUNCTION()
 	void OnPlayerDeathEnd();
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<APlayerStart> EchoPlayerStart;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<ACharacterST> EchoPlayerCharacter;
 };
