@@ -43,7 +43,7 @@ public:
 	UInputAction* ADestroySlot;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Actions")
-	UInputAction* AInteract;
+	UInputAction* AInteractOrGrab;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input Actions")
 	UInputAction* APropulse;

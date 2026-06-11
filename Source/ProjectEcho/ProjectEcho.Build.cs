@@ -25,7 +25,10 @@ public class ProjectEcho : ModuleRules
 			"RenderCore"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] { });
+		PrivateDependencyModuleNames.AddRange(new string[] {
+			"Slate",
+			"SlateCore"
+		});
 
 		PublicIncludePaths.AddRange(new string[] {
 			"ProjectEcho",

@@ -24,6 +24,9 @@ public:
 	
 	void EnableStateMachineInputs();
 	void DisableStateMachineInputs();
+	
+	
+	
 protected:
 	void OnPauseInputStarted();
 	

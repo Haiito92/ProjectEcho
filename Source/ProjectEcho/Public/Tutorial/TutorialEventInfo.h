@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Controls/PlayerActionType.h"
+#include "Controls/EPlayerActionType.h"
 #include "TutorialEventInfo.generated.h"
 
 /**
@@ -13,7 +13,8 @@ UENUM(BlueprintType)
 enum class ETutorialEvent: uint8
 {
 	Unknow = 0,
-	ShowTutorialPrompt,
+	ShowActionTutorialPrompt,
+	ShowInfoTutorialPrompt,
 	HideTutorialPrompt,
 	LockInputAction,
 	UnlockInputAction,
@@ -32,5 +33,8 @@ public:
 	ETutorialEvent Event = ETutorialEvent::Unknow;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	PlayerActionType PlayerActionType = PlayerActionType::Unknow;	
+	EPlayerActionType PlayerActionType = EPlayerActionType::Unknow;	
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText InfoText = FText::GetEmpty();	
 };

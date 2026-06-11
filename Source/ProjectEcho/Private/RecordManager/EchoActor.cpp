@@ -8,6 +8,7 @@
 #include "RecordManager/RecordableInterface.h"
 #include "RecordManager/RecordManagerSubsystem.h"
 #include "ReflectMechanic/ReflectComponent.h"
+#include "WorldPartition/HLOD/DestructibleHLODComponent.h"
 
 AEchoActor::AEchoActor()
 {
@@ -114,7 +115,7 @@ void AEchoActor::Laserize_Implementation()
 {
 	ILaserizable::Laserize_Implementation();
 	
-	ReceiveLaserize();
+	Execute_ReceiveLaserize(this);
 	
 	OnEchoDestroyed.Broadcast(EchoIndex);
 }

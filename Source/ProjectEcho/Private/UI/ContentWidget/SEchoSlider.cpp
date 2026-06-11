@@ -33,7 +33,9 @@ void SEchoSlider::Construct(const FArguments& InArgs)
 FReply SEchoSlider::OnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& InFocusEvent)
 {
 	FReply Reply = SSlider::OnFocusReceived(MyGeometry, InFocusEvent);
+	bControllerInputCaptured = true;
 	OnReceivedFocus.ExecuteIfBound();
+	
 	return Reply;
 }
 
