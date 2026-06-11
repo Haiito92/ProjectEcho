@@ -11,6 +11,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Anamorphose/AnamorphoseHolder.h"
 #include "GrabMechanic/GrabbingComponent.h"
 #include "RecordManager/RecordHandlerComponent.h"
 #include "RecordManager/RecordManagerSubsystem.h"
@@ -48,6 +49,9 @@ ACharacterST::ACharacterST()
 	FirstPersonCameraComponent->bEnableFirstPersonScale = true;
 	FirstPersonCameraComponent->FirstPersonFieldOfView = 70.0f;
 	FirstPersonCameraComponent->FirstPersonScale = 0.6f;
+	
+	InteractionSphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Interaction Sphere"));
+	InteractionSphereCollider->SetupAttachment(GetCapsuleComponent());
 	
 	GetMesh()->SetOwnerNoSee(true);
 	GetMesh()->FirstPersonPrimitiveType = EFirstPersonPrimitiveType::WorldSpaceRepresentation;
@@ -116,24 +120,6 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Input->BindAction(InputActions->AThrowOrReflect, ETriggerEvent::Completed,this,&ACharacterST::AStopThrowOrReflect);
 }
 
-void ACharacterST::OnInteractionSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (OtherActor->Implements<UInteractable>())
-	{
-		IInteractable::Execute_UpdateCanBeInteracted(OtherActor, true);
-	}
-}
-
-void ACharacterST::OnInteractionSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	if (OtherActor->Implements<UInteractable>())
-	{
-		IInteractable::Execute_UpdateCanBeInteracted(OtherActor, false);
-	}
-}
-
 void ACharacterST::InitPlayer()
 {
 	RecordHandlerComponent = FindComponentByClass<URecordHandlerComponent>();
@@ -149,7 +135,7 @@ void ACharacterST::InitPlayer()
 		{
 			if (UInteractMechanicSettings* InteractMechanicSettings = DataAssetSettings->InteractMechanicSettings.LoadSynchronous())
 			{
-				InteractionSphereCollider->SetSphereRadius(InteractMechanicSettings->InteractionSphereRadius);
+				//InteractionSphereCollider->SetSphereRadius(InteractMechanicSettings->InteractionSphereRadius);
 				InteractionSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ACharacterST::OnInteractionSphereBeginOverlap);
 				InteractionSphereCollider->OnComponentEndOverlap.AddDynamic(this, &ACharacterST::OnInteractionSphereEndOverlap);
 			}
@@ -165,6 +151,25 @@ void ACharacterST::LoadData()
 	GetCharacterMovement()->MaxAcceleration = playerData->MoveAcceleration;
 	GetCharacterMovement()->AirControlBoostVelocityThreshold = playerData->AirPrecision;
 	GetCharacterMovement()->GravityScale = playerData->GravityScale;
+}
+
+
+void ACharacterST::OnInteractionSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor->Implements<UAnamorphoseHolder>())
+	{
+		IAnamorphoseHolder::Execute_OnEnterRadiusOfInteraction(OtherActor);
+	}
+}
+
+void ACharacterST::OnInteractionSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor->Implements<UAnamorphoseHolder>())
+	{
+		IAnamorphoseHolder::Execute_OnExitRadiusOfInteraction(OtherActor);
+	}
 }
 
 void ACharacterST::AMove(const FInputActionValue& Value)
