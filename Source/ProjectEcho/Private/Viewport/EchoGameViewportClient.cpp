@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Viewport/EchoViewport.h"
+#include "Viewport/EchoGameViewportClient.h"
 
 #include "EchoSystem.h"
 #include "InputKeyEventArgs.h"
@@ -9,7 +9,7 @@
 #include "Tools/Debug/EchoDebug.h"
 #include "Tools/Debug/EchoMessageType.h"
 
-void UEchoViewport::Init(struct FWorldContext& WorldContext, UGameInstance* OwningGameInstance,
+void UEchoGameViewportClient::Init(struct FWorldContext& WorldContext, UGameInstance* OwningGameInstance,
 	bool bCreateNewAudioDevice)
 {
 	Super::Init(WorldContext, OwningGameInstance, bCreateNewAudioDevice);
@@ -19,7 +19,7 @@ void UEchoViewport::Init(struct FWorldContext& WorldContext, UGameInstance* Owni
 	if (!IsValid(DeviceSubsystem)) UEchoDebug::Log(EEchoSystem::GameLoop, EEchoMessageType::Error, "Viewport: Device subsystem invalid");
 
 }
-bool UEchoViewport::InputKey(const FInputKeyEventArgs& EventArgs)
+bool UEchoGameViewportClient::InputKey(const FInputKeyEventArgs& EventArgs)
 {
 	EControlDeviceType NewControlDeviceType = EControlDeviceType::KeyboardAndMouse;
 	
@@ -28,13 +28,12 @@ bool UEchoViewport::InputKey(const FInputKeyEventArgs& EventArgs)
 		NewControlDeviceType = EControlDeviceType::Gamepad;
 	}
 	
-	
 	if (IsValid(DeviceSubsystem)) DeviceSubsystem->SetCurrentControlDeviceType(NewControlDeviceType);
 	
 	return Super::InputKey(EventArgs);
 }
 
-bool UEchoViewport::InputAxis(const FInputKeyEventArgs& Args)
+bool UEchoGameViewportClient::InputAxis(const FInputKeyEventArgs& Args)
 {
 	EControlDeviceType NewControlDeviceType = EControlDeviceType::KeyboardAndMouse;
 	
@@ -46,4 +45,23 @@ bool UEchoViewport::InputAxis(const FInputKeyEventArgs& Args)
 	if (IsValid(DeviceSubsystem)) DeviceSubsystem->SetCurrentControlDeviceType(NewControlDeviceType);
 	
 	return Super::InputAxis(Args);
+}
+
+void UEchoGameViewportClient::ReceivedFocus(FViewport* InViewport)
+{
+	Super::ReceivedFocus(InViewport);
+	
+	OnViewportReceivedFocus.Broadcast();
+}
+
+void UEchoGameViewportClient::LostFocus(FViewport* InViewport)
+{
+	Super::LostFocus(InViewport);
+	
+	OnViewportLostFocus.Broadcast();
+}
+
+TOptional<bool> UEchoGameViewportClient::QueryShowFocus(const EFocusCause InFocusCause) const
+{
+	return Super::QueryShowFocus(InFocusCause);
 }

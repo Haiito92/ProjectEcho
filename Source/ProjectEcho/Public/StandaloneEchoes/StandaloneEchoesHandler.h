@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "StandaloneEchoesSpecialAnimation.h"
 #include "GameFramework/Actor.h"
 #include "StandaloneEchoesHandler.generated.h"
 
+enum class EAnimationValueReference : uint8;
 enum class ERecordedAction : uint8;
 struct FRecordedAction;
 class AEchoActor;
@@ -77,6 +79,22 @@ public:
 	void RecreateAllRewindActions(int TimelineIndex);
 #pragma endregion
 	
+#pragma region AnimationKey
+	
+	UFUNCTION(BlueprintCallable)
+	int CreateSpecialAnimationKey(int TimelineIndex, const float& LocalTimeKey);
+	
+	UFUNCTION(BlueprintCallable)
+	void ModifySpecialAnimationKeyTimeKey(int TimelineIndex, const int& KeyIndex, const float& NewTimeKey);
+	
+	UFUNCTION(BlueprintCallable)
+	void ModifySpecialAnimationKeyAnimation(int TimelineIndex, const int& KeyIndex, EAnimationValueReference InAnimationValueReference);
+	
+	UFUNCTION(BlueprintCallable)
+	void RecreateAllAnimationKeys(int TimelineIndex);
+	
+#pragma endregion
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetTimelinesLength();
 	
@@ -98,9 +116,16 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	float RewindSpeed = 0.f;
 	
+	//Minimal Distance to be considered running between two frames
+	UPROPERTY(EditAnywhere)
+	float MinDistanceRunning = 5.f;
+	
 	UPROPERTY()
 	TObjectPtr<URecordManagerSettings> RecordManagerSettings = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TMap<ERecordedAction, ERecordedAction> RewindEquivalentActions;
+	TMap<ERecordedAction, ERecordedAction> RewindEquivalentActions = TMap<ERecordedAction, ERecordedAction>();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<int32, FStandaloneEchoesAnimationArrayWrapper> SpecialAnimations = TMap<int32, FStandaloneEchoesAnimationArrayWrapper>();
 };

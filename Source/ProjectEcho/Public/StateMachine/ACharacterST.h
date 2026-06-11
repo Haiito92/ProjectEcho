@@ -167,6 +167,12 @@ public:
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="InRespawnTransform"))
 	void SetRespawnTransform(const FTransform& InRespawnTransform);
 
+	UFUNCTION()
+	void TryInteract(bool Succeed);
+	
+	UFUNCTION()
+	void TryGrab(bool Succeed);
+	
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="PlayerAction"))
 	void LockAction(const EPlayerActionType& PlayerAction);
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="PlayerAction"))
@@ -271,9 +277,13 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnReflected OnReflected;
 	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnValidGrab);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTryInteract, bool, Succeed);
 	UPROPERTY(BlueprintAssignable)
-	FOnValidGrab OnValidGrab;
+	FOnTryInteract OnTryInteract;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTryGrab, bool, Succeed);
+	UPROPERTY(BlueprintAssignable)
+	FOnTryGrab OnTryGrab;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnValidThrow);
 	UPROPERTY(BlueprintAssignable)
