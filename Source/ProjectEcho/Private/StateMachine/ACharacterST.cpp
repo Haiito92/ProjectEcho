@@ -11,6 +11,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Anamorphose/AnamorphoseHolder.h"
 #include "GrabMechanic/GrabbingComponent.h"
 #include "RecordManager/RecordHandlerComponent.h"
 #include "RecordManager/RecordManagerSubsystem.h"
@@ -50,6 +51,7 @@ ACharacterST::ACharacterST()
 	FirstPersonCameraComponent->FirstPersonScale = 0.6f;
 	
 	InteractionSphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Interaction Sphere"));
+	InteractionSphereCollider->SetupAttachment(GetCapsuleComponent());
 	
 	GetMesh()->SetOwnerNoSee(true);
 	GetMesh()->FirstPersonPrimitiveType = EFirstPersonPrimitiveType::WorldSpaceRepresentation;
@@ -133,7 +135,7 @@ void ACharacterST::InitPlayer()
 		{
 			if (UInteractMechanicSettings* InteractMechanicSettings = DataAssetSettings->InteractMechanicSettings.LoadSynchronous())
 			{
-				InteractionSphereCollider->SetSphereRadius(InteractMechanicSettings->InteractionSphereRadius);
+				//InteractionSphereCollider->SetSphereRadius(InteractMechanicSettings->InteractionSphereRadius);
 				InteractionSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ACharacterST::OnInteractionSphereBeginOverlap);
 				InteractionSphereCollider->OnComponentEndOverlap.AddDynamic(this, &ACharacterST::OnInteractionSphereEndOverlap);
 			}
@@ -155,18 +157,18 @@ void ACharacterST::LoadData()
 void ACharacterST::OnInteractionSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor->Implements<UInteractable>())
+	if (OtherActor->Implements<UAnamorphoseHolder>())
 	{
-		IInteractable::Execute_UpdateCanBeInteracted(OtherActor, true);
+		IAnamorphoseHolder::Execute_OnEnterRadiusOfInteraction(OtherActor);
 	}
 }
 
 void ACharacterST::OnInteractionSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (OtherActor->Implements<UInteractable>())
+	if (OtherActor->Implements<UAnamorphoseHolder>())
 	{
-		IInteractable::Execute_UpdateCanBeInteracted(OtherActor, false);
+		IAnamorphoseHolder::Execute_OnExitRadiusOfInteraction(OtherActor);
 	}
 }
 
