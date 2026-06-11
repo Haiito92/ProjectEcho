@@ -10,6 +10,7 @@
 #include "RecordManager/RecordHandlerInterface.h"
 #include "ACharacterST.generated.h"
 
+class USphereComponent;
 class UStateMachineSettings;
 enum class EPlayerActionType : uint8;
 class UReflectComponent;
@@ -35,6 +36,12 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UFUNCTION()
+	void OnInteractionSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	
+	UFUNCTION()
+	void OnInteractionSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 	UFUNCTION(BlueprintCallable)
 	void InitPlayer();
@@ -349,6 +356,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USphereComponent> InteractionSphereCollider;
 	
 	UPROPERTY()
 	bool bCanBeReflected = false;
