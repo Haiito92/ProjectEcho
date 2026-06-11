@@ -24,4 +24,7 @@ class PROJECTECHO_API IInteractable
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void Interact();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void UpdateCanBeInteracted(bool bCanBeInteracted);
 };

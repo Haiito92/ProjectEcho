@@ -21,6 +21,8 @@
 #include "Tools/Debug/EchoDebug.h"
 #include "Tools/Debug/EchoMessageType.h"
 #include "Controls/EPlayerActionType.h"
+#include "InteractableMechanic/Interactable.h"
+#include "InteractableMechanic/InteractMechanicSettings.h"
 #include "StateMachine/Data/UStateMachineSettings.h"
 
 class UPlayerData;
@@ -114,6 +116,24 @@ void ACharacterST::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Input->BindAction(InputActions->AThrowOrReflect, ETriggerEvent::Completed,this,&ACharacterST::AStopThrowOrReflect);
 }
 
+void ACharacterST::OnInteractionSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor->Implements<UInteractable>())
+	{
+		IInteractable::Execute_UpdateCanBeInteracted(OtherActor, true);
+	}
+}
+
+void ACharacterST::OnInteractionSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor->Implements<UInteractable>())
+	{
+		IInteractable::Execute_UpdateCanBeInteracted(OtherActor, false);
+	}
+}
+
 void ACharacterST::InitPlayer()
 {
 	RecordHandlerComponent = FindComponentByClass<URecordHandlerComponent>();
@@ -122,6 +142,19 @@ void ACharacterST::InitPlayer()
 	
 	InitStateMachine();
 	LoadData();
+	
+	if (IsValid(InteractionSphereCollider))
+	{
+		if (const UDataAssetDeveloperSettings* DataAssetSettings = GetDefault<UDataAssetDeveloperSettings>())
+		{
+			if (UInteractMechanicSettings* InteractMechanicSettings = DataAssetSettings->InteractMechanicSettings.LoadSynchronous())
+			{
+				InteractionSphereCollider->SetSphereRadius(InteractMechanicSettings->InteractionSphereRadius);
+				InteractionSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ACharacterST::OnInteractionSphereBeginOverlap);
+				InteractionSphereCollider->OnComponentEndOverlap.AddDynamic(this, &ACharacterST::OnInteractionSphereEndOverlap);
+			}
+		}
+	}
 }
 
 void ACharacterST::LoadData()
