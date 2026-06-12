@@ -9,6 +9,7 @@
 #include "EchoSystem.h"
 #include "RecordManager/RecordKeysStructs.h"
 #include "Tools/Debug/EchoDebug.h"
+#include "Tools/Debug/EchoMessageType.h"
 
 URecordableComponent::URecordableComponent()
 {
@@ -59,10 +60,35 @@ void URecordableComponent::RecordKey(const float& CurrentTimeKey)
 			return A.TimeKey < B.TimeKey;
 		});
 	}
+	
+	if (bShouldRecordReleaseKey)
+	{
+		bShouldRecordReleaseKey = false;
+		ReleaseKeys.Add(TransformKey);
+		ReleaseKeys.Sort([](const FRecordTransformKey& A, const FRecordTransformKey& B)
+		{
+			return A.TimeKey < B.TimeKey;
+		});
+	}
 }
 
 void URecordableComponent::ReplayKey(const float& PreviousTimeKey, const float& CurrentTimeKey)
 {
+	if (!ReleaseKeys.IsEmpty())
+	{
+		FRecordTransformKey* FoundKey = ReleaseKeys.FindByPredicate([PreviousTimeKey, CurrentTimeKey](const FRecordTransformKey& Key)
+		{
+			return Key.TimeKey > PreviousTimeKey && Key.TimeKey < CurrentTimeKey;
+		});
+		if (FoundKey != nullptr)
+		{
+			GetOwner()->SetActorLocation(FoundKey->Position);
+			GetOwner()->SetActorRotation(FoundKey->Rotation);
+			GetOwner()->SetActorScale3D(FoundKey->Scale);
+			UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Replaying a Release Key", FColor::Cyan, 1.f);
+			return;
+		}
+	}
 	const FRecordTransformKey* NextTransformKey = FindNextTransformKey(CurrentTimeKey);
 	const FRecordTransformKey* PreviousTransformKey = FindPreviousTransformKey(CurrentTimeKey);
 	if (NextTransformKey != nullptr && PreviousTransformKey != nullptr)
@@ -123,7 +149,7 @@ void URecordableComponent::StopRewind(const float& CurrentTimeKey, bool bForceRe
 				//Place Actor according to previous and next PhysicsKey 
 				float lerpValue = (CurrentTimeKey - PreviousPhysicsKey->TimeKey) / (NextPhysicsKey->TimeKey - PreviousPhysicsKey->TimeKey);
 				FVector Velocity = FMath::Lerp(PreviousPhysicsKey->LinearVelocity, NextPhysicsKey->LinearVelocity, lerpValue);
-				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "Replaying Velocity : " + Velocity.ToString());
+				UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Record, EEchoMessageType::Log, "Replaying Velocity : " + Velocity.ToString(), FColor::Cyan, 1.f);
 				PhysicsComponent->SetPhysicsLinearVelocity(Velocity);
 				PhysicsComponent->SetPhysicsAngularVelocityInDegrees(FMath::Lerp(PreviousPhysicsKey->AngularVelocity, NextPhysicsKey->AngularVelocity, lerpValue));
 			}
@@ -160,6 +186,14 @@ void URecordableComponent::RegisterInteractionKey(const FRecordInteractionKey& I
 	});
 }
 
+void URecordableComponent::OnReleased()
+{
+	if (bIsRecording)
+	{
+		bShouldRecordReleaseKey = true;
+	}
+}
+
 void URecordableComponent::HandleTimelineDestruction(const int& RecordTimelineIndex)
 {
 	InteractionKeys.RemoveAll([&](const FRecordInteractionKey& InteractionKey)
@@ -192,6 +226,7 @@ void URecordableComponent::StopRecording(bool bForceStopRecording)
 	}
 	TransformKeys.Empty();
 	PhysicsKeys.Empty();
+	ReleaseKeys.Empty();
 }
 
 bool URecordableComponent::IsRecording() const
@@ -234,6 +269,13 @@ void URecordableComponent::ClearKeysPastCurrentKey(const float& CurrentTimeKey)
 			return InteractionKey.TimeKey > CurrentTimeKey;
 		});
 	}
+	if (!ReleaseKeys.IsEmpty())
+	{
+		ReleaseKeys.RemoveAll([&](const FRecordTransformKey& ReleaseKey)
+		{
+			return ReleaseKey.TimeKey > CurrentTimeKey;
+		});
+	}
 }
 
 void URecordableComponent::ClearKeysBeforeCurrentKey(const float& CurrentTimeKey)
@@ -257,6 +299,13 @@ void URecordableComponent::ClearKeysBeforeCurrentKey(const float& CurrentTimeKey
 		InteractionKeys.RemoveAll([&](const FRecordInteractionKey& InteractionKey)
 		{
 			return InteractionKey.TimeKey < CurrentTimeKey;
+		});
+	}
+	if (!ReleaseKeys.IsEmpty())
+	{
+		ReleaseKeys.RemoveAll([&](const FRecordTransformKey& ReleaseKey)
+		{
+			return ReleaseKey.TimeKey < CurrentTimeKey;
 		});
 	}
 }
