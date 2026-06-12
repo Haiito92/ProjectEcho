@@ -90,7 +90,7 @@ protected:
 	void StartRecord();
 	
 	UFUNCTION()
-	void StopRecord();
+	void StopRecord(bool bForceStop = false);
 	
 	UFUNCTION()
 	void OnIncrementSlot();

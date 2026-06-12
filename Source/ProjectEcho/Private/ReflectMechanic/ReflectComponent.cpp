@@ -148,9 +148,14 @@ bool UReflectComponent::TryReflect()
 	}
 	
 	AActor* ReflectedActor = HitResult.GetActor();
-	if (!IsValid(ReflectedActor) || !ReflectedActor->Implements<UReflectable>())
+	if (!IsValid(ReflectedActor))
 	{
-		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Warning, "Reflect Failed: Actor is not Reflectable", FColor::Yellow, 3.0f);
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Warning, "Reflect Failed: Actor is not Valid", FColor::Yellow, 3.0f);
+		return false;
+	}
+	if (!ReflectedActor->Implements<UReflectable>())
+	{
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Reflect, EEchoMessageType::Warning, "Reflect Failed: Actor is not Reflectable : " + ReflectedActor->GetFName().ToString(), FColor::Yellow, 3.0f);
 		return false;
 	}
 	
