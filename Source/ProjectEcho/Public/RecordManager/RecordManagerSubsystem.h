@@ -208,7 +208,7 @@ public:
 	bool CanStopRecord() const;
     
     UFUNCTION(BlueprintCallable)
-    void StopRecord();
+    void StopRecord(bool bForceStop = false);
 	
 	UFUNCTION()
 	void StartPlayerRewind();
