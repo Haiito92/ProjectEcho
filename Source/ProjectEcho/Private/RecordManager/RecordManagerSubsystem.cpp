@@ -649,9 +649,9 @@ bool URecordManagerSubsystem::CanStopRecord() const
 	return bIsRecording && (CurrentTimeKey - RecordingTimeline.StartTimeKey) > RecordManagerSettings->MinRecordTime;
 }
 
-void URecordManagerSubsystem::StopRecord()
+void URecordManagerSubsystem::StopRecord(bool bForceStop)
 {
-	if (CanStopRecord())
+	if (CanStopRecord() || bForceStop)
 	{
 		bIsRecording = false;
 		if (RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass()))
@@ -911,6 +911,33 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 		PlayPlayerRewind(previousTimeKey - RecordingTimeline.StartTimeKey, CurrentTimeKey - RecordingTimeline.StartTimeKey);
 	}
 	
+	//Handle Recordables
+	if (bIsInRewind)
+	{
+		for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
+		{
+			if (!IsValid(RecordableComponent)) continue;
+			if (RecordableComponent->IsRecording())
+			{
+				if (CurrentTimeKey > RecordableComponent->GetFirstInteractedKey())
+				{
+					RecordableComponent->ReplayKey(previousTimeKey, CurrentTimeKey);
+				}
+			}
+		}
+	}
+	else
+	{
+		for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
+		{
+			if (!IsValid(RecordableComponent)) continue;
+			if (RecordableComponent->IsRecording())
+			{
+				RecordableComponent->RecordKey(CurrentTimeKey);
+			}
+		}
+	}
+	
 	//--- Handle Replay ---
 	if (!GlobalTimeline.Timelines.IsEmpty())
 	{
@@ -929,35 +956,20 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 		}
 	}
 	
-	//Handle Recordables
+	//Handle Recordable First Keys and Stop Recording
 	if (bIsInRewind)
 	{
-		for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
+		for (TObjectPtr RecordableComponent : RecordableComponents)
 		{
 			if (!IsValid(RecordableComponent)) continue;
 			if (RecordableComponent->IsRecording())
 			{
-				if (CurrentTimeKey > RecordableComponent->GetFirstInteractedKey())
-				{
-					RecordableComponent->ReplayKey(previousTimeKey, CurrentTimeKey);
-				}
-				else
+				if (CurrentTimeKey < RecordableComponent->GetFirstInteractedKey())
 				{
 					RecordableComponent->StopRewind(CurrentTimeKey);
 					RecordableComponent->ReplayFirstKey();
 					if (CurrentTimeKey < RecordableComponent->GetFirstInteractedKey()) RecordableComponent->StopRecording();
 				}
-			}
-		}
-	}
-	else
-	{
-		for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
-		{
-			if (!IsValid(RecordableComponent)) continue;
-			if (RecordableComponent->IsRecording())
-			{
-				RecordableComponent->RecordKey(CurrentTimeKey);
 			}
 		}
 	}

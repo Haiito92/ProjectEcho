@@ -75,7 +75,7 @@ void UState::Tick(float DeltaTime)
 
 void UState::OnDeathInRecord()
 {
-	StopRecord();
+	StopRecord(true);
 }
 
 void UState::Exit()
@@ -215,10 +215,10 @@ void UState::StartRecord()
 	RecordManagerSubsystem->StartRecord(Character, RestoreStateActions, FirstActions);
 }
 
-void UState::StopRecord()
+void UState::StopRecord(bool bForceStop)
 {
 	if (Character->GetLockedActions()[EPlayerActionType::StopRecord]) return;
-	RecordManagerSubsystem->StopRecord();
+	RecordManagerSubsystem->StopRecord(bForceStop);
 }
 
 void UState::OnIncrementSlot()
