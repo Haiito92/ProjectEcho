@@ -12,7 +12,7 @@ class UDeviceGameInstanceSubsystem;
  */
 struct FInputKeyEventArgs;
 
-UCLASS()
+UCLASS(Blueprintable, BlueprintType )
 class PROJECTECHO_API UEchoGameViewportClient : public UGameViewportClient
 {
 	GENERATED_BODY()
@@ -26,9 +26,14 @@ public:
 	
 	virtual void ReceivedFocus(FViewport* InViewport) override;
 	virtual void LostFocus(FViewport* InViewport) override;
-
 	
 	virtual TOptional<bool> QueryShowFocus(const EFocusCause InFocusCause) const override;
+	
+protected:
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveReceivedFocus();
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveLostFocus();
 private:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnViewportReceivedFocusSignature);
 	UPROPERTY(BlueprintAssignable)
