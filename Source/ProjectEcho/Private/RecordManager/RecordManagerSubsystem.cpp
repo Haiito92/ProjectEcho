@@ -923,12 +923,6 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 				{
 					RecordableComponent->ReplayKey(previousTimeKey, CurrentTimeKey);
 				}
-				else
-				{
-					RecordableComponent->StopRewind(CurrentTimeKey);
-					RecordableComponent->ReplayFirstKey();
-					if (CurrentTimeKey < RecordableComponent->GetFirstInteractedKey()) RecordableComponent->StopRecording();
-				}
 			}
 		}
 	}
@@ -959,6 +953,24 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 		{
 			CurrentTimeKey = 0;
 			StopRewind();
+		}
+	}
+	
+	//Handle Recordable First Keys and Stop Recording
+	if (bIsInRewind)
+	{
+		for (TObjectPtr RecordableComponent : RecordableComponents)
+		{
+			if (!IsValid(RecordableComponent)) continue;
+			if (RecordableComponent->IsRecording())
+			{
+				if (CurrentTimeKey < RecordableComponent->GetFirstInteractedKey())
+				{
+					RecordableComponent->StopRewind(CurrentTimeKey);
+					RecordableComponent->ReplayFirstKey();
+					if (CurrentTimeKey < RecordableComponent->GetFirstInteractedKey()) RecordableComponent->StopRecording();
+				}
+			}
 		}
 	}
 	
