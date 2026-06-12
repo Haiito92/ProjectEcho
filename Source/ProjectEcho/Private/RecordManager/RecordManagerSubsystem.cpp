@@ -649,9 +649,9 @@ bool URecordManagerSubsystem::CanStopRecord() const
 	return bIsRecording && (CurrentTimeKey - RecordingTimeline.StartTimeKey) > RecordManagerSettings->MinRecordTime;
 }
 
-void URecordManagerSubsystem::StopRecord()
+void URecordManagerSubsystem::StopRecord(bool bForceStop)
 {
-	if (CanStopRecord())
+	if (CanStopRecord() || bForceStop)
 	{
 		bIsRecording = false;
 		if (RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass()))
