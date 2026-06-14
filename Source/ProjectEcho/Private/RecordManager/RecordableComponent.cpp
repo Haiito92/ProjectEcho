@@ -78,7 +78,7 @@ void URecordableComponent::ReplayKey(const float& PreviousTimeKey, const float& 
 	{
 		FRecordTransformKey* FoundKey = ReleaseKeys.FindByPredicate([PreviousTimeKey, CurrentTimeKey](const FRecordTransformKey& Key)
 		{
-			return Key.TimeKey > PreviousTimeKey && Key.TimeKey < CurrentTimeKey;
+			return Key.TimeKey < PreviousTimeKey && Key.TimeKey > CurrentTimeKey; //In Rewind Previous Time Key > Current Time Key
 		});
 		if (FoundKey != nullptr)
 		{
