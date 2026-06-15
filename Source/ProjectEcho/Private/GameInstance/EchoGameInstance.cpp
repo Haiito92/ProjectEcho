@@ -15,6 +15,8 @@ void UEchoGameInstance::Init()
 {
 	Super::Init();
 	
+	GEngine->SetMaxFPS(144);
+	
 	UOptionsGameInstanceSubsystem* OptionsSubsystem = GetSubsystem<UOptionsGameInstanceSubsystem>();
 	
 	if (IsValid(OptionsSubsystem))
