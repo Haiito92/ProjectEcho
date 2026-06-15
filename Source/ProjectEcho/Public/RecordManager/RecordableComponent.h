@@ -78,6 +78,9 @@ public:
 	UFUNCTION()
 	void RegisterInteractionKey(const FRecordInteractionKey& InteractionKey);
 	
+	UFUNCTION(BlueprintCallable)
+	void OnReleased();
+	
 	UFUNCTION()
 	void HandleTimelineDestruction(const int& RecordTimelineIndex);
 	
@@ -109,6 +112,10 @@ private:
 	UPROPERTY()
 	TArray<FRecordInteractionKey> InteractionKeys;
 	
+	//Transform Key Recorded specially on Cube Release
+	UPROPERTY()
+	TArray<FRecordTransformKey> ReleaseKeys;
+	
 	//Clear All Keys Coming after Current Key
 	void ClearKeysPastCurrentKey(const float& CurrentTimeKey);
 	
@@ -122,6 +129,8 @@ private:
 	const FRecordPhysicsKey* FindNextPhysicsKey(const float& CurrentTimeKey);
 	
 	bool bIsRecording = false;
+	
+	bool bShouldRecordReleaseKey = false;
 	
 	//Let Component Handle Physics' Record using given Mesh
 	UPROPERTY(EditDefaultsOnly)

@@ -7,6 +7,10 @@ FCommandContext::FCommandContext(AActor* InInstigator):FCommandContext(InInstiga
 {
 }
 
+FCommandContext::FCommandContext(UWorld* InWorld):FCommandContext(nullptr, InWorld)
+{
+}
+
 FCommandContext::FCommandContext(AActor* InInstigator, UWorld* InWorld)
 {
 	Instigator = InInstigator;

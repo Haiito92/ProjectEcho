@@ -24,7 +24,7 @@ public:
 	AStandaloneEchoesHandler();
 
 protected:
-	// Called when the game starts or when spawned
+	// Called when the game starts or wdfhen spawned
 	virtual void BeginPlay() override;
 
 public:
