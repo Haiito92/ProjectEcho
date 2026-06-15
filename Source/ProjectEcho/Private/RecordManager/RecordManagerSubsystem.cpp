@@ -1061,6 +1061,11 @@ void URecordManagerSubsystem::DestroyTimeline(int TimelineIndex)
 	{
 		CurrentTimeKey = 0.0f;
 	}
+
+	for (AActor* RecordListener : RecordListeners)
+	{
+		IRecordListener::Execute_ReactToTimelineDestroyed(RecordListener, DestroyedSlot);	
+	}
 	
 	OnTimelineDestroyed.Broadcast(DestroyedSlot);
 }
