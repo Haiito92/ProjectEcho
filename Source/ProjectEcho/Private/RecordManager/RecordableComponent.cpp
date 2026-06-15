@@ -74,6 +74,7 @@ void URecordableComponent::RecordKey(const float& CurrentTimeKey)
 
 void URecordableComponent::ReplayKey(const float& PreviousTimeKey, const float& CurrentTimeKey)
 {
+	if (InteractionStatus != ERecordInteractionType::NotInteracted) return; //If Object is Held, we don't replay the keys
 	if (!ReleaseKeys.IsEmpty())
 	{
 		FRecordTransformKey* FoundKey = ReleaseKeys.FindByPredicate([PreviousTimeKey, CurrentTimeKey](const FRecordTransformKey& Key)
@@ -103,7 +104,7 @@ void URecordableComponent::ReplayKey(const float& PreviousTimeKey, const float& 
 
 void URecordableComponent::ReplayFirstKey()
 {
-	if (TransformKeys.IsEmpty()) return;
+	if (TransformKeys.IsEmpty() && InteractionStatus != ERecordInteractionType::NotInteracted) return;
 	GetOwner()->SetActorLocation(TransformKeys[0].Position);
 	GetOwner()->SetActorRotation(TransformKeys[0].Rotation);
 	GetOwner()->SetActorScale3D(TransformKeys[0].Scale);
