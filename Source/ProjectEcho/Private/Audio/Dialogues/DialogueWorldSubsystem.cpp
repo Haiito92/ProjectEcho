@@ -64,6 +64,8 @@ void UDialogueWorldSubsystem::PlayDialogue2D(USoundBase* DialogueToPlay)
 		DialogueDuration,
 		false);
 	
+	CurrentlyPlayedDialogue = DialogueToPlay;
+	
 	UGameplayStatics::PlaySound2D(GetWorld(), DialogueToPlay);
 }
 
