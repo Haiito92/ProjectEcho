@@ -3,13 +3,21 @@
 
 #include "Audio/Dialogues/DialogueWorldSubsystem.h"
 
+#include "DataAssetDeveloperSettings.h"
 #include "EchoSystem.h"
+#include "Audio/Dialogues/DialogueSystemSettings.h"
+#include "Commands/CommandFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Tools/Debug/EchoDebug.h"
 #include "Tools/Debug/EchoMessageType.h"
 
 void UDialogueWorldSubsystem::InitializeDialogueSubsystem()
 {
+	const UDataAssetDeveloperSettings* DataDevSettings = GetDefault<UDataAssetDeveloperSettings>();
+	
+	if (!IsValid(DataDevSettings)) return;
+	
+	SystemSettings = DataDevSettings->DialogueSettings.LoadSynchronous();
 }
 
 void UDialogueWorldSubsystem::QueueDialogue2D(USoundBase* DialogueToQueue)
@@ -61,6 +69,19 @@ void UDialogueWorldSubsystem::PlayDialogue2D(USoundBase* DialogueToPlay)
 
 void UDialogueWorldSubsystem::OnCurrentDialogueEnded()
 {
+	FDialogueCommandData* CommandData = SystemSettings->DialogueCommands.Find(CurrentlyPlayedDialogue);
+	
+	if (CommandData != nullptr)
+	{
+		if (!CommandData->bReachEndOnce)
+		{
+			CommandData->bReachEndOnce = true;
+			UCommandFunctionLibrary::ExecuteCommandsWithContextFromWorld(CommandData->OnceDialogueEndCommands, GetWorld());
+		}
+		
+		UCommandFunctionLibrary::ExecuteCommandsWithContextFromWorld(CommandData->DialogueEndCommands, GetWorld());
+	}
+	
 	CurrentlyPlayedDialogue = nullptr;
 	
 	PlayNextDialogue2D();

@@ -6,6 +6,7 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "DialogueWorldSubsystem.generated.h"
 
+class UDialogueSystemSettings;
 /**
  * 
  */
@@ -35,4 +36,7 @@ private:
 	
 	UPROPERTY()
 	TArray<USoundBase*> QueuedDialogues;
+	
+	UPROPERTY()
+	TObjectPtr<UDialogueSystemSettings> SystemSettings;
 };
