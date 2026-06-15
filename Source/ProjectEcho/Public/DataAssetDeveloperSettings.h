@@ -8,6 +8,7 @@
 #include "Tools/Debug/DebugDataAsset.h"
 #include "DataAssetDeveloperSettings.generated.h"
 
+class UDialogueSystemSettings;
 class UTutorialSettingsData;
 class UOptionsSettingsData;
 class UInputDataConfig;
@@ -62,4 +63,7 @@ public:
 	
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="UI Settings")
 	TSoftObjectPtr<UTutorialSettingsData> UISettings;
+	
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Dialogue Settings")
+	TSoftObjectPtr<UDialogueSystemSettings> DialogueSettings;
 };

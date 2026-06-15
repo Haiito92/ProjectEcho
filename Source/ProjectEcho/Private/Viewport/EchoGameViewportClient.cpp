@@ -51,12 +51,16 @@ void UEchoGameViewportClient::ReceivedFocus(FViewport* InViewport)
 {
 	Super::ReceivedFocus(InViewport);
 	
+	ReceiveReceivedFocus();
+	
 	OnViewportReceivedFocus.Broadcast();
 }
 
 void UEchoGameViewportClient::LostFocus(FViewport* InViewport)
 {
 	Super::LostFocus(InViewport);
+	
+	ReceiveLostFocus();
 	
 	OnViewportLostFocus.Broadcast();
 }

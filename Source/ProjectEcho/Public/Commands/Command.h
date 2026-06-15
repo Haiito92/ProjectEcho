@@ -18,6 +18,7 @@ struct FCommandContext
 public:
 	FCommandContext() = default;
 	FCommandContext(AActor* InInstigator);
+	FCommandContext(UWorld* InWorld);
 	FCommandContext(AActor* InInstigator, UWorld* InWorld);
 	~FCommandContext() = default;
 	
