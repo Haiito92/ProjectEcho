@@ -104,7 +104,7 @@ void URecordableComponent::ReplayKey(const float& PreviousTimeKey, const float& 
 
 void URecordableComponent::ReplayFirstKey()
 {
-	if (TransformKeys.IsEmpty() && InteractionStatus != ERecordInteractionType::NotInteracted) return;
+	if (TransformKeys.IsEmpty() || InteractionStatus != ERecordInteractionType::NotInteracted) return;
 	GetOwner()->SetActorLocation(TransformKeys[0].Position);
 	GetOwner()->SetActorRotation(TransformKeys[0].Rotation);
 	GetOwner()->SetActorScale3D(TransformKeys[0].Scale);
