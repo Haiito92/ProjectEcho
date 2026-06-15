@@ -18,5 +18,8 @@ class PROJECTECHO_API UCommandFunctionLibrary : public UBlueprintFunctionLibrary
 	
 public:
 	UFUNCTION(BlueprintCallable)
-	static void ExecuteCommandsWithContext(const TArray<UCommand*>& Commands, AActor* Instigator);
+	static void ExecuteCommandsWithContextFromInstigator(const TArray<UCommand*>& Commands, AActor* Instigator);
+	
+	UFUNCTION(BlueprintCallable)
+	static void ExecuteCommandsWithContextFromWorld(const TArray<UCommand*>& Commands, UWorld* World);
 };
