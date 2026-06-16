@@ -3,13 +3,16 @@
 #include "PlayerInterface.h"
 #include "GameFramework/Character.h"
 #include "GrabMechanic/GrabberActorInterface.h"
+#include "GrabMechanic/GrabMechanicSettings.h"
 #include "KillMechanic/Killable.h"
 #include "LaserMechanic/Laserizable.h"
 #include "PropulseMechanic/Propulsable.h"
 #include "ReflectMechanic/Reflectable.h"
 #include "RecordManager/RecordHandlerInterface.h"
+
 #include "ACharacterST.generated.h"
 
+class IAnamorphoseHolder;
 class USphereComponent;
 class UStateMachineSettings;
 enum class EPlayerActionType : uint8;
@@ -44,10 +47,10 @@ public:
 	void LoadData();
 	
 	UFUNCTION()
-	void OnInteractionSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OnAnamorphoseSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 	UFUNCTION()
-	void OnInteractionSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	void OnAnamorphoseSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 	
 	UFUNCTION()
@@ -197,7 +200,7 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
 	UPROPERTY(BlueprintAssignable)
 	FMovePressed OnMovePressed;
-	
+
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveStarted, bool, isPress);
 	UPROPERTY(BlueprintAssignable)
 	FMoveStarted OnMoveStarted;
@@ -364,7 +367,7 @@ public:
 	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<USphereComponent> InteractionSphereCollider;
+	TObjectPtr<USphereComponent> AnamorphoseSphereCollider;
 	
 	UPROPERTY()
 	bool bCanBeReflected = false;
@@ -379,7 +382,14 @@ public:
 	UPROPERTY()
 	FTransform RespawnTransform;
 	
+protected:
+	UPROPERTY()
+	TArray<TObjectPtr<AActor>> AnamorphoseHolders = TArray<TObjectPtr<AActor>>();
+	
 private:
 	UPROPERTY()
 	TMap<EPlayerActionType, bool> LockedActions;
+	
+	UPROPERTY()
+	TObjectPtr<UGrabMechanicSettings> GrabMechanicSettings;
 };
