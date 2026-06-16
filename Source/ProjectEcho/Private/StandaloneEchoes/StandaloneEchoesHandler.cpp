@@ -352,15 +352,6 @@ void AStandaloneEchoesHandler::RecreateAllAnimationKeys(int TimelineIndex)
 				EchoTimelines[TimelineIndex].RecordAnimationKeys.Add(FRecordAnimationKey(AnimationValueTopBody, RecordActionKey.TimeKey));
 				continue;
 			}
-			
-			if (RecordActionKey.Action.ActionEnum == ERecordedAction::Interact || RecordActionKey.Action.ActionEnum == ERecordedAction::TryGrab)
-			{
-				FRecordAnimationValue AnimationValueInteractOn = FRecordAnimationValue(EAnimationValueReference::IsInteract, true);
-				FRecordAnimationValue AnimationValueInteractOff = FRecordAnimationValue(EAnimationValueReference::IsInteract, false);
-				EchoTimelines[TimelineIndex].RecordAnimationKeys.Add(FRecordAnimationKey(AnimationValueInteractOn, RecordActionKey.TimeKey));
-				EchoTimelines[TimelineIndex].RecordAnimationKeys.Add(FRecordAnimationKey(AnimationValueInteractOn, RecordActionKey.TimeKey + 0.2));
-				continue;
-			}
 		}
 		
 		//Setup Speed Animation Keys
