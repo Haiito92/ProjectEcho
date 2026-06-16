@@ -350,6 +350,7 @@ void AStandaloneEchoesHandler::RecreateAllAnimationKeys(int TimelineIndex)
 				FRecordAnimationValue AnimationValueTopBody = FRecordAnimationValue(EAnimationValueReference::AnimTopBody, bValue);
 				EchoTimelines[TimelineIndex].RecordAnimationKeys.Add(FRecordAnimationKey(AnimationValueReflect, RecordActionKey.TimeKey));
 				EchoTimelines[TimelineIndex].RecordAnimationKeys.Add(FRecordAnimationKey(AnimationValueTopBody, RecordActionKey.TimeKey));
+				continue;
 			}
 		}
 		
