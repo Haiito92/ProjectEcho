@@ -30,4 +30,8 @@ public:
 	//Strength of the Throw Force added to the Object
 	UPROPERTY(EditDefaultsOnly, Category="Throw")
 	float ThrowStrength = 5.0f;
+	
+	//Radius at which cube is supposed to be interactable (Anamorphose will be full)
+	UPROPERTY(EditDefaultsOnly, Category="Anamorphose")
+	float AnamorphoseFullInteractionRadius = 150.f;
 };
