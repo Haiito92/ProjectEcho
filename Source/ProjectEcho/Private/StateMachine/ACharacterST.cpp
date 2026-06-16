@@ -35,11 +35,6 @@ ACharacterST::ACharacterST()
 	
 	FirstPersonMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("First Person Mesh"));
 
-	FirstPersonMesh->SetupAttachment(GetMesh());
-	FirstPersonMesh->SetOnlyOwnerSee(true);
-	FirstPersonMesh->FirstPersonPrimitiveType = EFirstPersonPrimitiveType::FirstPerson;
-	FirstPersonMesh->SetCollisionProfileName(FName("NoCollision"));
-
 	// Create the Camera Component	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("First Person Camera"));
 	FirstPersonCameraComponent->SetupAttachment(GetMesh());
@@ -49,6 +44,11 @@ ACharacterST::ACharacterST()
 	FirstPersonCameraComponent->bEnableFirstPersonScale = true;
 	FirstPersonCameraComponent->FirstPersonFieldOfView = 70.0f;
 	FirstPersonCameraComponent->FirstPersonScale = 0.6f;
+	
+	FirstPersonMesh->SetupAttachment(FirstPersonCameraComponent);
+	FirstPersonMesh->SetOnlyOwnerSee(true);
+	FirstPersonMesh->FirstPersonPrimitiveType = EFirstPersonPrimitiveType::FirstPerson;
+	FirstPersonMesh->SetCollisionProfileName(FName("NoCollision"));
 	
 	InteractionSphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Interaction Sphere"));
 	InteractionSphereCollider->SetupAttachment(GetCapsuleComponent());
@@ -438,14 +438,9 @@ void ACharacterST::SetRespawnTransform(const FTransform& InRespawnTransform)
 	RespawnTransform = InRespawnTransform;
 }
 
-void ACharacterST::TryInteract(bool Succeed)
+void ACharacterST::TryGrabOrInteract(bool GrabSucceed)
 {
-	OnTryInteract.Broadcast(Succeed);
-}
-
-void ACharacterST::TryGrab(bool Succeed)
-{
-	OnTryGrab.Broadcast(Succeed);
+	OnTryGrabOrInteract.Broadcast(GrabSucceed);
 }
 
 void ACharacterST::LockAction(const EPlayerActionType& PlayerAction)
@@ -468,6 +463,22 @@ void ACharacterST::UnlockAction(const EPlayerActionType& PlayerAction)
 	*locked = false;
 	
 	OnActionUnlocked.Broadcast(PlayerAction);
+}
+
+void ACharacterST::LockAllActions()
+{
+	for (TTuple<EPlayerActionType, bool>& Pair : LockedActions)
+	{
+		Pair.Value = true;
+	}
+}
+
+void ACharacterST::UnlockAllActions()
+{
+	for (TTuple<EPlayerActionType, bool>& Pair : LockedActions)
+	{
+		Pair.Value = false;
+	}
 }
 
 const TMap<EPlayerActionType, bool>& ACharacterST::GetLockedActions() const

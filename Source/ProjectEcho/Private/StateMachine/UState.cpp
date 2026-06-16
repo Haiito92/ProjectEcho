@@ -248,10 +248,15 @@ void UState::OnDeath()
 
 void UState::OnInteractOrGrab()
 {
-	if (TryGrab())
-		return;
+	bool TryGrabSucceed = false;
 	
-	TryInteract();
+	if (TryGrab())
+		TryGrabSucceed = true;
+	else
+		TryInteract();
+	
+	Character->TryGrabOrInteract(TryGrabSucceed);
+	
 }
 
 bool UState::TryGrab()
@@ -282,9 +287,6 @@ bool UState::TryGrab()
 			FRecordedAction(ERecordedAction::TryGrab), FRecordedAction(ERecordedAction::ForceRelease));
 	}
 	
-	Character->TryGrab(TryGrab);
-	
-	
 	return TryGrab;
 }
 
@@ -297,8 +299,6 @@ bool UState::TryInteract()
 		Character->FirstPersonCameraComponent->GetComponentLocation(),
 		UKismetMathLibrary::GetForwardVector(Character->GetControlRotation())
 	);
-	
-	Character->TryInteract(bTryInteract);
 	
 	if (bTryInteract)
 	{
