@@ -458,7 +458,7 @@ void ACharacterST::LockAction(const EPlayerActionType& PlayerAction)
 {
 	bool* locked = LockedActions.Find(PlayerAction);
 	
-	if (!locked) return;
+	if (locked) return;
 	
 	*locked = true;
 	
