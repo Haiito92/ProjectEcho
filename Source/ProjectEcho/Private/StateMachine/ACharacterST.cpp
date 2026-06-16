@@ -438,14 +438,9 @@ void ACharacterST::SetRespawnTransform(const FTransform& InRespawnTransform)
 	RespawnTransform = InRespawnTransform;
 }
 
-void ACharacterST::TryInteract(bool Succeed)
+void ACharacterST::TryGrabOrInteract(bool GrabSucceed)
 {
-	OnTryInteract.Broadcast(Succeed);
-}
-
-void ACharacterST::TryGrab(bool Succeed)
-{
-	OnTryGrab.Broadcast(Succeed);
+	OnTryGrabOrInteract.Broadcast(GrabSucceed);
 }
 
 void ACharacterST::LockAction(const EPlayerActionType& PlayerAction)
