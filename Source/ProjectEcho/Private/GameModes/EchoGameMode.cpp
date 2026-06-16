@@ -4,6 +4,7 @@
 #include "GameModes/EchoGameMode.h"
 
 #include "EchoSystem.h"
+#include "Audio/Dialogues/DialogueWorldSubsystem.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "LevelStreaming/LevelStreamingWorldSubsystem.h"
@@ -33,6 +34,13 @@ void AEchoGameMode::InitializeGame()
 	}
 	else UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error, "Failed to initialize Record System", FColor::Red, 3.0f);
 
+	if (UDialogueWorldSubsystem* DialogueWorldSubsystem = GetWorld()->GetSubsystem<UDialogueWorldSubsystem>())
+	{
+		DialogueWorldSubsystem->InitializeDialogueSubsystem();
+		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "Successfully initialized Dialogue System", FColor::Green, 3.0f);
+	}
+	else UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error, "Failed to initialize Dialogue System", FColor::Red, 3.0f);
+	
 	EchoPlayerStart = Cast<APlayerStart>(UGameplayStatics::GetActorOfClass(this, APlayerStart::StaticClass()));
 	
 	FTransform PlayerRespawnTransform = FTransform::Identity;

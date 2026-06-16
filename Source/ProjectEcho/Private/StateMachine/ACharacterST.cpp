@@ -11,6 +11,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Anamorphose/AnamorphoseHolder.h"
 #include "GrabMechanic/GrabbingComponent.h"
 #include "RecordManager/RecordHandlerComponent.h"
 #include "RecordManager/RecordManagerSubsystem.h"
@@ -21,6 +22,8 @@
 #include "Tools/Debug/EchoDebug.h"
 #include "Tools/Debug/EchoMessageType.h"
 #include "Controls/EPlayerActionType.h"
+#include "InteractableMechanic/Interactable.h"
+#include "InteractableMechanic/InteractMechanicSettings.h"
 #include "StateMachine/Data/UStateMachineSettings.h"
 
 class UPlayerData;
@@ -32,20 +35,23 @@ ACharacterST::ACharacterST()
 	
 	FirstPersonMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("First Person Mesh"));
 
-	FirstPersonMesh->SetupAttachment(GetMesh());
-	FirstPersonMesh->SetOnlyOwnerSee(true);
-	FirstPersonMesh->FirstPersonPrimitiveType = EFirstPersonPrimitiveType::FirstPerson;
-	FirstPersonMesh->SetCollisionProfileName(FName("NoCollision"));
-
 	// Create the Camera Component	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("First Person Camera"));
-	FirstPersonCameraComponent->SetupAttachment(FirstPersonMesh, FName("head"));
+	FirstPersonCameraComponent->SetupAttachment(GetMesh());
 	FirstPersonCameraComponent->SetRelativeLocationAndRotation(FVector(-2.8f, 5.89f, 0.0f), FRotator(0.0f, 90.0f, -90.0f));
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 	FirstPersonCameraComponent->bEnableFirstPersonFieldOfView = true;
 	FirstPersonCameraComponent->bEnableFirstPersonScale = true;
 	FirstPersonCameraComponent->FirstPersonFieldOfView = 70.0f;
 	FirstPersonCameraComponent->FirstPersonScale = 0.6f;
+	
+	FirstPersonMesh->SetupAttachment(FirstPersonCameraComponent);
+	FirstPersonMesh->SetOnlyOwnerSee(true);
+	FirstPersonMesh->FirstPersonPrimitiveType = EFirstPersonPrimitiveType::FirstPerson;
+	FirstPersonMesh->SetCollisionProfileName(FName("NoCollision"));
+	
+	AnamorphoseSphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Anamorphose Sphere"));
+	AnamorphoseSphereCollider->SetupAttachment(GetCapsuleComponent());
 	
 	GetMesh()->SetOwnerNoSee(true);
 	GetMesh()->FirstPersonPrimitiveType = EFirstPersonPrimitiveType::WorldSpaceRepresentation;
@@ -62,6 +68,8 @@ ACharacterST::ACharacterST()
 void ACharacterST::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	GrabMechanicSettings = GetDefault<UDataAssetDeveloperSettings>()->GrabMechanicSettings.LoadSynchronous();
 }
 
 void ACharacterST::Tick(float DeltaTime)
@@ -77,6 +85,15 @@ void ACharacterST::Tick(float DeltaTime)
 		UE_LOG(LogTemp,Warning, TEXT("Velocity size is greater than max velocity size"));
 		Vel = Vel.GetSafeNormal() * MaxVelocity;
 		GetCharacterMovement()->Velocity = Vel;
+	}
+
+	for (TObjectPtr<AActor> AnamorphoseHolder : AnamorphoseHolders)
+	{
+		if (!IsValid(AnamorphoseHolder)) continue;
+		FVector HolderPosition = IAnamorphoseHolder::Execute_GetHolderPosition(AnamorphoseHolder);
+		const float interactionRadius = GrabMechanicSettings->AnamorphoseFullInteractionRadius;
+		float lerp = (FVector::Dist(HolderPosition, GetActorLocation()) - interactionRadius) / (AnamorphoseSphereCollider->GetScaledSphereRadius() - interactionRadius);
+		IAnamorphoseHolder::Execute_UpdateInteractionDistance(AnamorphoseHolder, 1 - lerp);
 	}
 }
 
@@ -122,6 +139,19 @@ void ACharacterST::InitPlayer()
 	
 	InitStateMachine();
 	LoadData();
+	
+	if (IsValid(AnamorphoseSphereCollider))
+	{
+		if (const UDataAssetDeveloperSettings* DataAssetSettings = GetDefault<UDataAssetDeveloperSettings>())
+		{
+			if (UInteractMechanicSettings* InteractMechanicSettings = DataAssetSettings->InteractMechanicSettings.LoadSynchronous())
+			{
+				//InteractionSphereCollider->SetSphereRadius(InteractMechanicSettings->InteractionSphereRadius);
+				AnamorphoseSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ACharacterST::OnAnamorphoseSphereBeginOverlap);
+				AnamorphoseSphereCollider->OnComponentEndOverlap.AddDynamic(this, &ACharacterST::OnAnamorphoseSphereEndOverlap);
+			}
+		}
+	}
 }
 
 void ACharacterST::LoadData()
@@ -132,6 +162,25 @@ void ACharacterST::LoadData()
 	GetCharacterMovement()->MaxAcceleration = playerData->MoveAcceleration;
 	GetCharacterMovement()->AirControlBoostVelocityThreshold = playerData->AirPrecision;
 	GetCharacterMovement()->GravityScale = playerData->GravityScale;
+}
+
+
+void ACharacterST::OnAnamorphoseSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor->Implements<UAnamorphoseHolder>())
+	{
+		AnamorphoseHolders.Add(OtherActor);
+	}
+}
+
+void ACharacterST::OnAnamorphoseSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor->Implements<UAnamorphoseHolder>())
+	{
+		AnamorphoseHolders.Remove(OtherActor);
+	}
 }
 
 void ACharacterST::AMove(const FInputActionValue& Value)
@@ -400,14 +449,9 @@ void ACharacterST::SetRespawnTransform(const FTransform& InRespawnTransform)
 	RespawnTransform = InRespawnTransform;
 }
 
-void ACharacterST::TryInteract(bool Succeed)
+void ACharacterST::TryGrabOrInteract(bool GrabSucceed)
 {
-	OnTryInteract.Broadcast(Succeed);
-}
-
-void ACharacterST::TryGrab(bool Succeed)
-{
-	OnTryGrab.Broadcast(Succeed);
+	OnTryGrabOrInteract.Broadcast(GrabSucceed);
 }
 
 void ACharacterST::LockAction(const EPlayerActionType& PlayerAction)
@@ -430,6 +474,22 @@ void ACharacterST::UnlockAction(const EPlayerActionType& PlayerAction)
 	*locked = false;
 	
 	OnActionUnlocked.Broadcast(PlayerAction);
+}
+
+void ACharacterST::LockAllActions()
+{
+	for (TTuple<EPlayerActionType, bool>& Pair : LockedActions)
+	{
+		Pair.Value = true;
+	}
+}
+
+void ACharacterST::UnlockAllActions()
+{
+	for (TTuple<EPlayerActionType, bool>& Pair : LockedActions)
+	{
+		Pair.Value = false;
+	}
 }
 
 const TMap<EPlayerActionType, bool>& ACharacterST::GetLockedActions() const

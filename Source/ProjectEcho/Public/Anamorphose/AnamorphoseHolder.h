@@ -1,0 +1,33 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "UObject/Interface.h"
+#include "AnamorphoseHolder.generated.h"
+
+// This class does not need to be modified.
+UINTERFACE()
+class UAnamorphoseHolder : public UInterface
+{
+	GENERATED_BODY()
+};
+
+/**
+ * 
+ */
+class PROJECTECHO_API IAnamorphoseHolder
+{
+	GENERATED_BODY()
+
+	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
+public:
+	
+	//Update distance between activation of Anamorphose and real interaction
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void UpdateInteractionDistance(float lerpValue);
+	
+	//Get Actor Position
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	FVector GetHolderPosition();
+};

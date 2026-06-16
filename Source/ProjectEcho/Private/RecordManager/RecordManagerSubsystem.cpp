@@ -649,9 +649,9 @@ bool URecordManagerSubsystem::CanStopRecord() const
 	return bIsRecording && (CurrentTimeKey - RecordingTimeline.StartTimeKey) > RecordManagerSettings->MinRecordTime;
 }
 
-void URecordManagerSubsystem::StopRecord()
+void URecordManagerSubsystem::StopRecord(bool bForceStop)
 {
-	if (CanStopRecord())
+	if (CanStopRecord() || bForceStop)
 	{
 		bIsRecording = false;
 		if (RecordedActor->GetClass()->ImplementsInterface(URecordHandlerInterface::StaticClass()))
@@ -834,6 +834,7 @@ FTimelineUIInfo URecordManagerSubsystem::GetRecordingTimelineUIInfo()
 	Info.EchoColorStruct = RecordManagerSettings->EchoColors[CurrentRecordingTimelineIndex];
 	for (const FRecordActionKey& ActionKey : RecordingTimeline.ActionKeys)
 	{
+		if (RecordManagerSettings->ActionsSkippedInUI.Contains(ActionKey.Action.ActionEnum)) continue;
 		FUIActionKey ActionInfo = FUIActionKey(ActionKey.TimeKey, ActionKey.Action.ActionEnum);
 		Info.ActionKeys.Add(ActionInfo);
 	}
@@ -911,6 +912,33 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 		PlayPlayerRewind(previousTimeKey - RecordingTimeline.StartTimeKey, CurrentTimeKey - RecordingTimeline.StartTimeKey);
 	}
 	
+	//Handle Recordables
+	if (bIsInRewind)
+	{
+		for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
+		{
+			if (!IsValid(RecordableComponent)) continue;
+			if (RecordableComponent->IsRecording())
+			{
+				if (CurrentTimeKey > RecordableComponent->GetFirstInteractedKey())
+				{
+					RecordableComponent->ReplayKey(previousTimeKey, CurrentTimeKey);
+				}
+			}
+		}
+	}
+	else
+	{
+		for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
+		{
+			if (!IsValid(RecordableComponent)) continue;
+			if (RecordableComponent->IsRecording())
+			{
+				RecordableComponent->RecordKey(CurrentTimeKey);
+			}
+		}
+	}
+	
 	//--- Handle Replay ---
 	if (!GlobalTimeline.Timelines.IsEmpty())
 	{
@@ -929,35 +957,20 @@ void URecordManagerSubsystem::Tick(float DeltaTime)
 		}
 	}
 	
-	//Handle Recordables
+	//Handle Recordable First Keys and Stop Recording
 	if (bIsInRewind)
 	{
-		for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
+		for (TObjectPtr RecordableComponent : RecordableComponents)
 		{
 			if (!IsValid(RecordableComponent)) continue;
 			if (RecordableComponent->IsRecording())
 			{
-				if (CurrentTimeKey > RecordableComponent->GetFirstInteractedKey())
-				{
-					RecordableComponent->ReplayKey(previousTimeKey, CurrentTimeKey);
-				}
-				else
+				if (CurrentTimeKey < RecordableComponent->GetFirstInteractedKey())
 				{
 					RecordableComponent->StopRewind(CurrentTimeKey);
 					RecordableComponent->ReplayFirstKey();
 					if (CurrentTimeKey < RecordableComponent->GetFirstInteractedKey()) RecordableComponent->StopRecording();
 				}
-			}
-		}
-	}
-	else
-	{
-		for (TObjectPtr<URecordableComponent> RecordableComponent : RecordableComponents)
-		{
-			if (!IsValid(RecordableComponent)) continue;
-			if (RecordableComponent->IsRecording())
-			{
-				RecordableComponent->RecordKey(CurrentTimeKey);
 			}
 		}
 	}
@@ -1048,6 +1061,11 @@ void URecordManagerSubsystem::DestroyTimeline(int TimelineIndex)
 	if (GlobalTimeline.Timelines.IsEmpty())
 	{
 		CurrentTimeKey = 0.0f;
+	}
+
+	for (AActor* RecordListener : RecordListeners)
+	{
+		IRecordListener::Execute_ReactToTimelineDestroyed(RecordListener, DestroyedSlot);	
 	}
 	
 	OnTimelineDestroyed.Broadcast(DestroyedSlot);

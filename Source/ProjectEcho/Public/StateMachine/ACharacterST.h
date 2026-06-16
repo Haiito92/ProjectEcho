@@ -3,13 +3,17 @@
 #include "PlayerInterface.h"
 #include "GameFramework/Character.h"
 #include "GrabMechanic/GrabberActorInterface.h"
+#include "GrabMechanic/GrabMechanicSettings.h"
 #include "KillMechanic/Killable.h"
 #include "LaserMechanic/Laserizable.h"
 #include "PropulseMechanic/Propulsable.h"
 #include "ReflectMechanic/Reflectable.h"
 #include "RecordManager/RecordHandlerInterface.h"
+
 #include "ACharacterST.generated.h"
 
+class IAnamorphoseHolder;
+class USphereComponent;
 class UStateMachineSettings;
 enum class EPlayerActionType : uint8;
 class UReflectComponent;
@@ -41,6 +45,13 @@ public:
 	
 	UFUNCTION()
 	void LoadData();
+	
+	UFUNCTION()
+	void OnAnamorphoseSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	
+	UFUNCTION()
+	void OnAnamorphoseSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	
 	
 	UFUNCTION()
 	void AMove(const FInputActionValue& Value);
@@ -168,15 +179,17 @@ public:
 	void SetRespawnTransform(const FTransform& InRespawnTransform);
 
 	UFUNCTION()
-	void TryInteract(bool Succeed);
-	
-	UFUNCTION()
-	void TryGrab(bool Succeed);
+	void TryGrabOrInteract(bool GrabSucceed);
 	
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="PlayerAction"))
 	void LockAction(const EPlayerActionType& PlayerAction);
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="PlayerAction"))
 	void UnlockAction(const EPlayerActionType& PlayerAction);
+	
+	UFUNCTION(BlueprintCallable)
+	void LockAllActions();
+	UFUNCTION(BlueprintCallable)
+	void UnlockAllActions();
 	
 	UFUNCTION()
 	const TMap<EPlayerActionType, bool>& GetLockedActions() const;
@@ -184,7 +197,7 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMovePressed, FVector2D, MoveInputVector);
 	UPROPERTY(BlueprintAssignable)
 	FMovePressed OnMovePressed;
-	
+
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveStarted, bool, isPress);
 	UPROPERTY(BlueprintAssignable)
 	FMoveStarted OnMoveStarted;
@@ -277,13 +290,9 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnReflected OnReflected;
 	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTryInteract, bool, Succeed);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTryGrabOrInteract, bool, GrabSucceed);
 	UPROPERTY(BlueprintAssignable)
-	FOnTryInteract OnTryInteract;
-	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTryGrab, bool, Succeed);
-	UPROPERTY(BlueprintAssignable)
-	FOnTryGrab OnTryGrab;
+	FOnTryGrabOrInteract OnTryGrabOrInteract;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnValidThrow);
 	UPROPERTY(BlueprintAssignable)
@@ -350,6 +359,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USphereComponent> AnamorphoseSphereCollider;
+	
 	UPROPERTY()
 	bool bCanBeReflected = false;
 	UPROPERTY()
@@ -363,7 +375,14 @@ public:
 	UPROPERTY()
 	FTransform RespawnTransform;
 	
+protected:
+	UPROPERTY()
+	TArray<TObjectPtr<AActor>> AnamorphoseHolders = TArray<TObjectPtr<AActor>>();
+	
 private:
 	UPROPERTY()
 	TMap<EPlayerActionType, bool> LockedActions;
+	
+	UPROPERTY()
+	TObjectPtr<UGrabMechanicSettings> GrabMechanicSettings;
 };

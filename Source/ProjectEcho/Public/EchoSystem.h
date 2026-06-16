@@ -23,6 +23,8 @@ enum class EEchoSystem : uint8
 	LevelStreaming,
 	Command,
 	Tutorial,
+	UI,
+	Audio,
 	Count UMETA(Hidden)
 };
 ENUM_RANGE_BY_COUNT(EEchoSystem, EEchoSystem::Count)

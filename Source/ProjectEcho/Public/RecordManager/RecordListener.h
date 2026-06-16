@@ -41,4 +41,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ReactToRewindEnd();
 	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ReactToTimelineDestroyed(int InTimelineIndex);
 };
