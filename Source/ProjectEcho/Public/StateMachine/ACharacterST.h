@@ -186,6 +186,11 @@ public:
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="PlayerAction"))
 	void UnlockAction(const EPlayerActionType& PlayerAction);
 	
+	UFUNCTION(BlueprintCallable)
+	void LockAllActions();
+	UFUNCTION(BlueprintCallable)
+	void UnlockAllActions();
+	
 	UFUNCTION()
 	const TMap<EPlayerActionType, bool>& GetLockedActions() const;
 	
