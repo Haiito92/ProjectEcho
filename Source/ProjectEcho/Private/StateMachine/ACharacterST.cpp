@@ -50,8 +50,8 @@ ACharacterST::ACharacterST()
 	FirstPersonMesh->FirstPersonPrimitiveType = EFirstPersonPrimitiveType::FirstPerson;
 	FirstPersonMesh->SetCollisionProfileName(FName("NoCollision"));
 	
-	InteractionSphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Interaction Sphere"));
-	InteractionSphereCollider->SetupAttachment(GetCapsuleComponent());
+	AnamorphoseSphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Anamorphose Sphere"));
+	AnamorphoseSphereCollider->SetupAttachment(GetCapsuleComponent());
 	
 	GetMesh()->SetOwnerNoSee(true);
 	GetMesh()->FirstPersonPrimitiveType = EFirstPersonPrimitiveType::WorldSpaceRepresentation;
@@ -68,6 +68,8 @@ ACharacterST::ACharacterST()
 void ACharacterST::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	GrabMechanicSettings = GetDefault<UDataAssetDeveloperSettings>()->GrabMechanicSettings.LoadSynchronous();
 }
 
 void ACharacterST::Tick(float DeltaTime)
@@ -83,6 +85,15 @@ void ACharacterST::Tick(float DeltaTime)
 		UE_LOG(LogTemp,Warning, TEXT("Velocity size is greater than max velocity size"));
 		Vel = Vel.GetSafeNormal() * MaxVelocity;
 		GetCharacterMovement()->Velocity = Vel;
+	}
+
+	for (TObjectPtr<AActor> AnamorphoseHolder : AnamorphoseHolders)
+	{
+		if (!IsValid(AnamorphoseHolder)) continue;
+		FVector HolderPosition = IAnamorphoseHolder::Execute_GetHolderPosition(AnamorphoseHolder);
+		const float interactionRadius = GrabMechanicSettings->AnamorphoseFullInteractionRadius;
+		float lerp = (FVector::Dist(HolderPosition, GetActorLocation()) - interactionRadius) / (AnamorphoseSphereCollider->GetScaledSphereRadius() - interactionRadius);
+		IAnamorphoseHolder::Execute_UpdateInteractionDistance(AnamorphoseHolder, 1 - lerp);
 	}
 }
 
@@ -129,15 +140,15 @@ void ACharacterST::InitPlayer()
 	InitStateMachine();
 	LoadData();
 	
-	if (IsValid(InteractionSphereCollider))
+	if (IsValid(AnamorphoseSphereCollider))
 	{
 		if (const UDataAssetDeveloperSettings* DataAssetSettings = GetDefault<UDataAssetDeveloperSettings>())
 		{
 			if (UInteractMechanicSettings* InteractMechanicSettings = DataAssetSettings->InteractMechanicSettings.LoadSynchronous())
 			{
 				//InteractionSphereCollider->SetSphereRadius(InteractMechanicSettings->InteractionSphereRadius);
-				InteractionSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ACharacterST::OnInteractionSphereBeginOverlap);
-				InteractionSphereCollider->OnComponentEndOverlap.AddDynamic(this, &ACharacterST::OnInteractionSphereEndOverlap);
+				AnamorphoseSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ACharacterST::OnAnamorphoseSphereBeginOverlap);
+				AnamorphoseSphereCollider->OnComponentEndOverlap.AddDynamic(this, &ACharacterST::OnAnamorphoseSphereEndOverlap);
 			}
 		}
 	}
@@ -154,21 +165,21 @@ void ACharacterST::LoadData()
 }
 
 
-void ACharacterST::OnInteractionSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+void ACharacterST::OnAnamorphoseSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor->Implements<UAnamorphoseHolder>())
 	{
-		IAnamorphoseHolder::Execute_OnEnterRadiusOfInteraction(OtherActor);
+		AnamorphoseHolders.Add(OtherActor);
 	}
 }
 
-void ACharacterST::OnInteractionSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+void ACharacterST::OnAnamorphoseSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if (OtherActor->Implements<UAnamorphoseHolder>())
 	{
-		IAnamorphoseHolder::Execute_OnExitRadiusOfInteraction(OtherActor);
+		AnamorphoseHolders.Remove(OtherActor);
 	}
 }
 
@@ -447,7 +458,7 @@ void ACharacterST::LockAction(const EPlayerActionType& PlayerAction)
 {
 	bool* locked = LockedActions.Find(PlayerAction);
 	
-	if (!locked) return;
+	if (locked) return;
 	
 	*locked = true;
 	
