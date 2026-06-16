@@ -470,6 +470,22 @@ void ACharacterST::UnlockAction(const EPlayerActionType& PlayerAction)
 	OnActionUnlocked.Broadcast(PlayerAction);
 }
 
+void ACharacterST::LockAllActions()
+{
+	for (TTuple<EPlayerActionType, bool>& Pair : LockedActions)
+	{
+		Pair.Value = true;
+	}
+}
+
+void ACharacterST::UnlockAllActions()
+{
+	for (TTuple<EPlayerActionType, bool>& Pair : LockedActions)
+	{
+		Pair.Value = false;
+	}
+}
+
 const TMap<EPlayerActionType, bool>& ACharacterST::GetLockedActions() const
 {
 	return LockedActions;
