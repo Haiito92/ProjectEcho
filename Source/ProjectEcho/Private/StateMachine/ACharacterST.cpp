@@ -444,6 +444,11 @@ void ACharacterST::ForceRelease_Implementation()
 	if (IsValid(GrabbingComponent)) GrabbingComponent->ForceRelease();
 }
 
+USkeletalMeshComponent* ACharacterST::GetSkeletalMeshComponent_Implementation()
+{
+	return FirstPersonMesh;
+}
+
 void ACharacterST::SetRespawnTransform(const FTransform& InRespawnTransform)
 {
 	RespawnTransform = InRespawnTransform;
@@ -458,7 +463,7 @@ void ACharacterST::LockAction(const EPlayerActionType& PlayerAction)
 {
 	bool* locked = LockedActions.Find(PlayerAction);
 	
-	if (locked) return;
+	if (!locked || *locked) return;
 	
 	*locked = true;
 	
@@ -469,7 +474,7 @@ void ACharacterST::UnlockAction(const EPlayerActionType& PlayerAction)
 {
 	bool* locked = LockedActions.Find(PlayerAction);
 	
-	if (!locked) return;
+	if (!locked || !*locked) return;
 	
 	*locked = false;
 	
