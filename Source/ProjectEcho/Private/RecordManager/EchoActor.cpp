@@ -50,6 +50,11 @@ void AEchoActor::ForceRelease_Implementation()
 	if (IsValid(GrabbingComponent)) GrabbingComponent->ForceRelease();
 }
 
+USkeletalMeshComponent* AEchoActor::GetSkeletalMeshComponent_Implementation()
+{
+	return ReceiveGetSkeletalMeshComponent();
+}
+
 void AEchoActor::TakeStateSnapshot()
 {
 	if (IsValid(ReflectComponent)) EchoStateSnapshot.bIsReflecting = ReflectComponent->IsOn();
