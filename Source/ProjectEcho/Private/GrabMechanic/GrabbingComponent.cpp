@@ -6,6 +6,7 @@
 
 #include "DataAssetDeveloperSettings.h"
 #include "GrabMechanic/GrabbableInterface.h"
+#include "GrabMechanic/GrabberActorInterface.h"
 #include "GrabMechanic/GrabMechanicSettings.h"
 #include "Tools/Debug/EchoDebug.h"
 
@@ -68,9 +69,15 @@ bool UGrabbingComponent::TryGrab(const FRotator& ControlRotation, const FGrabbin
 			IGrabbableInterface::Execute_OnBeforeGrabbed(GrabbedActor, this->GetOwner(), GrabbingRules);
 			OnWillGrabActor.Broadcast(GrabbedActor);
 			FAttachmentTransformRules AttachmentTransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
-			GrabbedActor->AttachToComponent(this, AttachmentTransformRules);
-			IGrabbableInterface::Execute_OnGrabbed(GrabbedActor, this->GetOwner());
+			if (this->GetOwner()->Implements<UGrabberActorInterface>())
+			{
+				USkeletalMeshComponent* SKM = IGrabberActorInterface::Execute_GetSkeletalMeshComponent(this->GetOwner());
+				if (IsValid(SKM)) GrabbedActor->AttachToComponent(SKM, AttachmentTransformRules, FName("GrabbingSocket"));
+				else { GrabbedActor->AttachToComponent(this, AttachmentTransformRules);}
+			}
+			else { GrabbedActor->AttachToComponent(this, AttachmentTransformRules);}
 			
+			IGrabbableInterface::Execute_OnGrabbed(GrabbedActor, this->GetOwner());
 			OnActorGrabbed.Broadcast(GrabbedActor);
 			
 			return true;
@@ -85,6 +92,8 @@ bool UGrabbingComponent::TryRelease()
 	{
 		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Grab, EEchoMessageType::Log,"Releasing Grabbed Actor : " + GrabbedActor->GetName(), FColor::White, 3.f);
 		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		GrabbedActor->SetActorLocation(GetComponentLocation());
+		GrabbedActor->SetActorRotation(GetComponentRotation());
 		IGrabbableInterface::Execute_OnObjectReleased(GrabbedActor);
 		GrabbedActor = nullptr;
 		
@@ -101,6 +110,8 @@ bool UGrabbingComponent::TryThrow(const FRotator& ControlRotation)
 	{
 		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Grab, EEchoMessageType::Log,"Throwing Grabbed Actor : " + GrabbedActor->GetName(), FColor::White, 3.f);
 		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		GrabbedActor->SetActorLocation(GetComponentLocation());
+		GrabbedActor->SetActorRotation(GetComponentRotation());
 		IGrabbableInterface::Execute_OnThrown(GrabbedActor, ControlRotation.Vector(), GrabMechanicSettings->ThrowStrength);
 		GrabbedActor = nullptr;
 		
@@ -117,6 +128,8 @@ void UGrabbingComponent::ForceRelease()
 	{
 		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Grab, EEchoMessageType::Log,"Force Releasing Grabbed Actor : " + GrabbedActor->GetName(), FColor::White, 3.f);
 		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		GrabbedActor->SetActorLocation(GetComponentLocation());
+		GrabbedActor->SetActorRotation(GetComponentRotation());
 		IGrabbableInterface::Execute_OnObjectForceReleased(GrabbedActor);
 		GrabbedActor = nullptr;
 	}
@@ -131,7 +144,13 @@ void UGrabbingComponent::ForceGrab(AActor* Actor, const FGrabbingRules& Grabbing
 			GrabbedActor = Actor;
 			IGrabbableInterface::Execute_OnObjectBeforeForceGrabbed(GrabbedActor, this->GetOwner(), GrabbingRules);
 			FAttachmentTransformRules AttachmentTransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
-			GrabbedActor->AttachToComponent(this, AttachmentTransformRules);
+			if (this->GetOwner()->Implements<UGrabberActorInterface>())
+			{
+				USkeletalMeshComponent* SKM = IGrabberActorInterface::Execute_GetSkeletalMeshComponent(this->GetOwner());
+				if (IsValid(SKM)) GrabbedActor->AttachToComponent(SKM, AttachmentTransformRules, FName("GrabbingSocket"));
+				else { GrabbedActor->AttachToComponent(this, AttachmentTransformRules);}
+			}
+			else { GrabbedActor->AttachToComponent(this, AttachmentTransformRules);}
 			IGrabbableInterface::Execute_OnObjectForceGrabbed(GrabbedActor, this->GetOwner());
 		}
 	}
@@ -170,7 +189,13 @@ void UGrabbingComponent::TryForceGrabHeldCube(const FGrabbingRules& GrabbingRule
 			GrabbedActor = HitResult.GetActor();
 			IGrabbableInterface::Execute_OnObjectBeforeForceGrabbed(GrabbedActor, this->GetOwner(), GrabbingRules);
 			FAttachmentTransformRules AttachmentTransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
-			GrabbedActor->AttachToComponent(this, AttachmentTransformRules);
+			if (this->GetOwner()->Implements<UGrabberActorInterface>())
+			{
+				USkeletalMeshComponent* SKM = IGrabberActorInterface::Execute_GetSkeletalMeshComponent(this->GetOwner());
+				if (IsValid(SKM)) GrabbedActor->AttachToComponent(SKM, AttachmentTransformRules, FName("GrabbingSocket"));
+				else { GrabbedActor->AttachToComponent(this, AttachmentTransformRules);}
+			}
+			else { GrabbedActor->AttachToComponent(this, AttachmentTransformRules);}
 			IGrabbableInterface::Execute_OnObjectForceGrabbed(GrabbedActor, this->GetOwner());
 		}
 	}

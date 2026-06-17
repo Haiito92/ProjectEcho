@@ -444,6 +444,11 @@ void ACharacterST::ForceRelease_Implementation()
 	if (IsValid(GrabbingComponent)) GrabbingComponent->ForceRelease();
 }
 
+USkeletalMeshComponent* ACharacterST::GetSkeletalMeshComponent_Implementation()
+{
+	return FirstPersonMesh;
+}
+
 void ACharacterST::SetRespawnTransform(const FTransform& InRespawnTransform)
 {
 	RespawnTransform = InRespawnTransform;
