@@ -25,4 +25,8 @@ public:
 	//Call Force Release on Grabber Actor
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void ForceRelease();
+	
+	//Get Mesh to attach to socket
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	USkeletalMeshComponent* GetSkeletalMeshComponent();
 };
