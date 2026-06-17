@@ -56,6 +56,8 @@ public:
 	
 	virtual void ForceRelease_Implementation() override;
 	
+	virtual USkeletalMeshComponent* GetSkeletalMeshComponent_Implementation() override;
+	
 	//Take a Snapshot of all States to Restore
 	void TakeStateSnapshot();
 	
@@ -92,6 +94,9 @@ public:
 	virtual void HandleFootstep_Implementation(bool bRightFoot) override;
 
 protected:
+	UFUNCTION(BlueprintImplementableEvent)
+	USkeletalMeshComponent* ReceiveGetSkeletalMeshComponent();
+	
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveHandleActionKey(ERecordedAction Action);
 	
