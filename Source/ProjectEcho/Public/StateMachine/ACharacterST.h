@@ -175,6 +175,8 @@ public:
 	
 	virtual void ForceRelease_Implementation() override;
 	
+	virtual USkeletalMeshComponent* GetSkeletalMeshComponent_Implementation() override;
+	
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="InRespawnTransform"))
 	void SetRespawnTransform(const FTransform& InRespawnTransform);
 
