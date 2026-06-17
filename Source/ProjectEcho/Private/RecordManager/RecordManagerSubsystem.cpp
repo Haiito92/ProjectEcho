@@ -1073,6 +1073,7 @@ void URecordManagerSubsystem::DestroyTimeline(int TimelineIndex)
 
 void URecordManagerSubsystem::ForceDestroyAllTimelines()
 {
+	if (bIsPlayerRewinding) return; //Skip Function if Player is Rewinding
 	if (bIsRecording)
 	{
 		StopRecord();
