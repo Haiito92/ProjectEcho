@@ -31,7 +31,6 @@ void UState::InitState(UStateMachine* InStateMachine, ACharacterST* InCharacter)
 	RecordManagerSubsystem = GetWorld()->GetSubsystem<URecordManagerSubsystem>();
 	InteractorComponent = Character->FindComponentByClass<UInteractorComponent>();
 	ReflectComponent = Character->FindComponentByClass<UReflectComponent>();
-	PropulseComponent = Character->FindComponentByClass<UPropulseComponent>();
 	RecordHandlerComponent = Character->RecordHandlerComponent;
 }
 
@@ -45,8 +44,6 @@ void UState::Enter()
 	Character->OnDeath.AddDynamic(this, &UState::OnDeath);
 	Character->OnDeathInRecord.AddDynamic(this, &UState::OnDeathInRecord);
 	Character->OnInteractOrGrab.AddDynamic(this, &UState::OnInteractOrGrab);
-	Character->OnStartPropulse.AddDynamic(this, &UState::OnPropulseInputStarted);
-	Character->OnStopPropulse.AddDynamic(this, &UState::OnPropulseInputStopped);
 	Character->OnPropulsed.AddDynamic(this, &UState::OnPropulsed);
 	Character->OnReflectInputStarted.AddDynamic(this, &UState::OnReflectInputStarted);
 	Character->OnReflectInputCompleted.AddDynamic(this, &UState::OnReflectInputCompleted);
@@ -88,8 +85,6 @@ void UState::Exit()
 	Character->OnDeath.RemoveDynamic(this, &UState::OnDeath);
 	Character->OnDeathInRecord.RemoveDynamic(this, &UState::OnDeathInRecord);
 	Character->OnInteractOrGrab.RemoveDynamic(this, &UState::OnInteractOrGrab);
-	Character->OnStartPropulse.RemoveDynamic(this, &UState::OnPropulseInputStarted);
-	Character->OnStopPropulse.RemoveDynamic(this, &UState::OnPropulseInputStopped);
 	Character->OnPropulsed.RemoveDynamic(this, &UState::OnPropulsed);
 	Character->OnReflectInputStarted.RemoveDynamic(this, &UState::OnReflectInputStarted);
 	Character->OnReflectInputCompleted.RemoveDynamic(this, &UState::OnReflectInputCompleted);
@@ -104,7 +99,7 @@ void UState::Exit()
 
 bool UState::CanUseGrab()
 {
-	return (StateSettings & EStateSettings::CanGrab) == EStateSettings::CanGrab && !ReflectComponent->IsOn() && !PropulseComponent->IsOn();
+	return (StateSettings & EStateSettings::CanGrab) == EStateSettings::CanGrab && !ReflectComponent->IsOn();
 }
 
 bool UState::CanUseRecord()
@@ -114,7 +109,7 @@ bool UState::CanUseRecord()
 
 bool UState::CanUseInteract()
 {
-	return (StateSettings & EStateSettings::CanInteract) == EStateSettings::CanInteract && !ReflectComponent->IsOn() && !GrabbingComponent->IsGrabbing() && !PropulseComponent->IsOn();
+	return (StateSettings & EStateSettings::CanInteract) == EStateSettings::CanInteract && !ReflectComponent->IsOn() && !GrabbingComponent->IsGrabbing();
 }
 
 bool UState::CanUsePropulse()
@@ -124,7 +119,7 @@ bool UState::CanUsePropulse()
 
 bool UState::CanUseReflect()
 {
-	return (StateSettings & EStateSettings::CanReflect) == EStateSettings::CanReflect && !GrabbingComponent->IsGrabbing() && !PropulseComponent->IsOn();
+	return (StateSettings & EStateSettings::CanReflect) == EStateSettings::CanReflect && !GrabbingComponent->IsGrabbing();
 }
 
 void UState::OnMovePressed(FVector2D InMoveInput)
@@ -273,7 +268,7 @@ bool UState::TryGrab()
 			FRecordedAction(ERecordedAction::TryRelease), FRecordedAction(ERecordedAction::ForceGrab));
 		}
 		
-		return true; // We return true no matter what, because if if release fail, we still can't interact after
+		return true; // We return true no matter what, because if release fail, we still can't interact after
 	}
 	
 	FGrabbingRules GrabbingRules = FGrabbingRules();
@@ -307,28 +302,6 @@ bool UState::TryInteract()
 	}
 	
 	return bTryInteract;
-}
-
-void UState::OnPropulseInputStarted()
-{
-	if (CanUsePropulse() && IsValid(PropulseComponent))
-	{
-		PropulseComponent->StartPropulse();
-
-		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
-			FRecordedAction(ERecordedAction::StartPropulse));
-	}
-}
-
-void UState::OnPropulseInputStopped()
-{
-	if (CanUsePropulse() && IsValid(PropulseComponent))
-	{
-		PropulseComponent->StopPropulse();
-
-		if (IsValid(RecordHandlerComponent)) RecordHandlerComponent->RegisterActionInRecord(
-			FRecordedAction(ERecordedAction::StopPropulse));
-	}
 }
 
 void UState::OnPropulsed(const FVector& PropulseDirection, float PropulsePower)
