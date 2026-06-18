@@ -115,11 +115,6 @@ protected:
 	bool TryInteract();
 	
 	UFUNCTION(meta=(DeprecatedFunction))
-	void OnPropulseInputStarted();
-	UFUNCTION(meta=(DeprecatedFunction))
-	void OnPropulseInputStopped();
-	
-	UFUNCTION(meta=(DeprecatedFunction))
 	void OnPropulsed(const FVector& PropulseDirection, float PropulsePower);
 	
 	UFUNCTION()
@@ -159,7 +154,4 @@ protected:
 	
 	UPROPERTY()
 	TObjectPtr<UReflectComponent> ReflectComponent;
-	
-	UPROPERTY()
-	TObjectPtr<UPropulseComponent> PropulseComponent;
 };
