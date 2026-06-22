@@ -17,7 +17,9 @@ enum class ETutorialEvent: uint8
 	ShowInfoTutorialPrompt,
 	HideTutorialPrompt,
 	LockInputAction,
+	LockAllInputActions,
 	UnlockInputAction,
+	UnlockAllInputActions,
 };
 
 
