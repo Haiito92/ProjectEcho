@@ -1073,6 +1073,7 @@ void URecordManagerSubsystem::DestroyTimeline(int TimelineIndex)
 
 void URecordManagerSubsystem::ForceDestroyAllTimelines()
 {
+	if (bIsPlayerRewinding) return; //Skip Function if Player is Rewinding
 	if (bIsRecording)
 	{
 		StopRecord();
@@ -1103,8 +1104,9 @@ void URecordManagerSubsystem::IncrementSelectedSlot()
 			if (SelectedSlot >= GlobalTimeline.NbSlots) SelectedSlot = 0;
 		}
 		while (!GlobalTimeline.Timelines.Contains(SelectedSlot));
+	
+		OnTimelineSelected.Broadcast(PreviouslySelectedSlot, SelectedSlot);
 	}
-	OnTimelineSelected.Broadcast(PreviouslySelectedSlot, SelectedSlot);
 }
 
 void URecordManagerSubsystem::DecrementSelectedSlot()
@@ -1121,9 +1123,9 @@ void URecordManagerSubsystem::DecrementSelectedSlot()
 			if (SelectedSlot < 0) SelectedSlot = GlobalTimeline.NbSlots - 1;
 		}
 		while (!GlobalTimeline.Timelines.Contains(SelectedSlot));
-	}
 	
-	OnTimelineSelected.Broadcast(PreviouslySelectedSlot, SelectedSlot);
+		OnTimelineSelected.Broadcast(PreviouslySelectedSlot, SelectedSlot);
+	}
 }
 
 void URecordManagerSubsystem::SelectSlot(int Index, bool bCanSelectNonExistentTimeline)
