@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Commands/Command.h"
 #include "Engine/DataAsset.h"
 #include "TutorialSettingsData.generated.h"
 
@@ -40,4 +41,16 @@ class PROJECTECHO_API UTutorialSettingsData : public UDataAsset
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tutorial UI")
 	TMap<EPlayerActionType, FActionTutorialUIData> ActionTutorialsInfo;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tutorial Commands")
+	TArray<TObjectPtr<UCommand>> FirstRecordCommands;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tutorial Commands")
+	TArray<TObjectPtr<UCommand>> FirstStopRecordCommands;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tutorial Commands")
+	TArray<TObjectPtr<UCommand>> FirstPlayerRewindEndCommands;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tutorial Commands")
+	TArray<TObjectPtr<UCommand>> FirstTimelineDestroyedCommands;
 };
