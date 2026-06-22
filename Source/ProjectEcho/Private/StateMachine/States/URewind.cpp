@@ -14,6 +14,7 @@ void URewind::InitState(UStateMachine* InStateMachine, ACharacterST* InCharacter
 	EnumState = EState::Rewind;
 	StateSettings ^= EStateSettings::CanBeReflected;
 	StateSettings ^= EStateSettings::CanBePropulsed;
+	StateSettings ^= EStateSettings::CanBeLaserized;
 }
 
 void URewind::Tick(float DeltaTime)
@@ -23,6 +24,7 @@ void URewind::Tick(float DeltaTime)
 
 void URewind::Enter()
 {
+	
 	Character->GetCharacterMovement()->DisableMovement();
 	Character->GetCharacterMovement()->StopMovementImmediately();
 	RecordManagerSubsystem->OnStopPlayerRewinding.AddDynamic(this, &URewind::OnRewindingEnded);

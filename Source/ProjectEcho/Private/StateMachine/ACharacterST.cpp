@@ -309,6 +309,11 @@ void ACharacterST::Kill_Implementation()
 	}
 }
 
+bool ACharacterST::CanBeLaserized_Implementation() const
+{
+	return bCanBeLaserized;
+}
+
 void ACharacterST::Laserize_Implementation()
 {
 	ILaserizable::Laserize_Implementation();

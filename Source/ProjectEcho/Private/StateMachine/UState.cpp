@@ -54,6 +54,8 @@ void UState::Enter()
 
 	Character->bCanBeReflected = (StateSettings & EStateSettings::CanBeReflected) == EStateSettings::CanBeReflected;
 	Character->bCanBePropulsed = (StateSettings & EStateSettings::CanBePropulsed) == EStateSettings::CanBePropulsed;
+	Character->bCanBeLaserized = (StateSettings & EStateSettings::CanBeLaserized) == EStateSettings::CanBeLaserized;
+	
 	
 	if (Character->ConsumeShouldRestoreReflect())
 	{
@@ -95,6 +97,7 @@ void UState::Exit()
 
 	Character->bCanBeReflected = false;
 	Character->bCanBePropulsed = false;
+	Character->bCanBeLaserized = false;
 }
 
 bool UState::CanUseGrab()

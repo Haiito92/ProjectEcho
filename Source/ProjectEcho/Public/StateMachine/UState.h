@@ -24,7 +24,8 @@ enum class EStateSettings: uint8
 	CanBePropulsed = 1 << 4,
 	CanReflect = 1 << 5,
 	CanBeReflected = 1 << 6,
-	All = 0b01111111
+	CanBeLaserized = 1 << 7,
+	All = 0b11111111
 };
 
 ENUM_CLASS_FLAGS(EStateSettings);
