@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameEvents/GameEventInfo.h"
 #include "GameFramework/GameModeBase.h"
 #include "EchoGameModeBase.generated.h"
 
+class UGameEventSubsystem;
 class UMenuEventHolder;
 class AEchoPlayerControllerBase;
 class AEchoHUDBase;
@@ -28,6 +30,7 @@ protected:
 	
 private:
 	void StartGame();
+	UFUNCTION(BlueprintCallable)
 	void EndGame();
 	
 public:
@@ -62,6 +65,9 @@ protected:
 	UFUNCTION()
 	void OnPauseInputStarted();
 	
+	UFUNCTION()
+	void OnGameEventLaunched(const FGameEventInfo& EventInfo);
+	
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UMenuEventHolder> MenuEventHolder;
 	
@@ -73,4 +79,7 @@ protected:
 	
 	UPROPERTY()
 	bool bIsGamePaused = false;
+	
+	UPROPERTY()
+	TObjectPtr<UGameEventSubsystem> GameEventSubsystem;
 };

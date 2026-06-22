@@ -3,6 +3,7 @@
 
 #include "GameModes/EchoGameModeBase.h"
 #include "EchoSystem.h"
+#include "GameEvents/GameEventSubsystem.h"
 #include "HUDs/EchoHUDBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "PlayerControllers/EchoPlayerControllerBase.h"
@@ -40,6 +41,20 @@ void AEchoGameModeBase::SpawnActors()
 
 void AEchoGameModeBase::InitializeGame()
 {
+	UWorld* World = GetWorld();
+	
+	if (IsValid(World))
+	{
+		GameEventSubsystem = GetWorld()->GetSubsystem<UGameEventSubsystem>();
+		
+		if (IsValid(GameEventSubsystem))
+		{
+			GameEventSubsystem->InitializeEventSubsytem();
+			
+			GameEventSubsystem->OnGameEventLaunched.AddDynamic(this, &ThisClass::OnGameEventLaunched);
+		}
+	}
+	
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 	if (IsValid(PlayerController))
 	{
@@ -82,6 +97,8 @@ void AEchoGameModeBase::StartGame()
 void AEchoGameModeBase::EndGame()
 {
 	UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Log, "End Game", FColor::Orange, 3.0f);
+
+	ReceiveEndGame();
 }
 
 void AEchoGameModeBase::ToggleGamePause()
@@ -125,4 +142,20 @@ void AEchoGameModeBase::ResumeGame()
 void AEchoGameModeBase::OnPauseInputStarted()
 {
 	ToggleGamePause();
+}
+
+void AEchoGameModeBase::OnGameEventLaunched(const FGameEventInfo& EventInfo)
+{
+	switch (EventInfo.Event)
+	{
+		case EGameEvent::AskEndGame:
+		{
+			EndGame();
+			break;
+		}
+		default:
+		{
+			break;
+		}
+	}
 }
