@@ -111,6 +111,9 @@ public:
 	void ReceiveDeathInRecord();
 	
 	UFUNCTION(BlueprintCallable)
+	virtual bool CanBeLaserized_Implementation() const override ;
+	
+	UFUNCTION(BlueprintCallable)
 	virtual void Laserize_Implementation() override;
 	
 	UFUNCTION(BlueprintCallable)
@@ -368,6 +371,9 @@ public:
 	bool bCanBeReflected = false;
 	UPROPERTY()
 	bool bCanBePropulsed = false;
+	
+	UPROPERTY()
+	bool bCanBeLaserized = false;
 	
 	UPROPERTY()
 	bool bShouldRestoreReflect = false;

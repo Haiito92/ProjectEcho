@@ -2,6 +2,3 @@
 
 
 #include "LaserMechanic/Laserizable.h"
-
-
-// Add default functionality here for any ILaserizable functions that are not pure virtual.
