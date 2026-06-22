@@ -61,8 +61,8 @@ public:
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Options Settings")
 	TSoftObjectPtr<UOptionsSettingsData> OptionsSettings;
 	
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="UI Settings")
-	TSoftObjectPtr<UTutorialSettingsData> UISettings;
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Tutorial Settings")
+	TSoftObjectPtr<UTutorialSettingsData> TutorialSettings;
 	
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Dialogue Settings")
 	TSoftObjectPtr<UDialogueSystemSettings> DialogueSettings;
