@@ -25,6 +25,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void ResumeHUD();
 	
+	UFUNCTION(BlueprintCallable)
+	virtual void ShowEchoHUD();
+	UFUNCTION(BlueprintCallable)
+	virtual void HideEchoHUD();
+	
 private:
 	virtual void InternalHUDInit(AEchoPlayerControllerBase* InEchoPlayerController, UMenuEventHolder* InMenuEventHolder);
 	virtual void CreateWidgets();
@@ -48,6 +53,12 @@ protected:
 	
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="Receive Resume HUD"))
 	void ReceiveResumeHUD();
+	
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="Receive Show Echo HUD"))
+	void ReceiveShowEchoHUD();
+	
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="Receive Hide Echo HUD"))
+	void ReceiveHideEchoHUD();
 	
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UMenuEventHolder> MenuEventHolder;
