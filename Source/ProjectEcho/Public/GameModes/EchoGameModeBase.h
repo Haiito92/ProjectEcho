@@ -71,7 +71,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UMenuEventHolder> MenuEventHolder;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<AEchoHUDBase> EchoHUD;
 	
 	UPROPERTY(BlueprintReadOnly)

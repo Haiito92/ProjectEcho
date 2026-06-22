@@ -28,6 +28,16 @@ void AEchoHUDBase::ResumeHUD()
 	ReceiveResumeHUD();
 }
 
+void AEchoHUDBase::ShowEchoHUD()
+{
+	ReceiveShowEchoHUD();
+}
+
+void AEchoHUDBase::HideEchoHUD()
+{
+	ReceiveHideEchoHUD();
+}
+
 void AEchoHUDBase::InternalHUDInit(AEchoPlayerControllerBase* InEchoPlayerController, UMenuEventHolder* InMenuEventHolder)
 {
 	MenuEventHolder = InMenuEventHolder;
