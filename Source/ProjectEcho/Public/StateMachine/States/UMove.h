@@ -12,6 +12,7 @@ class PROJECTECHO_API UMove : public UState
 	GENERATED_BODY()
 public:
 	void Enter() override;
+	virtual void Tick(float DeltaTime) override;
 	void Exit() override;
 	virtual void InitState(UStateMachine* InStateMachine, ACharacterST* InCharacter) override;
 	
