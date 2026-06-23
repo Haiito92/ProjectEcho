@@ -29,6 +29,9 @@ public:
 	
 	virtual TOptional<bool> QueryShowFocus(const EFocusCause InFocusCause) const override;
 	
+	UFUNCTION(BlueprintCallable)
+	void SetShouldBroadcastFocusEvents(bool InShouldBroadcastFocusEvents);
+	
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveReceivedFocus();
@@ -45,4 +48,7 @@ private:
 	
 	UPROPERTY()
 	TObjectPtr<UDeviceGameInstanceSubsystem> DeviceSubsystem;
+	
+	UPROPERTY()
+	bool ShouldBroadcastFocusEvents;
 };
