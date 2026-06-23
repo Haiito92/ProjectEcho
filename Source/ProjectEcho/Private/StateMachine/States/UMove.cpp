@@ -11,6 +11,12 @@ void UMove::Enter()
 	Character->OnJumpingStarted.AddDynamic(this, &UMove::OnJumpingStarted);
 }
 
+void UMove::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	CheckIsFalling();
+}
+
 void UMove::Exit()
 {
 	Super::Exit();

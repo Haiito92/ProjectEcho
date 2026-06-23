@@ -8,6 +8,7 @@
 #include "Tools/Debug/DebugDataAsset.h"
 #include "DataAssetDeveloperSettings.generated.h"
 
+class UGameloopSettings;
 class UDialogueSystemSettings;
 class UTutorialSettingsData;
 class UOptionsSettingsData;
@@ -66,4 +67,7 @@ public:
 	
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Dialogue Settings")
 	TSoftObjectPtr<UDialogueSystemSettings> DialogueSettings;
+	
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category="Gameloop Settings")
+	TSoftObjectPtr<UGameloopSettings> GameloopSettings;
 };
