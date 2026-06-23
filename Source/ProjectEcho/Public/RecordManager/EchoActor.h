@@ -92,6 +92,8 @@ public:
 	FRotator GetEchoControlRotation();
 	
 	virtual void HandleFootstep_Implementation(bool bRightFoot) override;
+	
+	virtual void HandleLanding_Implementation() override;
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
@@ -123,6 +125,9 @@ protected:
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveHandleFootstep(bool bIsRightFoot);
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveHandleLanding();
 	
 public:	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEchoDestroyedSignature, int, EchoIndex);

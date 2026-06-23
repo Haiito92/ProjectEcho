@@ -24,4 +24,7 @@ class PROJECTECHO_API IEchoInterface
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void HandleFootstep(bool bRightFoot);
+	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void HandleLanding();
 };
