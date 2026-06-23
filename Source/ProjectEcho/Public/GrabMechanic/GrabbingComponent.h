@@ -47,7 +47,7 @@ public:
 	
 	//Try Force Grab at Holding Position (Grabs Fakely Held Cube, used for Echoes in Rewind)
 	UFUNCTION(BLueprintCallable)
-	virtual void TryForceGrabHeldCube(const FGrabbingRules& GrabbingRules);
+	virtual bool TryForceGrabHeldCube(const FGrabbingRules& GrabbingRules);
 	
 	//Has Object Currently Grabbed
 	UFUNCTION(BlueprintCallable, BlueprintPure)

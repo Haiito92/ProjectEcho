@@ -156,13 +156,13 @@ void UGrabbingComponent::ForceGrab(AActor* Actor, const FGrabbingRules& Grabbing
 	}
 }
 
-void UGrabbingComponent::TryForceGrabHeldCube(const FGrabbingRules& GrabbingRules)
+bool UGrabbingComponent::TryForceGrabHeldCube(const FGrabbingRules& GrabbingRules)
 {
-	if (IsGrabbing()) return;
+	if (IsGrabbing()) return false;
 	if (!IsValid(GrabMechanicSettings))
 	{
 		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Grab, EEchoMessageType::Error,"GrabSettings not found, Can't Grab !", FColor::White, 3.f);
-		return;
+		return false;
 	}
 	FHitResult HitResult;
 	FCollisionQueryParams TraceParams = FCollisionQueryParams::DefaultQueryParam;
@@ -197,12 +197,14 @@ void UGrabbingComponent::TryForceGrabHeldCube(const FGrabbingRules& GrabbingRule
 			}
 			else { GrabbedActor->AttachToComponent(this, AttachmentTransformRules);}
 			IGrabbableInterface::Execute_OnObjectForceGrabbed(GrabbedActor, this->GetOwner());
+			return true;
 		}
 	}
 	else
 	{
 		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Grab, EEchoMessageType::Error,"Failed to Try ForceGrab Held Cube (Nothing found on SphereCast)", FColor::White, 3.f);
 	}
+	return false;
 }
 
 bool UGrabbingComponent::IsGrabbing()
