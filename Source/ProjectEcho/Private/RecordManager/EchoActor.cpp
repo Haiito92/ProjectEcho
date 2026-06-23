@@ -131,6 +131,12 @@ void AEchoActor::HandleFootstep_Implementation(bool bRightFoot)
 	ReceiveHandleFootstep(bRightFoot);
 }
 
+void AEchoActor::HandleLanding_Implementation()
+{
+	//Call BP Function
+	ReceiveHandleLanding();
+}
+
 void AEchoActor::RegisterRecordable(TScriptInterface<IRecordableInterface> Recordable)
 {
 	OnRegisterRecordable.Broadcast(Recordable);
