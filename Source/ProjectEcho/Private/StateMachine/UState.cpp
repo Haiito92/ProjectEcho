@@ -276,6 +276,7 @@ bool UState::TryGrab()
 	
 	FGrabbingRules GrabbingRules = FGrabbingRules();
 	GrabbingRules.CollisionChannelsToIgnore.Add(ECC_Pawn);
+	GrabbingRules.bMakeTransparent = true;
 	
 	bool TryGrab = GrabbingComponent->TryGrab(Character->GetControlRotation(), GrabbingRules); 
 	
