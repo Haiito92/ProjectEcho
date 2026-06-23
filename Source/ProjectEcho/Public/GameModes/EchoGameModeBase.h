@@ -7,6 +7,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "EchoGameModeBase.generated.h"
 
+class UEchoGameViewportClient;
 class UGameEventSubsystem;
 class UMenuEventHolder;
 class AEchoPlayerControllerBase;
@@ -82,4 +83,7 @@ protected:
 	
 	UPROPERTY()
 	TObjectPtr<UGameEventSubsystem> GameEventSubsystem;
+	
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UEchoGameViewportClient> EchoGameViewportClient;
 };
