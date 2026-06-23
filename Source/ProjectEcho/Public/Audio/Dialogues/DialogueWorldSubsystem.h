@@ -7,9 +7,27 @@
 #include "DialogueWorldSubsystem.generated.h"
 
 class UDialogueSystemSettings;
+class USoundBase;
+class UCommand;
 /**
  * 
  */
+USTRUCT(Blueprintable, BlueprintType)
+struct FQueuedDialogueInfo
+{
+	GENERATED_BODY()
+	
+public:
+	FQueuedDialogueInfo() = default;
+	~FQueuedDialogueInfo() = default;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<USoundBase> DialogueQueued = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<UCommand*> DialogueEndCommands = TArray<UCommand*>();
+};
+
 UCLASS()
 class PROJECTECHO_API UDialogueWorldSubsystem : public UWorldSubsystem
 {
@@ -19,23 +37,23 @@ public:
 	UFUNCTION()
 	void InitializeDialogueSubsystem();
 	
-	UFUNCTION(BlueprintCallable)
-	void QueueDialogue2D(USoundBase* DialogueToQueue);
+	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="QueuedDialogueInfo"))
+	void QueueDialogue2D(const FQueuedDialogueInfo& QueuedDialogueInfo);
 	
 private:
 	
 	void PlayNextDialogue2D();
-	void PlayDialogue2D(USoundBase* DialogueToPlay);
+	void PlayDialogue2D(const FQueuedDialogueInfo& DialogueToPlayInfo);
 	void OnCurrentDialogueEnded();
 	
 	
 	UPROPERTY()
-	USoundBase* CurrentlyPlayedDialogue;
+	FQueuedDialogueInfo CurrentlyPlayedDialogueInfo;
 	UPROPERTY()
 	FTimerHandle PlayedDialogueTimerHandle;
 	
 	UPROPERTY()
-	TArray<USoundBase*> QueuedDialogues;
+	TArray<FQueuedDialogueInfo> QueuedDialogues;
 	
 	UPROPERTY()
 	TObjectPtr<UDialogueSystemSettings> SystemSettings;

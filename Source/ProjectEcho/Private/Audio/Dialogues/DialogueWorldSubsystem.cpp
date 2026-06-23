@@ -2,7 +2,6 @@
 
 
 #include "Audio/Dialogues/DialogueWorldSubsystem.h"
-
 #include "DataAssetDeveloperSettings.h"
 #include "EchoSystem.h"
 #include "Audio/Dialogues/DialogueSystemSettings.h"
@@ -20,21 +19,21 @@ void UDialogueWorldSubsystem::InitializeDialogueSubsystem()
 	SystemSettings = DataDevSettings->DialogueSettings.LoadSynchronous();
 }
 
-void UDialogueWorldSubsystem::QueueDialogue2D(USoundBase* DialogueToQueue)
+void UDialogueWorldSubsystem::QueueDialogue2D(const FQueuedDialogueInfo& QueuedDialogueInfo)
 {
-	if (!IsValid(DialogueToQueue))
+	if (!IsValid(QueuedDialogueInfo.DialogueQueued))
 	{
 		UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::Audio, EEchoMessageType::Error, "Can't queue dialogue: dialogue is not valid!", FColor::Red, 3.0f);
 		return;
 	}
 	
-	if (CurrentlyPlayedDialogue == nullptr)
+	if (CurrentlyPlayedDialogueInfo.DialogueQueued == nullptr)
 	{
-		PlayDialogue2D(DialogueToQueue);
+		PlayDialogue2D(QueuedDialogueInfo);
 		return;
 	}
 	
-	QueuedDialogues.Add(DialogueToQueue);
+	QueuedDialogues.Add(QueuedDialogueInfo);
 }
 
 void UDialogueWorldSubsystem::PlayNextDialogue2D()
@@ -45,15 +44,17 @@ void UDialogueWorldSubsystem::PlayNextDialogue2D()
 		return;
 	}
 	
-	USoundBase* NextDialogue = QueuedDialogues[0];
+	FQueuedDialogueInfo NextDialogueInfo = QueuedDialogues[0];
 	QueuedDialogues.RemoveAt(0);
 	
-	PlayDialogue2D(NextDialogue);
+	PlayDialogue2D(NextDialogueInfo);
 }
 
-void UDialogueWorldSubsystem::PlayDialogue2D(USoundBase* DialogueToPlay)
+void UDialogueWorldSubsystem::PlayDialogue2D(const FQueuedDialogueInfo& DialogueToPlayInfo)
 {
-	float DialogueDuration = DialogueToPlay->GetDuration();
+	if (!IsValid(DialogueToPlayInfo.DialogueQueued)) return;
+	
+	float DialogueDuration = DialogueToPlayInfo.DialogueQueued->GetDuration();
 	
 	FTimerDelegate DialogueTimerDelegate;
 	DialogueTimerDelegate.BindUObject(this, &ThisClass::OnCurrentDialogueEnded);
@@ -64,27 +65,30 @@ void UDialogueWorldSubsystem::PlayDialogue2D(USoundBase* DialogueToPlay)
 		DialogueDuration,
 		false);
 	
-	CurrentlyPlayedDialogue = DialogueToPlay;
+	CurrentlyPlayedDialogueInfo = DialogueToPlayInfo;
 	
-	UGameplayStatics::PlaySound2D(GetWorld(), DialogueToPlay);
+	UGameplayStatics::PlaySound2D(GetWorld(), DialogueToPlayInfo.DialogueQueued);
 }
 
 void UDialogueWorldSubsystem::OnCurrentDialogueEnded()
 {
-	FDialogueCommandData* CommandData = SystemSettings->DialogueCommands.Find(CurrentlyPlayedDialogue);
+	FDialogueCommandData* GlobalCommandData = SystemSettings->DialogueCommands.Find(CurrentlyPlayedDialogueInfo.DialogueQueued);
 	
-	if (CommandData != nullptr)
+	if (GlobalCommandData != nullptr)
 	{
-		if (!CommandData->bReachEndOnce)
+		if (!GlobalCommandData->bReachEndOnce)
 		{
-			CommandData->bReachEndOnce = true;
-			UCommandFunctionLibrary::ExecuteCommandsWithContextFromWorld(CommandData->OnceDialogueEndCommands, GetWorld());
+			GlobalCommandData->bReachEndOnce = true;
+			UCommandFunctionLibrary::ExecuteCommandsWithContextFromWorld(GlobalCommandData->OnceDialogueEndCommands, GetWorld());
 		}
 		
-		UCommandFunctionLibrary::ExecuteCommandsWithContextFromWorld(CommandData->DialogueEndCommands, GetWorld());
+		UCommandFunctionLibrary::ExecuteCommandsWithContextFromWorld(GlobalCommandData->DialogueEndCommands, GetWorld());
 	}
 	
-	CurrentlyPlayedDialogue = nullptr;
+	UCommandFunctionLibrary::ExecuteCommandsWithContextFromWorld(CurrentlyPlayedDialogueInfo.DialogueEndCommands, GetWorld());
+	
+	
+	CurrentlyPlayedDialogueInfo = FQueuedDialogueInfo();
 	
 	PlayNextDialogue2D();
 }
