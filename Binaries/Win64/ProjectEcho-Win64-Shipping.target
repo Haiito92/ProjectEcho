@@ -3397,6 +3397,10 @@
 			"Type": "UFS"
 		},
 		{
+			"Path": "$(EngineDir)/Plugins/Experimental/GPULightmass/GPULightmass.uplugin",
+			"Type": "UFS"
+		},
+		{
 			"Path": "$(EngineDir)/Plugins/Experimental/GeometryCollectionPlugin/GeometryCollectionPlugin.uplugin",
 			"Type": "UFS"
 		},
@@ -3850,6 +3854,7 @@
 		"Fracture",
 		"FullBodyIK",
 		"GLTFExporter",
+		"GPULightmass",
 		"GPUReshape",
 		"GameplayCameras",
 		"GameplayStateTree",
