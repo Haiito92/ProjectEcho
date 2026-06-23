@@ -2,6 +2,8 @@
 
 
 #include "GameModes/EchoGameModeBase.h"
+
+#include "DataAssetDeveloperSettings.h"
 #include "EchoSystem.h"
 #include "GameEvents/GameEventSubsystem.h"
 #include "GameInstance/EchoGameplayStatics.h"
@@ -12,6 +14,7 @@
 #include "Tools/Debug/EchoDebug.h"
 #include "Tools/Debug/EchoMessageType.h"
 #include "UI/MenuEvents/MenuEventHolder.h"
+#include "GameModes/GameloopSettings.h"
 
 void AEchoGameModeBase::BeginPlay()
 {
@@ -69,6 +72,12 @@ void AEchoGameModeBase::InitializeGame()
 			EchoPlayerController->PauseInputStarted.AddDynamic(this, &AEchoGameModeBase::OnPauseInputStarted);
 		}
 		else UEchoDebug::LogAndAddOnScreenDebugMessage(EEchoSystem::GameLoop, EEchoMessageType::Error, "Failed to initialize player controller", FColor::Red, 3.0f);
+	}
+	
+	const UDataAssetDeveloperSettings* DataAssetSettings = GetDefault<UDataAssetDeveloperSettings>();
+	if (IsValid(DataAssetSettings))
+	{
+		GameloopSettings = DataAssetSettings->GameloopSettings.LoadSynchronous();
 	}
 }
 
