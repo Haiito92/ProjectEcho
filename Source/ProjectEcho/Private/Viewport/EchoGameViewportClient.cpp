@@ -14,6 +14,8 @@ void UEchoGameViewportClient::Init(struct FWorldContext& WorldContext, UGameInst
 {
 	Super::Init(WorldContext, OwningGameInstance, bCreateNewAudioDevice);
 	
+	ShouldBroadcastFocusEvents = true;
+	
 	DeviceSubsystem = GetGameInstance()->GetSubsystem<UDeviceGameInstanceSubsystem>();
 	
 	if (!IsValid(DeviceSubsystem)) UEchoDebug::Log(EEchoSystem::GameLoop, EEchoMessageType::Error, "Viewport: Device subsystem invalid");
@@ -53,7 +55,7 @@ void UEchoGameViewportClient::ReceivedFocus(FViewport* InViewport)
 	
 	ReceiveReceivedFocus();
 	
-	OnViewportReceivedFocus.Broadcast();
+	if (ShouldBroadcastFocusEvents) OnViewportReceivedFocus.Broadcast();
 }
 
 void UEchoGameViewportClient::LostFocus(FViewport* InViewport)
@@ -62,10 +64,15 @@ void UEchoGameViewportClient::LostFocus(FViewport* InViewport)
 	
 	ReceiveLostFocus();
 	
-	OnViewportLostFocus.Broadcast();
+	if (ShouldBroadcastFocusEvents) OnViewportLostFocus.Broadcast();
 }
 
 TOptional<bool> UEchoGameViewportClient::QueryShowFocus(const EFocusCause InFocusCause) const
 {
 	return Super::QueryShowFocus(InFocusCause);
+}
+
+void UEchoGameViewportClient::SetShouldBroadcastFocusEvents(bool InShouldBroadcastFocusEvents)
+{
+	ShouldBroadcastFocusEvents = InShouldBroadcastFocusEvents;
 }
