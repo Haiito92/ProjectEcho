@@ -4,6 +4,7 @@
 #include "GameModes/EchoGameModeBase.h"
 #include "EchoSystem.h"
 #include "GameEvents/GameEventSubsystem.h"
+#include "GameInstance/EchoGameplayStatics.h"
 #include "HUDs/EchoHUDBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "PlayerControllers/EchoPlayerControllerBase.h"
@@ -53,6 +54,8 @@ void AEchoGameModeBase::InitializeGame()
 			
 			GameEventSubsystem->OnGameEventLaunched.AddDynamic(this, &ThisClass::OnGameEventLaunched);
 		}
+		
+		EchoGameViewportClient = UEchoGameplayStatics::GetEchoGameViewportClient(World);
 	}
 	
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
