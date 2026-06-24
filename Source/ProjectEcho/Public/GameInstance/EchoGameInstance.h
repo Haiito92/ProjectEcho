@@ -4,11 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "Framework/Application/NavigationConfig.h"
 #include "EchoGameInstance.generated.h"
 
 /**
  * 
  */
+
+class FEchoNavigationConfig : public FNavigationConfig
+{
+public:
+	FEchoNavigationConfig();
+};
+
 UCLASS()
 class PROJECTECHO_API UEchoGameInstance : public UGameInstance
 {

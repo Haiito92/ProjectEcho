@@ -11,11 +11,22 @@
 #include "Tools/Debug/EchoMessageType.h"
 #include "Viewport/EchoGameViewportClient.h"
 
+FEchoNavigationConfig::FEchoNavigationConfig()
+{
+	KeyEventRules.Emplace(EKeys::Z, EUINavigation::Up);
+	KeyEventRules.Emplace(EKeys::S, EUINavigation::Down);
+	KeyEventRules.Emplace(EKeys::Q, EUINavigation::Left);
+	KeyEventRules.Emplace(EKeys::D, EUINavigation::Right);
+}
+
 void UEchoGameInstance::Init()
 {
 	Super::Init();
 	
 	GEngine->SetMaxFPS(144);
+	
+	TSharedRef<FEchoNavigationConfig> Config = MakeShared<FEchoNavigationConfig>();
+	FSlateApplication::Get().SetNavigationConfig(Config);
 	
 	UOptionsGameInstanceSubsystem* OptionsSubsystem = GetSubsystem<UOptionsGameInstanceSubsystem>();
 	
