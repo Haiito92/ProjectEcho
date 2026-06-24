@@ -43,6 +43,42 @@
 			"Type": "SymbolFile"
 		},
 		{
+			"Path": "$(ProjectDir)/Binaries/Win64/boost_atomic-mt-x64.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
+			"Path": "$(ProjectDir)/Binaries/Win64/boost_chrono-mt-x64.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
+			"Path": "$(ProjectDir)/Binaries/Win64/boost_filesystem-mt-x64.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
+			"Path": "$(ProjectDir)/Binaries/Win64/boost_iostreams-mt-x64.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
+			"Path": "$(ProjectDir)/Binaries/Win64/boost_program_options-mt-x64.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
+			"Path": "$(ProjectDir)/Binaries/Win64/boost_python311-mt-x64.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
+			"Path": "$(ProjectDir)/Binaries/Win64/boost_regex-mt-x64.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
+			"Path": "$(ProjectDir)/Binaries/Win64/boost_system-mt-x64.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
+			"Path": "$(ProjectDir)/Binaries/Win64/boost_thread-mt-x64.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
 			"Path": "$(ProjectDir)/Binaries/Win64/tbb12.dll",
 			"Type": "DynamicLibrary"
 		},
@@ -3205,6 +3241,10 @@
 			"Type": "UFS"
 		},
 		{
+			"Path": "$(EngineDir)/Plugins/Animation/LiveLink/LiveLink.uplugin",
+			"Type": "UFS"
+		},
+		{
 			"Path": "$(EngineDir)/Plugins/Animation/RigLogic/RigLogic.uplugin",
 			"Type": "UFS"
 		},
@@ -3258,6 +3298,18 @@
 		},
 		{
 			"Path": "$(EngineDir)/Plugins/Developer/AnimationSharing/AnimationSharing.uplugin",
+			"Type": "UFS"
+		},
+		{
+			"Path": "$(EngineDir)/Plugins/Developer/Concert/ConcertMain/ConcertMain.uplugin",
+			"Type": "UFS"
+		},
+		{
+			"Path": "$(EngineDir)/Plugins/Developer/Concert/ConcertSync/ConcertSyncClient/ConcertSyncClient.uplugin",
+			"Type": "UFS"
+		},
+		{
+			"Path": "$(EngineDir)/Plugins/Developer/Concert/ConcertSync/ConcertSyncCore/ConcertSyncCore.uplugin",
 			"Type": "UFS"
 		},
 		{
@@ -3429,6 +3481,10 @@
 			"Type": "UFS"
 		},
 		{
+			"Path": "$(EngineDir)/Plugins/Experimental/GPULightmass/GPULightmass.uplugin",
+			"Type": "UFS"
+		},
+		{
 			"Path": "$(EngineDir)/Plugins/Experimental/GeometryCollectionPlugin/GeometryCollectionPlugin.uplugin",
 			"Type": "UFS"
 		},
@@ -3497,6 +3553,10 @@
 			"Type": "UFS"
 		},
 		{
+			"Path": "$(EngineDir)/Plugins/Importers/USDImporter/USDImporter.uplugin",
+			"Type": "UFS"
+		},
+		{
 			"Path": "$(EngineDir)/Plugins/Interchange/Assets/InterchangeAssets.uplugin",
 			"Type": "UFS"
 		},
@@ -3506,6 +3566,10 @@
 		},
 		{
 			"Path": "$(EngineDir)/Plugins/Interchange/Runtime/Interchange.uplugin",
+			"Type": "UFS"
+		},
+		{
+			"Path": "$(EngineDir)/Plugins/Marketplace/FabLauncher/FabLauncher.uplugin",
 			"Type": "UFS"
 		},
 		{
@@ -3609,6 +3673,10 @@
 			"Type": "UFS"
 		},
 		{
+			"Path": "$(EngineDir)/Plugins/Runtime/Analytics/AnalyticsBlueprintLibrary/AnalyticsBlueprintLibrary.uplugin",
+			"Type": "UFS"
+		},
+		{
 			"Path": "$(EngineDir)/Plugins/Runtime/AndroidFileServer/AndroidFileServer.uplugin",
 			"Type": "UFS"
 		},
@@ -3654,6 +3722,10 @@
 		},
 		{
 			"Path": "$(EngineDir)/Plugins/Runtime/CustomMeshComponent/CustomMeshComponent.uplugin",
+			"Type": "UFS"
+		},
+		{
+			"Path": "$(EngineDir)/Plugins/Runtime/Database/SQLiteCore/SQLiteCore.uplugin",
 			"Type": "UFS"
 		},
 		{
@@ -3745,6 +3817,10 @@
 			"Type": "UFS"
 		},
 		{
+			"Path": "$(EngineDir)/Plugins/Runtime/USDCore/USDCore.uplugin",
+			"Type": "UFS"
+		},
+		{
 			"Path": "$(EngineDir)/Plugins/Runtime/WaveTable/WaveTable.uplugin",
 			"Type": "UFS"
 		},
@@ -3793,6 +3869,42 @@
 			"Type": "NonUFS"
 		},
 		{
+			"Path": "$(ProjectDir)/Binaries/Win64/boost_atomic-mt-x64.dll",
+			"Type": "NonUFS"
+		},
+		{
+			"Path": "$(ProjectDir)/Binaries/Win64/boost_chrono-mt-x64.dll",
+			"Type": "NonUFS"
+		},
+		{
+			"Path": "$(ProjectDir)/Binaries/Win64/boost_filesystem-mt-x64.dll",
+			"Type": "NonUFS"
+		},
+		{
+			"Path": "$(ProjectDir)/Binaries/Win64/boost_iostreams-mt-x64.dll",
+			"Type": "NonUFS"
+		},
+		{
+			"Path": "$(ProjectDir)/Binaries/Win64/boost_program_options-mt-x64.dll",
+			"Type": "NonUFS"
+		},
+		{
+			"Path": "$(ProjectDir)/Binaries/Win64/boost_python311-mt-x64.dll",
+			"Type": "NonUFS"
+		},
+		{
+			"Path": "$(ProjectDir)/Binaries/Win64/boost_regex-mt-x64.dll",
+			"Type": "NonUFS"
+		},
+		{
+			"Path": "$(ProjectDir)/Binaries/Win64/boost_system-mt-x64.dll",
+			"Type": "NonUFS"
+		},
+		{
+			"Path": "$(ProjectDir)/Binaries/Win64/boost_thread-mt-x64.dll",
+			"Type": "NonUFS"
+		},
+		{
 			"Path": "$(ProjectDir)/Binaries/Win64/tbb12.dll",
 			"Type": "NonUFS"
 		},
@@ -3812,6 +3924,7 @@
 		"ActorSequence",
 		"AdvancedRenamer",
 		"AlembicImporter",
+		"AnalyticsBlueprintLibrary",
 		"AndroidDeviceProfileSelector",
 		"AndroidFileServer",
 		"AndroidMedia",
@@ -3856,6 +3969,9 @@
 		"ColorGrading",
 		"CompositeCore",
 		"ComputeFramework",
+		"ConcertMain",
+		"ConcertSyncClient",
+		"ConcertSyncCore",
 		"ContentBrowserAssetDataSource",
 		"ContentBrowserClassDataSource",
 		"ControlRig",
@@ -3882,10 +3998,12 @@
 		"EnvironmentQueryEditor",
 		"ExampleDeviceProfileSelector",
 		"Fab",
+		"FabLauncher",
 		"FacialAnimation",
 		"Fracture",
 		"FullBodyIK",
 		"GLTFExporter",
+		"GPULightmass",
 		"GPUReshape",
 		"GameplayCameras",
 		"GameplayStateTree",
@@ -3916,6 +4034,7 @@
 		"LevelSequenceNavigatorBridge",
 		"LightMixer",
 		"LinuxDeviceProfileSelector",
+		"LiveLink",
 		"LocalizableMessage",
 		"LocationServicesBPLibrary",
 		"MacGraphicsSwitching",
@@ -3966,11 +4085,11 @@
 		"RenderDocPlugin",
 		"RenderGraphInsights",
 		"ResonanceAudio",
-		"RiderLink",
 		"RiderSourceCodeAccess",
 		"RigLogic",
 		"RigVM",
 		"RuntimeTelemetry",
+		"SQLiteCore",
 		"SequenceNavigator",
 		"SequenceValidator",
 		"SequencerAnimTools",
@@ -3992,6 +4111,8 @@
 		"TweeningUtils",
 		"UMGWidgetPreview",
 		"UObjectPlugin",
+		"USDCore",
+		"USDImporter",
 		"UVEditor",
 		"UbaController",
 		"UdpMessaging",
